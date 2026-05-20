@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Microsoft.EntityFrameworkCore.SqlServer" Version="13.1.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Modules\Search\Concertable.Search.Infrastructure\Concertable.Search.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Concertable.Messaging\Concertable.Messaging.AzureServiceBus\Concertable.Messaging.AzureServiceBus.csproj" />
+    <ProjectReference Include="..\..\Concertable.Messaging\Concertable.Messaging.Infrastructure\Concertable.Messaging.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Concertable.ServiceDefaults\Concertable.ServiceDefaults.csproj" />
+  </ItemGroup>
+
+</Project>
