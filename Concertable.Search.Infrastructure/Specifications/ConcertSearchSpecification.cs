@@ -1,22 +1,22 @@
-using Concertable.Search.Application.Interfaces;
+﻿using Concertable.Search.Application.Interfaces;
 using Concertable.Search.Domain.Models;
 
 namespace Concertable.Search.Infrastructure.Specifications;
 
 internal class ConcertSearchSpecification : IConcertSearchSpecification
 {
-    private readonly ISearchSpecification<ConcertSearchModel> searchSpecification;
+    private readonly ISearchSpecification<ConcertReadModel> searchSpecification;
     private readonly TimeProvider timeProvider;
 
     public ConcertSearchSpecification(
-        ISearchSpecification<ConcertSearchModel> searchSpecification,
+        ISearchSpecification<ConcertReadModel> searchSpecification,
         TimeProvider timeProvider)
     {
         this.searchSpecification = searchSpecification;
         this.timeProvider = timeProvider;
     }
 
-    public IQueryable<ConcertSearchModel> Apply(IQueryable<ConcertSearchModel> query, SearchParams searchParams)
+    public IQueryable<ConcertReadModel> Apply(IQueryable<ConcertReadModel> query, SearchParams searchParams)
     {
         query = query
             .Where(e => e.DatePosted != null)

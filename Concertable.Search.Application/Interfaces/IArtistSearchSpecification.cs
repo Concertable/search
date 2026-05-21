@@ -1,6 +1,6 @@
-namespace Concertable.Search.Application.Interfaces;
+﻿namespace Concertable.Search.Application.Interfaces;
 
 internal interface IArtistSearchSpecification
 {
-    IQueryable<ArtistSearchModel> Apply(IQueryable<ArtistSearchModel> query, SearchParams searchParams);
+    IQueryable<ArtistReadModel> Apply(IQueryable<ArtistReadModel> query, SearchParams searchParams);
 }

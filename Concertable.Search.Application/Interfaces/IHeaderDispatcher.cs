@@ -1,6 +1,6 @@
-namespace Concertable.Search.Application.Interfaces;
+﻿namespace Concertable.Search.Application.Interfaces;
 
-internal interface IHeaderModule
+internal interface IHeaderDispatcher
 {
     Task<IPagination<IHeader>> SearchAsync(SearchParams searchParams);
     Task<IEnumerable<IHeader>> GetByAmountAsync(HeaderType type, int amount);

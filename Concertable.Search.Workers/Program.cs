@@ -27,7 +27,9 @@ services.AddAzureServiceBusTransport(
         .SubscribeTo<ArtistChangedEvent>()
         .SubscribeTo<VenueChangedEvent>()
         .SubscribeTo<ConcertChangedEvent>()
-        .SubscribeTo<ReviewSubmittedEvent>());
+        .SubscribeTo<ArtistRatingUpdatedEvent>()
+        .SubscribeTo<VenueRatingUpdatedEvent>()
+        .SubscribeTo<ConcertRatingUpdatedEvent>());
 
 services.AddInbox(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("SearchDb")));
 

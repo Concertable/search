@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Concertable.Search.Api.Controllers;
@@ -7,25 +7,25 @@ namespace Concertable.Search.Api.Controllers;
 [Route("api/concert/headers")]
 internal class ConcertHeaderController : ControllerBase
 {
-    private readonly IConcertHeaderModule concertHeaderModule;
+    private readonly IConcertHeaderService concertheaderDispatcher;
 
-    public ConcertHeaderController(IConcertHeaderModule concertHeaderModule)
+    public ConcertHeaderController(IConcertHeaderService concertheaderDispatcher)
     {
-        this.concertHeaderModule = concertHeaderModule;
+        this.concertheaderDispatcher = concertheaderDispatcher;
     }
 
     [AllowAnonymous]
     [HttpGet("popular")]
     public async Task<IActionResult> GetPopular()
-        => Ok(await concertHeaderModule.GetPopularAsync());
+        => Ok(await concertheaderDispatcher.GetPopularAsync());
 
     [AllowAnonymous]
     [HttpGet("free")]
     public async Task<IActionResult> GetFree()
-        => Ok(await concertHeaderModule.GetFreeAsync());
+        => Ok(await concertheaderDispatcher.GetFreeAsync());
 
     [HttpGet("recommended")]
     [Authorize]
     public async Task<IActionResult> GetRecommended([FromQuery] ConcertParams concertParams)
-        => Ok(await concertHeaderModule.GetRecommendedAsync(concertParams));
+        => Ok(await concertheaderDispatcher.GetRecommendedAsync(concertParams));
 }

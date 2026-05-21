@@ -1,4 +1,4 @@
-using Concertable.Application.Interfaces.Geometry;
+﻿using Concertable.Application.Interfaces.Geometry;
 using Concertable.Concert.Contracts.Events;
 using Concertable.Messaging.Domain;
 using Concertable.Search.Infrastructure.Data;
@@ -32,13 +32,13 @@ internal class ConcertProjectionHandler : IIntegrationEventHandler<ConcertChange
 
         var location = geometryProvider.CreatePoint(e.Latitude, e.Longitude);
 
-        var concert = await context.Set<ConcertSearchModel>()
+        var concert = await context.Set<ConcertReadModel>()
             .Include(c => c.ConcertGenres)
             .FirstOrDefaultAsync(c => c.Id == e.ConcertId, ct);
 
         if (concert is null)
         {
-            concert = new ConcertSearchModel
+            concert = new ConcertReadModel
             {
                 Id = e.ConcertId,
                 ArtistId = e.ArtistId,
@@ -53,10 +53,10 @@ internal class ConcertProjectionHandler : IIntegrationEventHandler<ConcertChange
                 DatePosted = e.DatePosted,
                 Location = location
             };
-            context.Set<ConcertSearchModel>().Add(concert);
+            context.Set<ConcertReadModel>().Add(concert);
 
             foreach (var genre in e.Genres)
-                concert.ConcertGenres.Add(new ConcertSearchModelGenre { ConcertId = e.ConcertId, Genre = genre });
+                concert.ConcertGenres.Add(new ConcertReadModelGenre { ConcertId = e.ConcertId, Genre = genre });
         }
         else
         {
@@ -78,7 +78,7 @@ internal class ConcertProjectionHandler : IIntegrationEventHandler<ConcertChange
             foreach (var g in concert.ConcertGenres.Where(g => !desired.Contains(g.Genre)).ToList())
                 concert.ConcertGenres.Remove(g);
             foreach (var g in desired.Where(g => !current.Contains(g)))
-                concert.ConcertGenres.Add(new ConcertSearchModelGenre { ConcertId = e.ConcertId, Genre = g });
+                concert.ConcertGenres.Add(new ConcertReadModelGenre { ConcertId = e.ConcertId, Genre = g });
         }
 
         await context.SaveChangesAsync(ct);

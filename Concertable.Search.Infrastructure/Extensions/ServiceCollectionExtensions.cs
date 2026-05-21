@@ -1,4 +1,4 @@
-using Concertable.Artist.Contracts.Events;
+﻿using Concertable.Artist.Contracts.Events;
 using Concertable.Concert.Contracts.Events;
 using Concertable.DataAccess.Infrastructure;
 using Concertable.Search.Application;
@@ -27,13 +27,13 @@ public static class ServiceCollectionExtensions
                 sqlOpt => sqlOpt.UseNetTopologySuite()));
         services.AddScoped<ISearchDbContext>(sp => sp.GetRequiredService<SearchDbContext>());
         services.AddSingleton<SearchConfigurationProvider>();
-        services.AddSingleton<IGeometrySpecification<ArtistSearchModel>, GeometrySpecification<ArtistSearchModel>>();
-        services.AddSingleton<IGeometrySpecification<VenueSearchModel>, GeometrySpecification<VenueSearchModel>>();
-        services.AddSingleton<IGeometrySpecification<ConcertSearchModel>, GeometrySpecification<ConcertSearchModel>>();
+        services.AddSingleton<IGeometrySpecification<ArtistReadModel>, GeometrySpecification<ArtistReadModel>>();
+        services.AddSingleton<IGeometrySpecification<VenueReadModel>, GeometrySpecification<VenueReadModel>>();
+        services.AddSingleton<IGeometrySpecification<ConcertReadModel>, GeometrySpecification<ConcertReadModel>>();
 
-        services.AddSingleton<ISearchSpecification<ArtistSearchModel>, SearchSpecification<ArtistSearchModel>>();
-        services.AddSingleton<ISearchSpecification<VenueSearchModel>, SearchSpecification<VenueSearchModel>>();
-        services.AddSingleton<ISearchSpecification<ConcertSearchModel>, SearchSpecification<ConcertSearchModel>>();
+        services.AddSingleton<ISearchSpecification<ArtistReadModel>, SearchSpecification<ArtistReadModel>>();
+        services.AddSingleton<ISearchSpecification<VenueReadModel>, SearchSpecification<VenueReadModel>>();
+        services.AddSingleton<ISearchSpecification<ConcertReadModel>, SearchSpecification<ConcertReadModel>>();
 
         services.AddSingleton<IArtistSearchSpecification, ArtistSearchSpecification>();
         services.AddSingleton<IVenueSearchSpecification, VenueSearchSpecification>();
@@ -62,11 +62,11 @@ public static class ServiceCollectionExtensions
         services.AddKeyedScoped<IHeaderService, ArtistHeaderService>(HeaderType.Artist);
         services.AddKeyedScoped<IHeaderService, VenueHeaderService>(HeaderType.Venue);
         services.AddKeyedScoped<IHeaderService, ConcertHeaderService>(HeaderType.Concert);
-        services.AddScoped<IConcertHeaderModule, ConcertHeaderService>();
+        services.AddScoped<IConcertHeaderService, ConcertHeaderService>();
 
         services.AddScoped<IHeaderServiceFactory, HeaderServiceFactory>();
 
-        services.AddScoped<IHeaderModule, SearchModule>();
+        services.AddScoped<IHeaderDispatcher, HeaderDispatcher>();
 
         services.AddValidatorsFromAssemblyContaining<SearchParamsValidator>();
 
@@ -78,7 +78,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IIntegrationEventHandler<ArtistChangedEvent>, ArtistProjectionHandler>();
         services.AddScoped<IIntegrationEventHandler<VenueChangedEvent>, VenueProjectionHandler>();
         services.AddScoped<IIntegrationEventHandler<ConcertChangedEvent>, ConcertProjectionHandler>();
-        services.AddScoped<IIntegrationEventHandler<ReviewSubmittedEvent>, RatingProjectionHandler>();
+        services.AddScoped<IIntegrationEventHandler<ArtistRatingUpdatedEvent>, ArtistRatingProjectionHandler>();
+        services.AddScoped<IIntegrationEventHandler<VenueRatingUpdatedEvent>, VenueRatingProjectionHandler>();
+        services.AddScoped<IIntegrationEventHandler<ConcertRatingUpdatedEvent>, ConcertRatingProjectionHandler>();
         return services;
     }
 }

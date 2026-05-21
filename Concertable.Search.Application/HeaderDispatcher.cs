@@ -1,12 +1,12 @@
-using Concertable.Search.Application.Interfaces;
+﻿using Concertable.Search.Application.Interfaces;
 
 namespace Concertable.Search.Application;
 
-internal class SearchModule : IHeaderModule
+internal class HeaderDispatcher : IHeaderDispatcher
 {
     private readonly IHeaderServiceFactory headerServiceFactory;
 
-    public SearchModule(IHeaderServiceFactory headerServiceFactory)
+    public HeaderDispatcher(IHeaderServiceFactory headerServiceFactory)
     {
         this.headerServiceFactory = headerServiceFactory;
     }

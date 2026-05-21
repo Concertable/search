@@ -1,4 +1,4 @@
-using Concertable.DataAccess;
+﻿using Concertable.DataAccess;
 using Concertable.Search.Domain.Models;
 using Concertable.Search.Infrastructure.Data;
 using Concertable.Search.Infrastructure.Extensions;
@@ -11,14 +11,14 @@ internal class ConcertHeaderRepository : IConcertHeaderRepository
 {
     private readonly ISearchDbContext context;
     private readonly IConcertSearchSpecification searchSpecification;
-    private readonly IGeometrySpecification<ConcertSearchModel> geometrySpecification;
+    private readonly IGeometrySpecification<ConcertReadModel> geometrySpecification;
     private readonly ISortSpecification<ConcertHeaderDto> sortSpecification;
     private readonly TimeProvider timeProvider;
 
     public ConcertHeaderRepository(
         ISearchDbContext context,
         IConcertSearchSpecification searchSpecification,
-        IGeometrySpecification<ConcertSearchModel> geometrySpecification,
+        IGeometrySpecification<ConcertReadModel> geometrySpecification,
         ISortSpecification<ConcertHeaderDto> sortSpecification,
         TimeProvider timeProvider)
     {

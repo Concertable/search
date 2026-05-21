@@ -1,5 +1,4 @@
-using Concertable.Concert.Domain;
-using Concertable.Search.Domain.Models;
+﻿using Concertable.Search.Domain.Models;
 using LinqKit;
 
 namespace Concertable.Search.Infrastructure.Mappers;
@@ -7,7 +6,7 @@ namespace Concertable.Search.Infrastructure.Mappers;
 internal static class QueryableConcertHeaderMappers
 {
     public static IQueryable<ConcertHeaderDto> ToHeaderDtos(
-        this IQueryable<ConcertSearchModel> query,
+        this IQueryable<ConcertReadModel> query,
         IQueryable<ConcertRatingProjection> ratings) =>
         from c in query.Where(c => c.Venue.Location != null).AsExpandable()
         join r in ratings on c.Id equals r.ConcertId into rg

@@ -1,8 +1,8 @@
-using Concertable.Search.Application.Interfaces;
+﻿using Concertable.Search.Application.Interfaces;
 
 namespace Concertable.Search.Application.Services;
 
-internal class ConcertHeaderService : IHeaderService, IConcertHeaderModule
+internal class ConcertHeaderService : IHeaderService, IConcertHeaderService
 {
     private readonly IConcertHeaderRepository concertHeaderRepository;
 
@@ -18,9 +18,6 @@ internal class ConcertHeaderService : IHeaderService, IConcertHeaderModule
     }
 
     public async Task<IEnumerable<IHeader>> GetByAmountAsync(int amount) =>
-        await concertHeaderRepository.GetByAmountAsync(amount);
-
-    public async Task<IEnumerable<IHeader>> GetByAmountAsync(HeaderType type, int amount) =>
         await concertHeaderRepository.GetByAmountAsync(amount);
 
     public async Task<IEnumerable<ConcertHeaderDto>> GetPopularAsync() =>

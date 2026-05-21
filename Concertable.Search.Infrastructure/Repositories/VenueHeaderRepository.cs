@@ -1,4 +1,4 @@
-using Concertable.DataAccess;
+﻿using Concertable.DataAccess;
 using Concertable.Search.Infrastructure.Data;
 using Concertable.Search.Infrastructure.Mappers;
 using Microsoft.EntityFrameworkCore;
@@ -9,13 +9,13 @@ internal class VenueHeaderRepository : IVenueHeaderRepository
 {
     private readonly ISearchDbContext context;
     private readonly IVenueSearchSpecification searchSpecification;
-    private readonly IGeometrySpecification<VenueSearchModel> geometrySpecification;
+    private readonly IGeometrySpecification<VenueReadModel> geometrySpecification;
     private readonly ISortSpecification<VenueHeaderDto> sortSpecification;
 
     public VenueHeaderRepository(
         ISearchDbContext context,
         IVenueSearchSpecification searchSpecification,
-        IGeometrySpecification<VenueSearchModel> geometrySpecification,
+        IGeometrySpecification<VenueReadModel> geometrySpecification,
         ISortSpecification<VenueHeaderDto> sortSpecification)
     {
         this.context = context;
