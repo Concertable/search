@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Modules\Search\Concertable.Search.Api\Concertable.Search.Api.csproj" />
+    <ProjectReference Include="..\Concertable.Search.Api\Concertable.Search.Api.csproj" />
     <ProjectReference Include="..\..\Concertable.ServiceDefaults\Concertable.ServiceDefaults.csproj" />
   </ItemGroup>
 
