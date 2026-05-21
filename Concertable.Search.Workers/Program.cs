@@ -3,6 +3,7 @@ using Concertable.Concert.Contracts.Events;
 using Concertable.Messaging.Application;
 using Concertable.Messaging.AzureServiceBus;
 using Concertable.Messaging.Infrastructure.Extensions;
+using Concertable.Messaging.Infrastructure.Inbox;
 using Concertable.Search.Infrastructure.Extensions;
 using Concertable.Venue.Contracts.Events;
 using Microsoft.EntityFrameworkCore;
@@ -33,4 +34,9 @@ services.AddAzureServiceBusTransport(
 
 services.AddInbox(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("SearchDb")));
 
-builder.Build().Run();
+var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+    await scope.ServiceProvider.GetRequiredService<InboxDbContext>().Database.MigrateAsync();
+
+app.Run();
