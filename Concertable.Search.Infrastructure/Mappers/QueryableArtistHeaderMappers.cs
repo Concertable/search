@@ -1,5 +1,4 @@
-using Concertable.Artist.Domain;
-using Concertable.Search.Domain.Models;
+﻿using Concertable.Search.Domain.Models;
 using LinqKit;
 
 namespace Concertable.Search.Infrastructure.Mappers;
@@ -7,7 +6,7 @@ namespace Concertable.Search.Infrastructure.Mappers;
 internal static class QueryableArtistHeaderMappers
 {
     public static IQueryable<ArtistHeaderDto> ToHeaderDtos(
-        this IQueryable<ArtistSearchModel> query,
+        this IQueryable<ArtistReadModel> query,
         IQueryable<ArtistRatingProjection> ratings) =>
         from a in query.AsExpandable()
         where a.Address != null

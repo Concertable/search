@@ -1,4 +1,4 @@
-using Concertable.Search.Application.Interfaces;
+﻿using Concertable.Search.Application.Interfaces;
 
 namespace Concertable.Search.Application.Services;
 

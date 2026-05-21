@@ -1,12 +1,12 @@
-using Concertable.Search.Domain.Models;
+﻿using Concertable.Search.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Concertable.Search.Infrastructure.Data.Configurations;
 
-internal sealed class ConcertSearchModelGenreConfiguration : IEntityTypeConfiguration<ConcertSearchModelGenre>
+internal sealed class ConcertReadModelGenreConfiguration : IEntityTypeConfiguration<ConcertReadModelGenre>
 {
-    public void Configure(EntityTypeBuilder<ConcertSearchModelGenre> builder)
+    public void Configure(EntityTypeBuilder<ConcertReadModelGenre> builder)
     {
         builder.ToTable("ConcertGenres", "search");
         builder.HasKey(x => new { x.ConcertId, x.Genre });

@@ -1,4 +1,4 @@
-using Concertable.DataAccess;
+﻿using Concertable.DataAccess;
 using Concertable.Search.Infrastructure.Data;
 using Concertable.Search.Infrastructure.Mappers;
 using Microsoft.EntityFrameworkCore;
@@ -9,13 +9,13 @@ internal class ArtistHeaderRepository : IArtistHeaderRepository
 {
     private readonly ISearchDbContext context;
     private readonly IArtistSearchSpecification searchSpecification;
-    private readonly IGeometrySpecification<ArtistSearchModel> geometrySpecification;
+    private readonly IGeometrySpecification<ArtistReadModel> geometrySpecification;
     private readonly ISortSpecification<ArtistHeaderDto> sortSpecification;
 
     public ArtistHeaderRepository(
         ISearchDbContext context,
         IArtistSearchSpecification searchSpecification,
-        IGeometrySpecification<ArtistSearchModel> geometrySpecification,
+        IGeometrySpecification<ArtistReadModel> geometrySpecification,
         ISortSpecification<ArtistHeaderDto> sortSpecification)
     {
         this.context = context;

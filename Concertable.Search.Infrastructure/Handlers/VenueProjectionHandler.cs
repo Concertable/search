@@ -1,4 +1,4 @@
-using Concertable.Application.Interfaces.Geometry;
+﻿using Concertable.Application.Interfaces.Geometry;
 using Concertable.Messaging.Domain;
 using Concertable.Search.Infrastructure.Data;
 using Concertable.Shared.Infrastructure.Services.Geometry;
@@ -32,12 +32,12 @@ internal class VenueProjectionHandler : IIntegrationEventHandler<VenueChangedEve
 
         var location = geometryProvider.CreatePoint(e.Latitude, e.Longitude);
 
-        var venue = await context.Set<VenueSearchModel>()
+        var venue = await context.Set<VenueReadModel>()
             .FirstOrDefaultAsync(v => v.Id == e.VenueId, ct);
 
         if (venue is null)
         {
-            context.Set<VenueSearchModel>().Add(new VenueSearchModel
+            context.Set<VenueReadModel>().Add(new VenueReadModel
             {
                 Id = e.VenueId,
                 UserId = e.UserId,

@@ -1,9 +1,9 @@
-using Concertable.Shared;
+﻿using Concertable.Shared;
 using NetTopologySuite.Geometries;
 
 namespace Concertable.Search.Domain.Models;
 
-public sealed class ConcertSearchModel : IIdEntity, IHasName, IHasLocation, IEntity
+public sealed class ConcertReadModel : IIdEntity, IHasName, IHasLocation, IEntity
 {
     public int Id { get; set; }
     public int BookingId { get; set; }
@@ -18,7 +18,7 @@ public sealed class ConcertSearchModel : IIdEntity, IHasName, IHasLocation, IEnt
     public DateTime EndDate { get; set; }
     public DateTime? DatePosted { get; set; }
     public Point? Location { get; set; }
-    public ArtistSearchModel Artist { get; set; } = null!;
-    public VenueSearchModel Venue { get; set; } = null!;
-    public HashSet<ConcertSearchModelGenre> ConcertGenres { get; set; } = [];
+    public ArtistReadModel Artist { get; set; } = null!;
+    public VenueReadModel Venue { get; set; } = null!;
+    public HashSet<ConcertReadModelGenre> ConcertGenres { get; set; } = [];
 }

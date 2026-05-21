@@ -1,9 +1,4 @@
-using Concertable.Artist.Domain;
-using Concertable.Concert.Domain;
-using Concertable.Messaging.Domain;
-using Concertable.Search.Domain.Models;
-using Concertable.Venue.Domain;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace Concertable.Search.Infrastructure.Data;
 
@@ -12,9 +7,9 @@ internal class SearchDbContext(
     SearchConfigurationProvider provider)
     : DbContextBase(options), ISearchDbContext
 {
-    IQueryable<ArtistSearchModel> ISearchDbContext.Artists => Set<ArtistSearchModel>().AsNoTracking();
-    IQueryable<VenueSearchModel> ISearchDbContext.Venues => Set<VenueSearchModel>().AsNoTracking();
-    IQueryable<ConcertSearchModel> ISearchDbContext.Concerts => Set<ConcertSearchModel>().AsNoTracking();
+    IQueryable<ArtistReadModel> ISearchDbContext.Artists => Set<ArtistReadModel>().AsNoTracking();
+    IQueryable<VenueReadModel> ISearchDbContext.Venues => Set<VenueReadModel>().AsNoTracking();
+    IQueryable<ConcertReadModel> ISearchDbContext.Concerts => Set<ConcertReadModel>().AsNoTracking();
     IQueryable<ArtistRatingProjection> ISearchDbContext.ArtistRatingProjections => Set<ArtistRatingProjection>().AsNoTracking();
     IQueryable<VenueRatingProjection> ISearchDbContext.VenueRatingProjections => Set<VenueRatingProjection>().AsNoTracking();
     IQueryable<ConcertRatingProjection> ISearchDbContext.ConcertRatingProjections => Set<ConcertRatingProjection>().AsNoTracking();

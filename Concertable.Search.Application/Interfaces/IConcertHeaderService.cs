@@ -1,6 +1,6 @@
-namespace Concertable.Search.Application.Interfaces;
+﻿namespace Concertable.Search.Application.Interfaces;
 
-internal interface IConcertHeaderModule : IHeaderModule
+internal interface IConcertHeaderService : IHeaderService
 {
     Task<IEnumerable<ConcertHeaderDto>> GetPopularAsync();
     Task<IEnumerable<ConcertHeaderDto>> GetFreeAsync();

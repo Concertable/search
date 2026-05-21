@@ -1,4 +1,4 @@
-using Concertable.Application.Interfaces.Geometry;
+﻿using Concertable.Application.Interfaces.Geometry;
 using Concertable.Artist.Contracts.Events;
 using Concertable.Messaging.Domain;
 using Concertable.Search.Infrastructure.Data;
@@ -32,13 +32,13 @@ internal class ArtistProjectionHandler : IIntegrationEventHandler<ArtistChangedE
 
         var location = geometryProvider.CreatePoint(e.Latitude, e.Longitude);
 
-        var artist = await context.Set<ArtistSearchModel>()
+        var artist = await context.Set<ArtistReadModel>()
             .Include(a => a.ArtistGenres)
             .FirstOrDefaultAsync(a => a.Id == e.ArtistId, ct);
 
         if (artist is null)
         {
-            artist = new ArtistSearchModel
+            artist = new ArtistReadModel
             {
                 Id = e.ArtistId,
                 UserId = e.UserId,
@@ -47,10 +47,10 @@ internal class ArtistProjectionHandler : IIntegrationEventHandler<ArtistChangedE
                 Location = location,
                 Address = new Address(e.County, e.Town)
             };
-            context.Set<ArtistSearchModel>().Add(artist);
+            context.Set<ArtistReadModel>().Add(artist);
 
             foreach (var genre in e.Genres)
-                artist.ArtistGenres.Add(new ArtistSearchModelGenre { ArtistId = e.ArtistId, Genre = genre });
+                artist.ArtistGenres.Add(new ArtistReadModelGenre { ArtistId = e.ArtistId, Genre = genre });
         }
         else
         {
@@ -66,7 +66,7 @@ internal class ArtistProjectionHandler : IIntegrationEventHandler<ArtistChangedE
             foreach (var g in artist.ArtistGenres.Where(g => !desired.Contains(g.Genre)).ToList())
                 artist.ArtistGenres.Remove(g);
             foreach (var g in desired.Where(g => !current.Contains(g)))
-                artist.ArtistGenres.Add(new ArtistSearchModelGenre { ArtistId = e.ArtistId, Genre = g });
+                artist.ArtistGenres.Add(new ArtistReadModelGenre { ArtistId = e.ArtistId, Genre = g });
         }
 
         await context.SaveChangesAsync(ct);
