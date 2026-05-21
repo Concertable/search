@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Concertable.Search.Web": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:54409;http://localhost:54411"
+    }
+  }
+}

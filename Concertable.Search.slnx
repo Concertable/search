@@ -1,0 +1,12 @@
+<Solution>
+  <Project Path="Concertable.Search.Web/Concertable.Search.Web.csproj" />
+  <Project Path="Concertable.Search.Workers/Concertable.Search.Workers.csproj" />
+  <Project Path="Concertable.Search.Api/Concertable.Search.Api.csproj" />
+  <Project Path="Concertable.Search.Application/Concertable.Search.Application.csproj" />
+  <Project Path="Concertable.Search.Domain/Concertable.Search.Domain.csproj" />
+  <Project Path="Concertable.Search.Infrastructure/Concertable.Search.Infrastructure.csproj" />
+  <Folder Name="/Tests/">
+    <Project Path="Tests/Concertable.Search.IntegrationTests/Concertable.Search.IntegrationTests.csproj" />
+    <Project Path="Tests/Concertable.Search.UnitTests/Concertable.Search.UnitTests.csproj" />
+  </Folder>
+</Solution>

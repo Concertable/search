@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
+    <PackageReference Include="LinqKit.Microsoft.EntityFrameworkCore" Version="10.0.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Concertable.B2B\Modules\Artist\Concertable.Artist.Contracts\Concertable.Artist.Contracts.csproj" />
+    <ProjectReference Include="..\..\Concertable.B2B\Modules\Artist\Concertable.Artist.Domain\Concertable.Artist.Domain.csproj" />
+    <ProjectReference Include="..\..\Concertable.B2B\Modules\Venue\Concertable.Venue.Contracts\Concertable.Venue.Contracts.csproj" />
+    <ProjectReference Include="..\..\Concertable.B2B\Modules\Venue\Concertable.Venue.Domain\Concertable.Venue.Domain.csproj" />
+    <ProjectReference Include="..\..\Concertable.B2B\Modules\Concert\Concertable.Concert.Contracts\Concertable.Concert.Contracts.csproj" />
+    <ProjectReference Include="..\Concertable.Search.Application\Concertable.Search.Application.csproj" />
+    <ProjectReference Include="..\Concertable.Search.Domain\Concertable.Search.Domain.csproj" />
+    <ProjectReference Include="..\..\Concertable.B2B\Modules\Concert\Concertable.Concert.Domain\Concertable.Concert.Domain.csproj" />
+    <ProjectReference Include="..\..\Concertable.DataAccess\Concertable.DataAccess.Infrastructure\Concertable.DataAccess.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Shared\Concertable.Kernel\Concertable.Kernel.csproj" />
+    <ProjectReference Include="..\..\Concertable.Messaging\Concertable.Messaging.Contracts\Concertable.Messaging.Contracts.csproj" />
+    <ProjectReference Include="..\..\Concertable.Messaging\Concertable.Messaging.Domain\Concertable.Messaging.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
