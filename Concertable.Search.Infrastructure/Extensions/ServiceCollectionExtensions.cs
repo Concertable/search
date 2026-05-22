@@ -9,6 +9,7 @@ using Concertable.Search.Infrastructure.Handlers;
 using Concertable.Search.Infrastructure.Repositories;
 using Concertable.Search.Application.Services;
 using Concertable.Search.Infrastructure.Specifications;
+using Concertable.Shared.Infrastructure.Extensions;
 using Concertable.Venue.Contracts.Events;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +28,10 @@ public static class ServiceCollectionExtensions
                 sqlOpt => sqlOpt.UseNetTopologySuite()));
         services.AddScoped<ISearchDbContext>(sp => sp.GetRequiredService<SearchDbContext>());
         services.AddSingleton<SearchConfigurationProvider>();
+
+        services.AddScoped<IKeyedServiceProvider>(sp => (IKeyedServiceProvider)sp);
+        services.AddGeometry();
+
         services.AddSingleton<IGeometrySpecification<ArtistReadModel>, GeometrySpecification<ArtistReadModel>>();
         services.AddSingleton<IGeometrySpecification<VenueReadModel>, GeometrySpecification<VenueReadModel>>();
         services.AddSingleton<IGeometrySpecification<ConcertReadModel>, GeometrySpecification<ConcertReadModel>>();
