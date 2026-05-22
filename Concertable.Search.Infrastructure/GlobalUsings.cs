@@ -5,7 +5,7 @@ global using Concertable.Search.Application.Interfaces;
 global using Concertable.Search.Domain.Models;
 global using Concertable.Search.Domain.Projections;
 global using Concertable.Search.Infrastructure.Mappers;
-global using Concertable.Authorization.Contracts;
+global using Concertable.Shared.Infrastructure.Identity;
 global using Concertable.User.Contracts;
 global using Concertable.Messaging;
 global using Concertable.Messaging.Domain;

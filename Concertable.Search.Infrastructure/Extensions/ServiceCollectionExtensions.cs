@@ -30,6 +30,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<SearchConfigurationProvider>();
 
         services.AddScoped<IKeyedServiceProvider>(sp => (IKeyedServiceProvider)sp);
+        services.AddSingleton(TimeProvider.System);
         services.AddGeometry();
 
         services.AddSingleton<IGeometrySpecification<ArtistReadModel>, GeometrySpecification<ArtistReadModel>>();
@@ -56,7 +57,7 @@ public static class ServiceCollectionExtensions
         services.AddKeyedScoped<IAutocompleteService, ArtistAutocompleteService>(HeaderType.Artist);
         services.AddKeyedScoped<IAutocompleteService, VenueAutocompleteService>(HeaderType.Venue);
         services.AddKeyedScoped<IAutocompleteService, ConcertAutocompleteService>(HeaderType.Concert);
-        services.AddScoped<IAutocompleteService, AllAutocompleteService>();
+        services.AddKeyedScoped<IAutocompleteService, AllAutocompleteService>(null);
 
         services.AddScoped<IAutocompleteServiceFactory, AutocompleteServiceFactory>();
 
