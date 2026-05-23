@@ -1,4 +1,5 @@
-using Concertable.Application.Validators.Parameters;
+using Concertable.Kernel.Validators;
+using Concertable.Search.Application.Params;
 using FluentValidation;
 
 namespace Concertable.Search.Application.Validators;

@@ -1,3 +1,4 @@
+using Concertable.Contracts;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Concertable.Search.Api.ModelBinders;

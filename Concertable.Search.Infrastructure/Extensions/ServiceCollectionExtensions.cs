@@ -1,7 +1,6 @@
 ﻿using Concertable.Artist.Contracts.Events;
 using Concertable.Concert.Contracts.Events;
 using Concertable.DataAccess.Infrastructure;
-using Concertable.Search.Application;
 using Concertable.Search.Domain.Models;
 using Concertable.Search.Application.Validators;
 using Concertable.Search.Infrastructure.Data;
@@ -9,12 +8,14 @@ using Concertable.Search.Infrastructure.Handlers;
 using Concertable.Search.Infrastructure.Repositories;
 using Concertable.Search.Application.Services;
 using Concertable.Search.Infrastructure.Specifications;
-using Concertable.Shared.Infrastructure.Extensions;
 using Concertable.Venue.Contracts.Events;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Concertable.Messaging.Contracts;
+using Concertable.Search.Application.DTOs;
+using Concertable.Kernel.Extensions;
 
 namespace Concertable.Search.Infrastructure.Extensions;
 

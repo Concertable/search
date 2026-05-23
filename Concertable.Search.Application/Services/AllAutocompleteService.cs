@@ -1,3 +1,4 @@
+using Concertable.Search.Application.DTOs;
 using Concertable.Search.Application.Interfaces;
 
 namespace Concertable.Search.Application.Services;

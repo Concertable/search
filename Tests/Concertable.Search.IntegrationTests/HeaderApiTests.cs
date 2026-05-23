@@ -1,5 +1,6 @@
 ﻿using System.Net;
-using Concertable.Shared;
+using Concertable.Contracts;
+using Concertable.Search.Application.DTOs;
 
 namespace Concertable.Search.IntegrationTests;
 

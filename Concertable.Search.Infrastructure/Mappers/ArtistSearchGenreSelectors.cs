@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
+using Concertable.Contracts;
 using Concertable.Search.Domain.Models;
-using Concertable.Shared;
 
 namespace Concertable.Search.Infrastructure.Mappers;
 

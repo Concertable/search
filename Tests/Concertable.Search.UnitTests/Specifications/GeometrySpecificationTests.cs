@@ -1,6 +1,7 @@
-﻿using Concertable.Application.Interfaces.Geometry;
+﻿using Concertable.Kernel;
+using Concertable.Kernel.Geometry;
+using Concertable.Search.Application.Params;
 using Concertable.Search.Infrastructure.Specifications;
-using Concertable.Shared;
 using Moq;
 using NetTopologySuite;
 using NetTopologySuite.Geometries;
