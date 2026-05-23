@@ -3,7 +3,7 @@ using Concertable.Kernel;
 namespace Concertable.Search.Infrastructure.Specifications;
 
 internal class SearchSpecification<TEntity> : ISearchSpecification<TEntity>
-    where TEntity : IEntity, IHasName
+    where TEntity : class, IEntity, IHasName
 {
     public IQueryable<TEntity> Apply(IQueryable<TEntity> query, string? searchTerm)
     {

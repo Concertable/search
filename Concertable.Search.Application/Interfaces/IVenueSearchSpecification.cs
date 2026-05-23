@@ -1,8 +1,6 @@
-﻿using Concertable.Search.Application.Params;
+using Concertable.Kernel.Specifications;
+using Concertable.Search.Application.Params;
 
 namespace Concertable.Search.Application.Interfaces;
 
-internal interface IVenueSearchSpecification
-{
-    IQueryable<VenueReadModel> Apply(IQueryable<VenueReadModel> query, SearchParams searchParams);
-}
+internal interface IVenueSearchSpecification : ISpecification<VenueReadModel, SearchParams>;
