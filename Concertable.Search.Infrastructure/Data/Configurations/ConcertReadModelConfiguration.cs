@@ -10,6 +10,7 @@ internal sealed class ConcertReadModelConfiguration : IEntityTypeConfiguration<C
     {
         builder.ToTable("Concerts", "search");
         builder.HasKey(x => x.Id);
+        builder.Property(x => x.Id).ValueGeneratedNever();
         builder.Property(x => x.Name).IsRequired();
         builder.Property(x => x.Location).HasColumnType("geography");
 
