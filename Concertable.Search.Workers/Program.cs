@@ -1,10 +1,11 @@
 using Concertable.Artist.Contracts.Events;
 using Concertable.Concert.Contracts.Events;
-using Concertable.Messaging.Application;
-using Concertable.Messaging.AzureServiceBus;
+using Concertable.Messaging.Application.Extensions;
+using Concertable.Messaging.AzureServiceBus.Extensions;
 using Concertable.Messaging.Infrastructure.Extensions;
 using Concertable.Messaging.Infrastructure.Inbox;
 using Concertable.Search.Infrastructure.Extensions;
+using Concertable.ServiceDefaults;
 using Concertable.Venue.Contracts.Events;
 using Microsoft.EntityFrameworkCore;
 

@@ -1,3 +1,5 @@
+using Concertable.Search.Application.Params;
+
 namespace Concertable.Search.Application;
 
 internal static class GeoParamsExtensions

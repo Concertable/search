@@ -1,8 +1,9 @@
-﻿using Concertable.Application.Interfaces.Geometry;
-using Concertable.Artist.Contracts.Events;
+﻿using Concertable.Artist.Contracts.Events;
+using Concertable.Kernel.Geometry;
+using Concertable.Kernel.Services.Geometry;
+using Concertable.Messaging.Contracts;
 using Concertable.Messaging.Domain;
 using Concertable.Search.Infrastructure.Data;
-using Concertable.Shared.Infrastructure.Services.Geometry;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 

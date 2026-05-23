@@ -13,7 +13,7 @@ using NetTopologySuite.Geometries;
 namespace Concertable.Search.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(SearchDbContext))]
-    [Migration("20260522235038_InitialCreate")]
+    [Migration("20260523154543_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -274,7 +274,7 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("Concertable.Search.Domain.Models.ArtistReadModel", b =>
                 {
-                    b.OwnsOne("Concertable.Shared.Address", "Address", b1 =>
+                    b.OwnsOne("Concertable.Kernel.Address", "Address", b1 =>
                         {
                             b1.Property<int>("ArtistReadModelId")
                                 .HasColumnType("int");
@@ -343,7 +343,7 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("Concertable.Search.Domain.Models.VenueReadModel", b =>
                 {
-                    b.OwnsOne("Concertable.Shared.Address", "Address", b1 =>
+                    b.OwnsOne("Concertable.Kernel.Address", "Address", b1 =>
                         {
                             b1.Property<int>("VenueReadModelId")
                                 .HasColumnType("int");

@@ -1,4 +1,6 @@
 
+using Concertable.Search.Application.DTOs;
+
 namespace Concertable.Search.Infrastructure.Specifications;
 
 internal class HeaderSortSpecification<T> : ISortSpecification<T>

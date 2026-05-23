@@ -1,5 +1,5 @@
+using Concertable.Contracts;
 using Concertable.Search.Infrastructure.Data;
-using Concertable.Shared;
 using NetTopologySuite.Geometries;
 
 namespace Concertable.Search.Infrastructure.Data.Seeders;

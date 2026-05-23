@@ -1,7 +1,8 @@
-using Concertable.Application.Interfaces.Geometry;
-using Concertable.Shared.Infrastructure.Services.Geometry;
-using Concertable.Search.Application;
 using Microsoft.Extensions.DependencyInjection;
+using Concertable.Search.Application.Params;
+using Concertable.Kernel;
+using Concertable.Kernel.Geometry;
+using Concertable.Kernel.Services.Geometry;
 
 namespace Concertable.Search.Infrastructure.Specifications;
 

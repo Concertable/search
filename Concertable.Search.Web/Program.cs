@@ -1,5 +1,6 @@
 using Concertable.Search.Api.Extensions;
 using Concertable.Search.Infrastructure.Data;
+using Concertable.ServiceDefaults;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;

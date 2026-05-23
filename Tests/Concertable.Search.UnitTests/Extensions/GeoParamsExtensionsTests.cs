@@ -1,4 +1,6 @@
-﻿namespace Concertable.Search.UnitTests.Extensions;
+﻿using Concertable.Search.Application.Params;
+
+namespace Concertable.Search.UnitTests.Extensions;
 public class GeoParamsExtensionsTests
 {
     [Fact]

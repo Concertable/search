@@ -1,3 +1,4 @@
+using Concertable.Search.Application.DTOs;
 using Concertable.Search.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 

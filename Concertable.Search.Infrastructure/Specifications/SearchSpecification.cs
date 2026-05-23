@@ -1,3 +1,5 @@
+using Concertable.Kernel;
+
 namespace Concertable.Search.Infrastructure.Specifications;
 
 internal class SearchSpecification<TEntity> : ISearchSpecification<TEntity>

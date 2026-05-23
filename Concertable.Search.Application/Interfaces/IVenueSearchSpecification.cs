@@ -1,4 +1,6 @@
-﻿namespace Concertable.Search.Application.Interfaces;
+﻿using Concertable.Search.Application.Params;
+
+namespace Concertable.Search.Application.Interfaces;
 
 internal interface IVenueSearchSpecification
 {

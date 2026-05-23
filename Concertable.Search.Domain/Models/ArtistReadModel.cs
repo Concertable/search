@@ -1,4 +1,4 @@
-﻿using Concertable.Shared;
+﻿using Concertable.Kernel;
 using NetTopologySuite.Geometries;
 
 namespace Concertable.Search.Domain.Models;

@@ -1,3 +1,4 @@
+using Concertable.Messaging.Contracts;
 using Concertable.Messaging.Domain;
 using Concertable.Search.Infrastructure.Data;
 using Concertable.Venue.Contracts.Events;

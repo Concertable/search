@@ -1,6 +1,8 @@
+using Concertable.Contracts;
+using Concertable.Kernel;
 using System.Text.Json.Serialization;
 
-namespace Concertable.Search.Application;
+namespace Concertable.Search.Application.DTOs;
 
 [JsonDerivedType(typeof(ArtistHeaderDto), "artist")]
 [JsonDerivedType(typeof(VenueHeaderDto), "venue")]

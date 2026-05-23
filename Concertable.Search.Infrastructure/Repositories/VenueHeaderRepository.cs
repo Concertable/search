@@ -1,4 +1,7 @@
-﻿using Concertable.DataAccess;
+﻿using Concertable.Contracts;
+using Concertable.DataAccess;
+using Concertable.Search.Application.DTOs;
+using Concertable.Search.Application.Params;
 using Concertable.Search.Infrastructure.Data;
 using Concertable.Search.Infrastructure.Mappers;
 using Microsoft.EntityFrameworkCore;

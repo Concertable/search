@@ -1,6 +1,6 @@
-using Concertable.Shared;
+using Concertable.Contracts;
 
-namespace Concertable.Search.Application;
+namespace Concertable.Search.Application.Params;
 
 public class ConcertParams : IGeoParams
 {

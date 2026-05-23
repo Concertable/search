@@ -1,4 +1,4 @@
-namespace Concertable.Search.Application;
+namespace Concertable.Search.Application.Params;
 
 public interface IGeoParams
 {
