@@ -12,7 +12,8 @@ builder.Configuration.AddEnvironmentVariables();
 
 var services = builder.Services;
 
-services.AddControllers();
+services.AddControllers()
+    .AddApplicationPart(typeof(Concertable.Shared.Api.Controllers.GenreController).Assembly);
 services.AddSearchApi(builder.Configuration);
 
 services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
