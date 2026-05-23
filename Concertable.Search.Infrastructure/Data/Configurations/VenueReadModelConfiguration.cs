@@ -10,6 +10,7 @@ internal sealed class VenueReadModelConfiguration : IEntityTypeConfiguration<Ven
     {
         builder.ToTable("Venues", "search");
         builder.HasKey(x => x.Id);
+        builder.Property(x => x.Id).ValueGeneratedNever();
         builder.Property(x => x.Name).IsRequired();
         builder.Property(x => x.Location).HasColumnType("geography");
         builder.OwnsOne(x => x.Address, a =>

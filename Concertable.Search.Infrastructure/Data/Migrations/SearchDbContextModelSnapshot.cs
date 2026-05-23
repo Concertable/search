@@ -92,10 +92,7 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
             modelBuilder.Entity("Concertable.Search.Domain.Models.ArtistReadModel", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Avatar")
                         .HasColumnType("nvarchar(max)");
@@ -131,10 +128,7 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
             modelBuilder.Entity("Concertable.Search.Domain.Models.ConcertReadModel", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("ArtistId")
                         .HasColumnType("int");
@@ -198,10 +192,7 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
             modelBuilder.Entity("Concertable.Search.Domain.Models.VenueReadModel", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Avatar")
                         .HasColumnType("nvarchar(max)");
