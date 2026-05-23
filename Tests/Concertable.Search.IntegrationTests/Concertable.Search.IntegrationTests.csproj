@@ -17,15 +17,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Tests\Concertable.Testing.Integration\Concertable.Testing.Integration.csproj" />
+    <ProjectReference Include="..\..\..\Tests\Concertable.Testing.Integration.Search\Concertable.Testing.Integration.Search.csproj" />
     <ProjectReference Include="..\..\..\Tests\Concertable.Testing\Concertable.Testing.csproj" />
     <ProjectReference Include="..\..\Concertable.Search.Application\Concertable.Search.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Using Include="Xunit" />
-    <Using Include="Concertable.Testing.Integration" />
-    <Using Include="Concertable.Testing.Integration.Mocks" />
+    <Using Include="Concertable.Testing.Integration.Search" />
     <Using Include="Concertable.Testing" />
     <Using Include="Concertable.Search.Application" />
   </ItemGroup>

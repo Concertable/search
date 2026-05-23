@@ -39,6 +39,39 @@ internal class CommaDelimitedIntArrayBinderProvider : IModelBinderProvider
         if (context.Metadata.ModelType == typeof(int[]))
             return new CommaDelimitedIntArrayModelBinder();
 
+        if (context.Metadata.ModelType == typeof(Genre[]))
+            return new CommaDelimitedGenreArrayModelBinder();
+
         return null;
+    }
+}
+
+internal class CommaDelimitedGenreArrayModelBinder : IModelBinder
+{
+    public Task BindModelAsync(ModelBindingContext bindingContext)
+    {
+        var value = bindingContext.ValueProvider.GetValue(bindingContext.ModelName).FirstValue;
+
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            bindingContext.Result = ModelBindingResult.Success(Array.Empty<Genre>());
+            return Task.CompletedTask;
+        }
+
+        try
+        {
+            var result = value
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Select(s => int.TryParse(s, out var i) ? (Genre)i : Enum.Parse<Genre>(s))
+                .ToArray();
+
+            bindingContext.Result = ModelBindingResult.Success(result);
+        }
+        catch (Exception)
+        {
+            bindingContext.ModelState.AddModelError(bindingContext.ModelName, "Invalid genre value in comma-delimited list.");
+        }
+
+        return Task.CompletedTask;
     }
 }

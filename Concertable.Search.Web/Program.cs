@@ -1,5 +1,7 @@
 using Concertable.Search.Api.Extensions;
+using Concertable.Search.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,6 +35,12 @@ app.UseAuthorization();
 
 app.MapDefaultEndpoints();
 app.MapControllers();
+
+if (!app.Environment.IsProduction())
+{
+    using var scope = app.Services.CreateScope();
+    await scope.ServiceProvider.GetRequiredService<SearchDbContext>().Database.MigrateAsync();
+}
 
 app.Run();
 
