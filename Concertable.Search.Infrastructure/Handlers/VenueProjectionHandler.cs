@@ -3,7 +3,7 @@ using Concertable.Kernel.Services.Geometry;
 using Concertable.Messaging.Contracts;
 using Concertable.Messaging.Domain;
 using Concertable.Search.Infrastructure.Data;
-using Concertable.Venue.Contracts.Events;
+using Concertable.B2B.Venue.Contracts.Events;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 

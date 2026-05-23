@@ -1,4 +1,4 @@
-﻿using Concertable.Artist.Contracts.Events;
+﻿using Concertable.B2B.Artist.Contracts.Events;
 using Concertable.Kernel.Geometry;
 using Concertable.Kernel.Services.Geometry;
 using Concertable.Messaging.Contracts;

@@ -1,4 +1,4 @@
-using Concertable.Concert.Contracts.Events;
+using Concertable.B2B.Concert.Contracts.Events;
 using Concertable.Messaging.Contracts;
 using Concertable.Messaging.Domain;
 using Concertable.Search.Infrastructure.Data;

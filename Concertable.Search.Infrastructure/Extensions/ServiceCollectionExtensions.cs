@@ -1,5 +1,5 @@
-﻿using Concertable.Artist.Contracts.Events;
-using Concertable.Concert.Contracts.Events;
+﻿using Concertable.B2B.Artist.Contracts.Events;
+using Concertable.B2B.Concert.Contracts.Events;
 using Concertable.DataAccess.Infrastructure;
 using Concertable.Search.Domain.Models;
 using Concertable.Search.Application.Validators;
@@ -8,7 +8,7 @@ using Concertable.Search.Infrastructure.Handlers;
 using Concertable.Search.Infrastructure.Repositories;
 using Concertable.Search.Application.Services;
 using Concertable.Search.Infrastructure.Specifications;
-using Concertable.Venue.Contracts.Events;
+using Concertable.B2B.Venue.Contracts.Events;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
