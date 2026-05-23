@@ -22,6 +22,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Concertable.Search.Api\Concertable.Search.Api.csproj" />
     <ProjectReference Include="..\..\Concertable.ServiceDefaults\Concertable.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\..\Shared\Concertable.Shared.Api\Concertable.Shared.Api.csproj" />
   </ItemGroup>
 
 </Project>
