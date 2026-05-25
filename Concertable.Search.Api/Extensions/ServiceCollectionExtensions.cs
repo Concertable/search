@@ -1,6 +1,7 @@
 using Concertable.Search.Api.Controllers;
 using Concertable.Search.Api.ModelBinders;
 using Concertable.Search.Infrastructure.Extensions;
+using Concertable.Shared.Api.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,9 +16,7 @@ public static class ServiceCollectionExtensions
         services.Configure<MvcOptions>(opts =>
             opts.ModelBinderProviders.Insert(0, new CommaDelimitedIntArrayBinderProvider()));
         services.AddControllers()
-            .AddApplicationPart(typeof(AutocompleteController).Assembly)
-            .ConfigureApplicationPartManager(apm =>
-                apm.FeatureProviders.Add(new InternalControllerFeatureProvider()));
+            .AddInternalControllers(typeof(AutocompleteController).Assembly);
         return services;
     }
 }
