@@ -1,5 +1,4 @@
-using System.Runtime.CompilerServices;
-using Xunit;
+﻿using Xunit;
 
-[assembly: InternalsVisibleTo("xunit.runner.visualstudio")]
 [assembly: AssemblyTrait("Category", "Integration")]
+
