@@ -63,7 +63,7 @@ public class ConcertHeaderApiTests : IAsyncLifetime
     [Fact]
     public async Task GetRecommended_ShouldReturn200_WithConcerts_WhenAuthenticated()
     {
-        var client = fixture.CreateClient(fixture.SeedData.Customer);
+        var client = fixture.CreateClient(fixture.SeedState.Customer);
 
         var response = await client.GetAsync("/api/concert/headers/recommended");
 
@@ -76,7 +76,7 @@ public class ConcertHeaderApiTests : IAsyncLifetime
     [Fact]
     public async Task GetRecommended_ShouldReturn200_FilteredByGenre_WhenGenreProvided()
     {
-        var client = fixture.CreateClient(fixture.SeedData.Customer);
+        var client = fixture.CreateClient(fixture.SeedState.Customer);
 
         var response = await client.GetAsync($"/api/concert/headers/recommended?genres={Genre.Rock}");
 
@@ -89,7 +89,7 @@ public class ConcertHeaderApiTests : IAsyncLifetime
     [Fact]
     public async Task GetRecommended_ShouldReturn200_WithEmptyList_WhenGenreHasNoMatches()
     {
-        var client = fixture.CreateClient(fixture.SeedData.Customer);
+        var client = fixture.CreateClient(fixture.SeedState.Customer);
 
         var response = await client.GetAsync($"/api/concert/headers/recommended?genres={Genre.Jazz}");
 
@@ -103,7 +103,7 @@ public class ConcertHeaderApiTests : IAsyncLifetime
     public async Task GetRecommended_ShouldReturn200_WithConcerts_WhenCommaDelimitedGenreIdsContainMatch()
     {
         // Arrange
-        var client = fixture.CreateClient(fixture.SeedData.Customer);
+        var client = fixture.CreateClient(fixture.SeedState.Customer);
 
         // Act
         var response = await client.GetAsync($"/api/concert/headers/recommended?genres={Genre.Rock},{Genre.Jazz}");
