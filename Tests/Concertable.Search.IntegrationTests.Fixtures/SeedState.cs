@@ -4,5 +4,5 @@ namespace Concertable.Search.IntegrationTests.Fixtures;
 
 public class SeedState
 {
-    public SeedCustomer Customer => SeedCustomers.Customer1;
+    public Guid Customer => SeedCustomers.CustomerId(1);
 }
