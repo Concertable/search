@@ -83,10 +83,10 @@ public class ApiFixture : IAsyncLifetime
 
     public HttpClient CreateClient() => factory.CreateClient();
 
-    public HttpClient CreateClient(SeedCustomer customer)
+    public HttpClient CreateClient(Guid customerId)
     {
         var client = factory.CreateClient();
-        client.DefaultRequestHeaders.Add(TestAuthHandler.UserIdHeader, customer.Id.ToString());
+        client.DefaultRequestHeaders.Add(TestAuthHandler.UserIdHeader, customerId.ToString());
         return client;
     }
 }
