@@ -1,4 +1,4 @@
-using Concertable.Testing.Integration.Search;
+using Concertable.Search.IntegrationTests.Fixtures;
 
 [CollectionDefinition("Integration")]
 public class IntegrationCollection : ICollectionFixture<ApiFixture>;
