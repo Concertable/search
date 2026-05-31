@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using Concertable.Contracts;
 using Concertable.Search.Application.DTOs;
+using Xunit.Abstractions;
 
 namespace Concertable.Search.IntegrationTests;
 
@@ -10,9 +11,14 @@ public class ConcertHeaderApiTests : IAsyncLifetime
 {
     private readonly ApiFixture fixture;
 
-    public ConcertHeaderApiTests(ApiFixture fixture) => this.fixture = fixture;
+    public ConcertHeaderApiTests(ApiFixture fixture, ITestOutputHelper output)
+    {
+        this.fixture = fixture;
+        fixture.AttachOutput(output);
+    }
+
     public Task InitializeAsync() => fixture.ResetAsync();
-    public Task DisposeAsync() => Task.CompletedTask;
+    public Task DisposeAsync() { fixture.DetachOutput(); return Task.CompletedTask; }
 
     #region GetPopular
 

@@ -2,13 +2,16 @@ using Concertable.Search.Infrastructure.Data;
 using Concertable.Search.Infrastructure.Data.Seeders;
 using Concertable.Seed.Identity;
 using Concertable.Testing.Integration;
+using Concertable.Testing.Integration.Logging;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Concertable.Search.IntegrationTests.Fixtures;
 
@@ -16,6 +19,10 @@ public class ApiFixture : IAsyncLifetime
 {
     private SqlFixture sqlFixture = null!;
     private WebApplicationFactory<Program> factory = null!;
+    private readonly XunitOutputAccessor outputAccessor = new();
+
+    public void AttachOutput(ITestOutputHelper output) => outputAccessor.Output = output;
+    public void DetachOutput() => outputAccessor.Output = null;
 
     public SeedState SeedState { get; } = new SeedState();
 
@@ -37,6 +44,13 @@ public class ApiFixture : IAsyncLifetime
 
             builder.ConfigureTestServices(services =>
             {
+                services.AddLogging(b =>
+                {
+                    b.ClearProviders();
+                    b.AddProvider(new XunitLoggerProvider(outputAccessor));
+                    b.SetMinimumLevel(LogLevel.Information);
+                });
+
                 services.PostConfigure<AuthenticationOptions>(opts =>
                 {
                     opts.DefaultAuthenticateScheme = TestAuthHandler.SchemeName;

@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using Concertable.Contracts;
 using Concertable.Search.Application.DTOs;
+using Xunit.Abstractions;
 
 namespace Concertable.Search.IntegrationTests;
 
@@ -12,9 +13,14 @@ public class HeaderApiTests : IAsyncLifetime
 
     private record PaginationResponse<T>(IEnumerable<T> Data, int TotalCount, int TotalPages, int PageNumber, int PageSize);
 
-    public HeaderApiTests(ApiFixture fixture) => this.fixture = fixture;
+    public HeaderApiTests(ApiFixture fixture, ITestOutputHelper output)
+    {
+        this.fixture = fixture;
+        fixture.AttachOutput(output);
+    }
+
     public Task InitializeAsync() => fixture.ResetAsync();
-    public Task DisposeAsync() => Task.CompletedTask;
+    public Task DisposeAsync() { fixture.DetachOutput(); return Task.CompletedTask; }
 
     #region GetByAmount
 

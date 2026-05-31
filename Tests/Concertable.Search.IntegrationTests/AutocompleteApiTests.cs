@@ -1,5 +1,6 @@
 using System.Net;
 using Concertable.Search.Application.DTOs;
+using Xunit.Abstractions;
 
 namespace Concertable.Search.IntegrationTests;
 
@@ -9,9 +10,14 @@ public class AutocompleteApiTests : IAsyncLifetime
 {
     private readonly ApiFixture fixture;
 
-    public AutocompleteApiTests(ApiFixture fixture) => this.fixture = fixture;
+    public AutocompleteApiTests(ApiFixture fixture, ITestOutputHelper output)
+    {
+        this.fixture = fixture;
+        fixture.AttachOutput(output);
+    }
+
     public Task InitializeAsync() => fixture.ResetAsync();
-    public Task DisposeAsync() => Task.CompletedTask;
+    public Task DisposeAsync() { fixture.DetachOutput(); return Task.CompletedTask; }
 
     [Fact]
     public async Task GetHeaders_ShouldReturn200_WithResults_WhenSearchTermMatches()
