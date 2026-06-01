@@ -142,9 +142,6 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
                     b.Property<string>("Avatar")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("BookingId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("DatePosted")
                         .HasColumnType("datetime2");
 

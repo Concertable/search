@@ -8,6 +8,5 @@ global using Concertable.Search.Domain.Models;
 global using Concertable.Search.Domain.Projections;
 global using Concertable.Search.Infrastructure.Mappers;
 global using Concertable.Kernel.Identity;
-global using Concertable.B2B.User.Contracts;
 global using Concertable.Messaging;
 global using Concertable.Messaging.Domain;

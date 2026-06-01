@@ -13,7 +13,7 @@ using NetTopologySuite.Geometries;
 namespace Concertable.Search.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(SearchDbContext))]
-    [Migration("20260531230310_InitialCreate")]
+    [Migration("20260601232319_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -144,9 +144,6 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
 
                     b.Property<string>("Avatar")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("BookingId")
-                        .HasColumnType("int");
 
                     b.Property<DateTime?>("DatePosted")
                         .HasColumnType("datetime2");

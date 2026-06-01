@@ -32,7 +32,6 @@ internal static class SearchTestSeeder
         {
             ArtistId = artist.Id,
             VenueId = venue.Id,
-            BookingId = 1,
             Name = "Test Concert",
             Price = 20m,
             TotalTickets = 100,
