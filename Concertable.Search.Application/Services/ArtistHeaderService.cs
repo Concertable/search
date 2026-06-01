@@ -5,7 +5,7 @@ using Concertable.Search.Application.Params;
 
 namespace Concertable.Search.Application.Services;
 
-internal class ArtistHeaderService : IHeaderService
+internal sealed class ArtistHeaderService : IHeaderService
 {
     private readonly IArtistHeaderRepository artistHeaderRepository;
 

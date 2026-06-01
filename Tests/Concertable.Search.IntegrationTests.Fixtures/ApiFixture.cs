@@ -15,7 +15,7 @@ using Xunit.Abstractions;
 
 namespace Concertable.Search.IntegrationTests.Fixtures;
 
-public class ApiFixture : IAsyncLifetime
+public sealed class ApiFixture : IAsyncLifetime
 {
     private SqlFixture sqlFixture = null!;
     private WebApplicationFactory<Program> factory = null!;

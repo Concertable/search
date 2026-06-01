@@ -4,7 +4,7 @@ using Concertable.Search.Domain.Models;
 
 namespace Concertable.Search.Infrastructure.Specifications;
 
-internal class VenueSearchSpecification : IVenueSearchSpecification
+internal sealed class VenueSearchSpecification : IVenueSearchSpecification
 {
     private readonly ISearchSpecification<VenueReadModel> searchSpecification;
 

@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Concertable.Search.Infrastructure.Repositories;
 
-internal class ConcertAutocompleteRepository : IConcertAutocompleteRepository
+internal sealed class ConcertAutocompleteRepository : IConcertAutocompleteRepository
 {
     private readonly ISearchDbContext context;
     private readonly IConcertSearchSpecification specification;

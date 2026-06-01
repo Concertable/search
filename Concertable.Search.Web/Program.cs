@@ -59,4 +59,5 @@ if (!app.Environment.IsProduction())
 
 app.Run();
 
-public partial class Program { }
+public sealed partial class Program
+{ }

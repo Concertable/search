@@ -5,7 +5,7 @@ using Concertable.Search.Application.Params;
 
 namespace Concertable.Search.Application.Services;
 
-internal class VenueHeaderService : IHeaderService
+internal sealed class VenueHeaderService : IHeaderService
 {
     private readonly IVenueHeaderRepository venueHeaderRepository;
 

@@ -4,7 +4,7 @@ using FluentValidation;
 
 namespace Concertable.Search.Application.Validators;
 
-internal class SearchParamsValidator : AbstractValidator<SearchParams>
+internal sealed class SearchParamsValidator : AbstractValidator<SearchParams>
 {
     private static readonly string[] ValidSortValues = ["name_asc", "name_desc", "date_asc", "date_desc"];
 
@@ -20,7 +20,7 @@ internal class SearchParamsValidator : AbstractValidator<SearchParams>
     }
 }
 
-internal class ConcertParamsValidator : AbstractValidator<ConcertParams>
+internal sealed class ConcertParamsValidator : AbstractValidator<ConcertParams>
 {
     public ConcertParamsValidator()
     {

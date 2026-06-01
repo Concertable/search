@@ -4,7 +4,7 @@ using Concertable.Search.Domain.Models;
 
 namespace Concertable.Search.Infrastructure.Specifications;
 
-internal class ConcertSearchSpecification : IConcertSearchSpecification
+internal sealed class ConcertSearchSpecification : IConcertSearchSpecification
 {
     private readonly ISearchSpecification<ConcertReadModel> searchSpecification;
     private readonly TimeProvider timeProvider;

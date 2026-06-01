@@ -7,7 +7,8 @@ using NetTopologySuite;
 using NetTopologySuite.Geometries;
 
 namespace Concertable.Search.UnitTests.Specifications;
-public class GeometrySpecificationTests
+
+public sealed class GeometrySpecificationTests
 {
     private static readonly TestGeoParams LondonParams = new(51.5074, -0.1278);
     private static readonly TestGeoParams ManchesterParams = new(53.4808, -2.2426);
@@ -119,11 +120,11 @@ public class GeometrySpecificationTests
         Assert.Single(result);
     }
 
-    private class TestEntity : IIdEntity, IHasLocation
+    private sealed class TestEntity : IIdEntity, IHasLocation
     {
         public int Id { get; set; }
         public Point? Location { get; set; }
     }
 
-    private record TestGeoParams(double? Latitude, double? Longitude, int? RadiusKm = null) : IGeoParams;
+    private sealed record TestGeoParams(double? Latitude, double? Longitude, int? RadiusKm = null) : IGeoParams;
 }

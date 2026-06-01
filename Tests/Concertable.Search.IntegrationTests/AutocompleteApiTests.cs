@@ -6,7 +6,7 @@ namespace Concertable.Search.IntegrationTests;
 
 [Collection("Integration")]
 
-public class AutocompleteApiTests : IAsyncLifetime
+public sealed class AutocompleteApiTests : IAsyncLifetime
 {
     private readonly ApiFixture fixture;
 

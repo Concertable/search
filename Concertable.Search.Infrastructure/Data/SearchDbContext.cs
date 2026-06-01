@@ -2,7 +2,7 @@
 
 namespace Concertable.Search.Infrastructure.Data;
 
-internal class SearchDbContext(
+internal sealed class SearchDbContext(
     DbContextOptions<SearchDbContext> options,
     SearchConfigurationProvider provider)
     : DbContextBase(options), ISearchDbContext

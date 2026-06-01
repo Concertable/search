@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Concertable.Search.Api.ModelBinders;
 
-internal class CommaDelimitedIntArrayModelBinder : IModelBinder
+internal sealed class CommaDelimitedIntArrayModelBinder : IModelBinder
 {
     public Task BindModelAsync(ModelBindingContext bindingContext)
     {
@@ -33,7 +33,7 @@ internal class CommaDelimitedIntArrayModelBinder : IModelBinder
     }
 }
 
-internal class CommaDelimitedIntArrayBinderProvider : IModelBinderProvider
+internal sealed class CommaDelimitedIntArrayBinderProvider : IModelBinderProvider
 {
     public IModelBinder? GetBinder(ModelBinderProviderContext context)
     {
@@ -47,7 +47,7 @@ internal class CommaDelimitedIntArrayBinderProvider : IModelBinderProvider
     }
 }
 
-internal class CommaDelimitedGenreArrayModelBinder : IModelBinder
+internal sealed class CommaDelimitedGenreArrayModelBinder : IModelBinder
 {
     public Task BindModelAsync(ModelBindingContext bindingContext)
     {

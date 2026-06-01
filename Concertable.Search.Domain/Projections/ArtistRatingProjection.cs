@@ -1,6 +1,6 @@
 namespace Concertable.Search.Domain.Projections;
 
-public class ArtistRatingProjection
+public sealed class ArtistRatingProjection
 {
     public int ArtistId { get; set; }
     public double AverageRating { get; set; }

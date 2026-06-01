@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Concertable.Search.Infrastructure.Handlers;
 
-internal class VenueRatingProjectionHandler : IIntegrationEventHandler<VenueRatingUpdatedEvent>
+internal sealed class VenueRatingProjectionHandler : IIntegrationEventHandler<VenueRatingUpdatedEvent>
 {
     private readonly SearchDbContext context;
 
