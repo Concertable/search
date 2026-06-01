@@ -8,7 +8,7 @@ internal sealed class ArtistReadModelConfiguration : IEntityTypeConfiguration<Ar
 {
     public void Configure(EntityTypeBuilder<ArtistReadModel> builder)
     {
-        builder.ToTable("Artists", "search");
+        builder.ToTable(Schema.Tables.Artists, Schema.Name);
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).ValueGeneratedNever();
         builder.Property(x => x.Name).IsRequired();

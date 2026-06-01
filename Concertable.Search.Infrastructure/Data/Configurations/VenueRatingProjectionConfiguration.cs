@@ -7,7 +7,7 @@ internal sealed class VenueRatingProjectionConfiguration : IEntityTypeConfigurat
 {
     public void Configure(EntityTypeBuilder<VenueRatingProjection> builder)
     {
-        builder.ToTable("VenueRatingProjections", "search");
+        builder.ToTable(Schema.Tables.VenueRatingProjections, Schema.Name);
         builder.HasKey(p => p.VenueId);
         builder.Property(p => p.VenueId).ValueGeneratedNever();
     }

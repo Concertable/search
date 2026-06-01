@@ -8,7 +8,7 @@ internal sealed class ConcertReadModelGenreConfiguration : IEntityTypeConfigurat
 {
     public void Configure(EntityTypeBuilder<ConcertReadModelGenre> builder)
     {
-        builder.ToTable("ConcertGenres", "search");
+        builder.ToTable(Schema.Tables.ConcertGenres, Schema.Name);
         builder.HasKey(x => new { x.ConcertId, x.Genre });
     }
 }

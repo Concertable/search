@@ -8,7 +8,7 @@ internal sealed class ArtistReadModelGenreConfiguration : IEntityTypeConfigurati
 {
     public void Configure(EntityTypeBuilder<ArtistReadModelGenre> builder)
     {
-        builder.ToTable("ArtistGenres", "search");
+        builder.ToTable(Schema.Tables.ArtistGenres, Schema.Name);
         builder.HasKey(x => new { x.ArtistId, x.Genre });
     }
 }

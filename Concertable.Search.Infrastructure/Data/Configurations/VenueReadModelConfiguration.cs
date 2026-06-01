@@ -8,7 +8,7 @@ internal sealed class VenueReadModelConfiguration : IEntityTypeConfiguration<Ven
 {
     public void Configure(EntityTypeBuilder<VenueReadModel> builder)
     {
-        builder.ToTable("Venues", "search");
+        builder.ToTable(Schema.Tables.Venues, Schema.Name);
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).ValueGeneratedNever();
         builder.Property(x => x.Name).IsRequired();

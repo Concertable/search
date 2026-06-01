@@ -8,7 +8,7 @@ internal sealed class ConcertReadModelConfiguration : IEntityTypeConfiguration<C
 {
     public void Configure(EntityTypeBuilder<ConcertReadModel> builder)
     {
-        builder.ToTable("Concerts", "search");
+        builder.ToTable(Schema.Tables.Concerts, Schema.Name);
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).ValueGeneratedNever();
         builder.Property(x => x.Name).IsRequired();
