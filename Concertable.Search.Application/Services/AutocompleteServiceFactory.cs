@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Concertable.Search.Application.Services;
 
-internal class AutocompleteServiceFactory : IAutocompleteServiceFactory
+internal sealed class AutocompleteServiceFactory : IAutocompleteServiceFactory
 {
     private readonly IKeyedServiceProvider serviceProvider;
 

@@ -2,7 +2,7 @@ using Concertable.Contracts;
 
 namespace Concertable.Search.Application.Params;
 
-public class SearchParams : IPageParams, IGeoParams, ISortParams
+public sealed class SearchParams : IPageParams, IGeoParams, ISortParams
 {
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 10;

@@ -7,7 +7,7 @@ namespace Concertable.Search.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [AllowAnonymous]
-internal class HeaderController : ControllerBase
+internal sealed class HeaderController : ControllerBase
 {
     private readonly IHeaderDispatcher headerDispatcher;
 

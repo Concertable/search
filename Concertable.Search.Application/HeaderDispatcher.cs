@@ -5,7 +5,7 @@ using Concertable.Search.Application.Params;
 
 namespace Concertable.Search.Application;
 
-internal class HeaderDispatcher : IHeaderDispatcher
+internal sealed class HeaderDispatcher : IHeaderDispatcher
 {
     private readonly IHeaderServiceFactory headerServiceFactory;
 

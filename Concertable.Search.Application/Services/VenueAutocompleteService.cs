@@ -3,7 +3,7 @@ using Concertable.Search.Application.Interfaces;
 
 namespace Concertable.Search.Application.Services;
 
-internal class VenueAutocompleteService : IAutocompleteService
+internal sealed class VenueAutocompleteService : IAutocompleteService
 {
     private readonly IVenueAutocompleteRepository repository;
 

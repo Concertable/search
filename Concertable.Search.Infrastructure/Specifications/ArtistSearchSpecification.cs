@@ -4,7 +4,7 @@ using Concertable.Search.Domain.Models;
 
 namespace Concertable.Search.Infrastructure.Specifications;
 
-internal class ArtistSearchSpecification : IArtistSearchSpecification
+internal sealed class ArtistSearchSpecification : IArtistSearchSpecification
 {
     private readonly ISearchSpecification<ArtistReadModel> searchSpecification;
 

@@ -4,7 +4,7 @@ using Concertable.Search.Application.Interfaces;
 
 namespace Concertable.Search.Infrastructure.Specifications;
 
-internal class ConcertSortSpecification : ISortSpecification<ConcertHeaderDto>
+internal sealed class ConcertSortSpecification : ISortSpecification<ConcertHeaderDto>
 {
     public IQueryable<ConcertHeaderDto> Apply(IQueryable<ConcertHeaderDto> query, ISortParams sortParams) =>
         sortParams.Sort?.ToLower() switch

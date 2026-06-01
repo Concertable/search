@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Concertable.Search.Infrastructure.Handlers;
 
-internal class ArtistProjectionHandler : IIntegrationEventHandler<ArtistChangedEvent>
+internal sealed class ArtistProjectionHandler : IIntegrationEventHandler<ArtistChangedEvent>
 {
     private readonly IGeometryProvider geometryProvider;
     private readonly SearchDbContext context;

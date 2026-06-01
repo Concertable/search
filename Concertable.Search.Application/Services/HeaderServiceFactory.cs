@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Concertable.Search.Application.Services;
 
-internal class HeaderServiceFactory : IHeaderServiceFactory
+internal sealed class HeaderServiceFactory : IHeaderServiceFactory
 {
     private readonly IKeyedServiceProvider serviceProvider;
 

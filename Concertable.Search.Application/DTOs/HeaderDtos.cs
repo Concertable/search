@@ -13,7 +13,7 @@ public interface IHeader : IHasRating, IAddress
     string ImageUrl { get; set; }
 }
 
-public record ArtistHeaderDto : IHeader, IAddress
+public sealed record ArtistHeaderDto : IHeader, IAddress
 {
     public int Id { get; set; }
     public required string Name { get; set; }
@@ -24,7 +24,7 @@ public record ArtistHeaderDto : IHeader, IAddress
     public IEnumerable<Genre> Genres { get; set; } = [];
 }
 
-public record VenueHeaderDto : IHeader, IAddress
+public sealed record VenueHeaderDto : IHeader, IAddress
 {
     public int Id { get; set; }
     public required string Name { get; set; }
@@ -35,7 +35,7 @@ public record VenueHeaderDto : IHeader, IAddress
     public IEnumerable<Genre> Genres { get; set; } = [];
 }
 
-public record ConcertHeaderDto : IHeader, IAddress
+public sealed record ConcertHeaderDto : IHeader, IAddress
 {
     public int Id { get; set; }
     public required string Name { get; set; }
@@ -49,7 +49,7 @@ public record ConcertHeaderDto : IHeader, IAddress
     public IEnumerable<Genre> Genres { get; set; } = [];
 }
 
-public class AutocompleteDto : IHasName
+public sealed class AutocompleteDto : IHasName
 {
     [JsonPropertyName("$type")]
     public required string Type { get; init; }

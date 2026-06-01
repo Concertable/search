@@ -1,7 +1,8 @@
 ﻿using Concertable.Search.Application.Params;
 
 namespace Concertable.Search.UnitTests.Extensions;
-public class GeoParamsExtensionsTests
+
+public sealed class GeoParamsExtensionsTests
 {
     [Fact]
     public void HasValidCoordinates_ShouldReturnTrue_WhenBothProvided()
@@ -35,5 +36,5 @@ public class GeoParamsExtensionsTests
         Assert.False(geo.HasValidCoordinates());
     }
 
-    private record TestGeoParams(double? Latitude, double? Longitude, int? RadiusKm = null) : IGeoParams;
+    private sealed record TestGeoParams(double? Latitude, double? Longitude, int? RadiusKm = null) : IGeoParams;
 }

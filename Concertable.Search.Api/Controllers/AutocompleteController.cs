@@ -7,7 +7,7 @@ namespace Concertable.Search.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [AllowAnonymous]
-internal class AutocompleteController : ControllerBase
+internal sealed class AutocompleteController : ControllerBase
 {
     private readonly IAutocompleteServiceFactory autocompleteServiceFactory;
 

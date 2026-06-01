@@ -6,7 +6,7 @@ namespace Concertable.Search.Api.Controllers;
 
 [ApiController]
 [Route("api/concert/headers")]
-internal class ConcertHeaderController : ControllerBase
+internal sealed class ConcertHeaderController : ControllerBase
 {
     private readonly IConcertHeaderService concertheaderDispatcher;
 

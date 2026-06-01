@@ -2,7 +2,7 @@ using Concertable.Contracts;
 
 namespace Concertable.Search.Application.Params;
 
-public class ConcertParams : IGeoParams
+public sealed class ConcertParams : IGeoParams
 {
     public double? Latitude { get; set; }
     public double? Longitude { get; set; }

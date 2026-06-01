@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Concertable.Search.Infrastructure.Repositories;
 
-internal class VenueHeaderRepository : IVenueHeaderRepository
+internal sealed class VenueHeaderRepository : IVenueHeaderRepository
 {
     private readonly ISearchDbContext context;
     private readonly IVenueSearchSpecification searchSpecification;
@@ -38,7 +38,7 @@ internal class VenueHeaderRepository : IVenueHeaderRepository
     }
 
     public async Task<IEnumerable<VenueHeaderDto>> GetByAmountAsync(int amount) =>
-        await context.Venues            .OrderBy(v => v.Id)
+        await context.Venues.OrderBy(v => v.Id)
             .ToHeaderDtos(context.VenueRatingProjections.AsNoTracking())
             .Take(amount)
             .ToListAsync();

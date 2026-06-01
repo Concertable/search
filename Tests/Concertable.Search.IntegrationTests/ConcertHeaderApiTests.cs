@@ -7,7 +7,7 @@ namespace Concertable.Search.IntegrationTests;
 
 [Collection("Integration")]
 
-public class ConcertHeaderApiTests : IAsyncLifetime
+public sealed class ConcertHeaderApiTests : IAsyncLifetime
 {
     private readonly ApiFixture fixture;
 

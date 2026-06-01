@@ -7,11 +7,11 @@ namespace Concertable.Search.IntegrationTests;
 
 [Collection("Integration")]
 
-public class HeaderApiTests : IAsyncLifetime
+public sealed class HeaderApiTests : IAsyncLifetime
 {
     private readonly ApiFixture fixture;
 
-    private record PaginationResponse<T>(IEnumerable<T> Data, int TotalCount, int TotalPages, int PageNumber, int PageSize);
+    private sealed record PaginationResponse<T>(IEnumerable<T> Data, int TotalCount, int TotalPages, int PageNumber, int PageSize);
 
     public HeaderApiTests(ApiFixture fixture, ITestOutputHelper output)
     {

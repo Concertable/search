@@ -6,7 +6,7 @@ using Concertable.Kernel.Services.Geometry;
 
 namespace Concertable.Search.Infrastructure.Specifications;
 
-internal class GeometrySpecification<TEntity> : IGeometrySpecification<TEntity>
+internal sealed class GeometrySpecification<TEntity> : IGeometrySpecification<TEntity>
     where TEntity : class, IIdEntity, IHasLocation
 {
     private readonly IGeometryProvider geometryProvider;

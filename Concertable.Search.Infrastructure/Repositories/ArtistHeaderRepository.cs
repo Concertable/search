@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Concertable.Search.Infrastructure.Repositories;
 
-internal class ArtistHeaderRepository : IArtistHeaderRepository
+internal sealed class ArtistHeaderRepository : IArtistHeaderRepository
 {
     private readonly ISearchDbContext context;
     private readonly IArtistSearchSpecification searchSpecification;
@@ -38,7 +38,7 @@ internal class ArtistHeaderRepository : IArtistHeaderRepository
     }
 
     public async Task<IEnumerable<ArtistHeaderDto>> GetByAmountAsync(int amount) =>
-        await context.Artists            .OrderBy(a => a.Id)
+        await context.Artists.OrderBy(a => a.Id)
             .ToHeaderDtos(context.ArtistRatingProjections.AsNoTracking())
             .Take(amount)
             .ToListAsync();

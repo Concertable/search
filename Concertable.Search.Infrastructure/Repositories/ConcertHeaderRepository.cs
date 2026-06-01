@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Concertable.Search.Infrastructure.Repositories;
 
-internal class ConcertHeaderRepository : IConcertHeaderRepository
+internal sealed class ConcertHeaderRepository : IConcertHeaderRepository
 {
     private readonly ISearchDbContext context;
     private readonly IConcertSearchSpecification searchSpecification;
