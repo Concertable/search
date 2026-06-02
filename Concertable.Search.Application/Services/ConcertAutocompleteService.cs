@@ -12,6 +12,6 @@ internal sealed class ConcertAutocompleteService : IAutocompleteService
         this.repository = repository;
     }
 
-    public Task<IEnumerable<AutocompleteDto>> GetAsync(string? searchTerm) =>
+    public Task<IEnumerable<Autocomplete>> GetAsync(string? searchTerm) =>
         repository.GetAsync(searchTerm);
 }

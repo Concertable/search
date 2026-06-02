@@ -23,23 +23,23 @@ internal sealed class AllAutocompleteRepository : IAllAutocompleteRepository
         this.concertSpecification = concertSpecification;
     }
 
-    public async Task<IEnumerable<AutocompleteDto>> GetAsync(string? searchTerm)
+    public async Task<IEnumerable<Autocomplete>> GetAsync(string? searchTerm)
     {
         var searchParams = new SearchParams { SearchTerm = searchTerm };
 
         return await artistSpecification
             .Apply(context.Artists, searchParams)
-            .ToAutocompleteDtos()
+            .ToAutocompletes()
             .Take(20)
             .Concat(
                 venueSpecification
                     .Apply(context.Venues, searchParams)
-                    .ToAutocompleteDtos()
+                    .ToAutocompletes()
                     .Take(20))
             .Concat(
                 concertSpecification
                     .Apply(context.Concerts, searchParams)
-                    .ToAutocompleteDtos()
+                    .ToAutocompletes()
                     .Take(20))
             .OrderBy(r => r.Name)
             .Take(10)

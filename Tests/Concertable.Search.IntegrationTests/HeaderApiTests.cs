@@ -31,7 +31,7 @@ public sealed class HeaderApiTests : IAsyncLifetime
 
         var response = await client.GetAsync("/api/Header/amount/5?headerType=Artist");
         await response.ShouldBe(HttpStatusCode.OK);
-        var headers = await response.Content.ReadAsync<ArtistHeaderDto[]>();
+        var headers = await response.Content.ReadAsync<ArtistHeader[]>();
         Assert.NotNull(headers);
         Assert.Single(headers);
         Assert.Equal("Test Artist", headers[0].Name);
@@ -45,7 +45,7 @@ public sealed class HeaderApiTests : IAsyncLifetime
         var response = await client.GetAsync("/api/Header/amount/5?headerType=Venue");
 
         await response.ShouldBe(HttpStatusCode.OK);
-        var headers = await response.Content.ReadAsync<VenueHeaderDto[]>();
+        var headers = await response.Content.ReadAsync<VenueHeader[]>();
         Assert.NotNull(headers);
         Assert.Single(headers);
         Assert.Equal("Test Venue", headers[0].Name);
@@ -58,7 +58,7 @@ public sealed class HeaderApiTests : IAsyncLifetime
 
         var response = await client.GetAsync("/api/Header/amount/10?headerType=Concert");
         await response.ShouldBe(HttpStatusCode.OK);
-        var headers = await response.Content.ReadAsync<ConcertHeaderDto[]>();
+        var headers = await response.Content.ReadAsync<ConcertHeader[]>();
         Assert.NotNull(headers);
         Assert.NotEmpty(headers);
     }
@@ -85,7 +85,7 @@ public sealed class HeaderApiTests : IAsyncLifetime
         var response = await client.GetAsync("/api/Header?headerType=Artist&searchTerm=Test");
 
         await response.ShouldBe(HttpStatusCode.OK);
-        var result = await response.Content.ReadAsync<PaginationResponse<ArtistHeaderDto>>();
+        var result = await response.Content.ReadAsync<PaginationResponse<ArtistHeader>>();
         Assert.NotNull(result);
         Assert.Single(result.Data);
         Assert.Equal("Test Artist", result.Data.First().Name);
@@ -99,7 +99,7 @@ public sealed class HeaderApiTests : IAsyncLifetime
         var response = await client.GetAsync("/api/Header?headerType=Venue");
 
         await response.ShouldBe(HttpStatusCode.OK);
-        var result = await response.Content.ReadAsync<PaginationResponse<VenueHeaderDto>>();
+        var result = await response.Content.ReadAsync<PaginationResponse<VenueHeader>>();
         Assert.NotNull(result);
         Assert.Single(result.Data);
         Assert.Equal("Test Venue", result.Data.First().Name);
@@ -113,7 +113,7 @@ public sealed class HeaderApiTests : IAsyncLifetime
         var response = await client.GetAsync("/api/Header?headerType=Concert");
 
         await response.ShouldBe(HttpStatusCode.OK);
-        var result = await response.Content.ReadAsync<PaginationResponse<ConcertHeaderDto>>();
+        var result = await response.Content.ReadAsync<PaginationResponse<ConcertHeader>>();
         Assert.NotNull(result);
         Assert.NotEmpty(result.Data);
     }
@@ -126,7 +126,7 @@ public sealed class HeaderApiTests : IAsyncLifetime
         var response = await client.GetAsync("/api/Header?headerType=Artist&searchTerm=zzznomatch");
 
         await response.ShouldBe(HttpStatusCode.OK);
-        var result = await response.Content.ReadAsync<PaginationResponse<ArtistHeaderDto>>();
+        var result = await response.Content.ReadAsync<PaginationResponse<ArtistHeader>>();
         Assert.NotNull(result);
         Assert.Empty(result.Data);
     }
@@ -142,7 +142,7 @@ public sealed class HeaderApiTests : IAsyncLifetime
 
         // Assert
         await response.ShouldBe(HttpStatusCode.OK);
-        var result = await response.Content.ReadAsync<PaginationResponse<ArtistHeaderDto>>();
+        var result = await response.Content.ReadAsync<PaginationResponse<ArtistHeader>>();
         Assert.NotNull(result);
         Assert.NotEmpty(result.Data);
     }
@@ -158,7 +158,7 @@ public sealed class HeaderApiTests : IAsyncLifetime
 
         // Assert
         await response.ShouldBe(HttpStatusCode.OK);
-        var result = await response.Content.ReadAsync<PaginationResponse<ArtistHeaderDto>>();
+        var result = await response.Content.ReadAsync<PaginationResponse<ArtistHeader>>();
         Assert.NotNull(result);
         Assert.Empty(result.Data);
     }

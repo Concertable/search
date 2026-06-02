@@ -15,14 +15,14 @@ internal sealed class ConcertHeaderRepository : IConcertHeaderRepository
     private readonly ISearchDbContext context;
     private readonly IConcertSearchSpecification searchSpecification;
     private readonly IGeometrySpecification<ConcertReadModel> geometrySpecification;
-    private readonly ISortSpecification<ConcertHeaderDto> sortSpecification;
+    private readonly ISortSpecification<ConcertHeader> sortSpecification;
     private readonly TimeProvider timeProvider;
 
     public ConcertHeaderRepository(
         ISearchDbContext context,
         IConcertSearchSpecification searchSpecification,
         IGeometrySpecification<ConcertReadModel> geometrySpecification,
-        ISortSpecification<ConcertHeaderDto> sortSpecification,
+        ISortSpecification<ConcertHeader> sortSpecification,
         TimeProvider timeProvider)
     {
         this.context = context;
@@ -32,7 +32,7 @@ internal sealed class ConcertHeaderRepository : IConcertHeaderRepository
         this.timeProvider = timeProvider;
     }
 
-    public async Task<IPagination<ConcertHeaderDto>> SearchAsync(SearchParams searchParams)
+    public async Task<IPagination<ConcertHeader>> SearchAsync(SearchParams searchParams)
     {
         var query = searchSpecification.Apply(context.Concerts, searchParams);
         query = geometrySpecification.Apply(query, searchParams);
@@ -42,21 +42,21 @@ internal sealed class ConcertHeaderRepository : IConcertHeaderRepository
         return await dtos.ToPaginationAsync(searchParams);
     }
 
-    public async Task<IEnumerable<ConcertHeaderDto>> GetByAmountAsync(int amount) =>
+    public async Task<IEnumerable<ConcertHeader>> GetByAmountAsync(int amount) =>
         await context.Concerts.Active(timeProvider.GetUtcNow().DateTime)
             .OrderByDescending(c => c.DatePosted)
             .ToHeaderDtos(context.ConcertRatingProjections)
             .Take(amount)
             .ToListAsync();
 
-    public async Task<IEnumerable<ConcertHeaderDto>> GetPopularAsync() =>
+    public async Task<IEnumerable<ConcertHeader>> GetPopularAsync() =>
         await context.Concerts.Active(timeProvider.GetUtcNow().DateTime)
             .OrderByDescending(c => c.TotalTickets - c.AvailableTickets)
             .ToHeaderDtos(context.ConcertRatingProjections)
             .Take(10)
             .ToListAsync();
 
-    public async Task<IEnumerable<ConcertHeaderDto>> GetFreeAsync() =>
+    public async Task<IEnumerable<ConcertHeader>> GetFreeAsync() =>
         await context.Concerts.Active(timeProvider.GetUtcNow().DateTime)
             .Where(c => c.Price == 0)
             .OrderByDescending(c => c.DatePosted)
@@ -64,7 +64,7 @@ internal sealed class ConcertHeaderRepository : IConcertHeaderRepository
             .Take(10)
             .ToListAsync();
 
-    public async Task<IEnumerable<ConcertHeaderDto>> GetRecommendedAsync(ConcertParams concertParams)
+    public async Task<IEnumerable<ConcertHeader>> GetRecommendedAsync(ConcertParams concertParams)
     {
         var query = context.Concerts.Active(timeProvider.GetUtcNow().DateTime);
 

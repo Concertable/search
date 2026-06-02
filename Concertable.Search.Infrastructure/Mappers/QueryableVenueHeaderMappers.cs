@@ -5,13 +5,13 @@ namespace Concertable.Search.Infrastructure.Mappers;
 
 internal static class QueryableVenueHeaderMappers
 {
-    public static IQueryable<VenueHeaderDto> ToHeaderDtos(
+    public static IQueryable<VenueHeader> ToHeaderDtos(
         this IQueryable<VenueReadModel> query,
         IQueryable<VenueRatingProjection> ratings) =>
         from v in query.Where(v => v.Location != null && v.Address != null)
         join r in ratings on v.Id equals r.VenueId into rg
         from rating in rg.DefaultIfEmpty()
-        select new VenueHeaderDto
+        select new VenueHeader
         {
             Id = v.Id,
             Name = v.Name,
