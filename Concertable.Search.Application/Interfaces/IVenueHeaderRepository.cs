@@ -4,7 +4,7 @@ using Concertable.Search.Application.DTOs;
 
 namespace Concertable.Search.Application.Interfaces;
 
-internal interface IVenueHeaderRepository : IHeaderRepository<VenueHeaderDto>
+internal interface IVenueHeaderRepository : IHeaderRepository<VenueHeader>
 {
-    Task<IEnumerable<VenueHeaderDto>> GetByAmountAsync(int amount);
+    Task<IEnumerable<VenueHeader>> GetByAmountAsync(int amount);
 }

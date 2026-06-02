@@ -17,7 +17,7 @@ internal sealed class VenueHeaderService : IHeaderService
     public async Task<IPagination<IHeader>> SearchAsync(SearchParams searchParams)
     {
         var result = await venueHeaderRepository.SearchAsync(searchParams);
-        return new Pagination<VenueHeaderDto>(result.Data, result.TotalCount, result.PageNumber, result.PageSize);
+        return new Pagination<VenueHeader>(result.Data, result.TotalCount, result.PageNumber, result.PageSize);
     }
 
     public async Task<IEnumerable<IHeader>> GetByAmountAsync(int amount) =>

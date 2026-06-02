@@ -6,13 +6,13 @@ namespace Concertable.Search.Infrastructure.Mappers;
 
 internal static class QueryableConcertHeaderMappers
 {
-    public static IQueryable<ConcertHeaderDto> ToHeaderDtos(
+    public static IQueryable<ConcertHeader> ToHeaderDtos(
         this IQueryable<ConcertReadModel> query,
         IQueryable<ConcertRatingProjection> ratings) =>
         from c in query.Where(c => c.Venue.Location != null).AsExpandable()
         join r in ratings on c.Id equals r.ConcertId into rg
         from rating in rg.DefaultIfEmpty()
-        select new ConcertHeaderDto
+        select new ConcertHeader
         {
             Id = c.Id,
             Name = c.Name,

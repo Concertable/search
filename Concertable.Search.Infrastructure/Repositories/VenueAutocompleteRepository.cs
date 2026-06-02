@@ -17,10 +17,10 @@ internal sealed class VenueAutocompleteRepository : IVenueAutocompleteRepository
         this.specification = specification;
     }
 
-    public async Task<IEnumerable<AutocompleteDto>> GetAsync(string? searchTerm) =>
+    public async Task<IEnumerable<Autocomplete>> GetAsync(string? searchTerm) =>
         await specification
             .Apply(context.Venues, new SearchParams { SearchTerm = searchTerm })
-            .ToAutocompleteDtos()
+            .ToAutocompletes()
             .OrderBy(r => r.Name)
             .Take(10)
             .ToListAsync();
