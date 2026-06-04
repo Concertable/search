@@ -10,5 +10,6 @@
     <Project Path="Tests/Concertable.Search.IntegrationTests/Concertable.Search.IntegrationTests.csproj" />
     <Project Path="Tests/Concertable.Search.IntegrationTests.Fixtures/Concertable.Search.IntegrationTests.Fixtures.csproj" />
     <Project Path="Tests/Concertable.Search.UnitTests/Concertable.Search.UnitTests.csproj" />
+    <Project Path="Tests/E2ETests/Concertable.Search.E2ETests.Helpers/Concertable.Search.E2ETests.Helpers.csproj" />
   </Folder>
 </Solution>
