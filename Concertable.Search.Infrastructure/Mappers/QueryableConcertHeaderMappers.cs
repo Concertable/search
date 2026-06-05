@@ -14,7 +14,6 @@ internal static class QueryableConcertHeaderMappers
         from c in query.AsExpandable()
         join a in artists on c.ArtistId equals a.Id
         join v in venues on c.VenueId equals v.Id
-        where v.Location != null
         join r in ratings on c.Id equals r.ConcertId into rg
         from rating in rg.DefaultIfEmpty()
         select new ConcertHeader
@@ -26,8 +25,8 @@ internal static class QueryableConcertHeaderMappers
             StartDate = c.StartDate,
             EndDate = c.EndDate,
             DatePosted = c.DatePosted,
-            County = v.Address != null ? v.Address.County ?? string.Empty : string.Empty,
-            Town = v.Address != null ? v.Address.Town ?? string.Empty : string.Empty,
+            County = v.Address.County,
+            Town = v.Address.Town,
             Genres = ConcertSearchGenreSelectors.FromConcert.Invoke(c)
         };
 }

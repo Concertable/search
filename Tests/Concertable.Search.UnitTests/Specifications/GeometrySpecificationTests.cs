@@ -34,7 +34,6 @@ public sealed class GeometrySpecificationTests
 
     private TestEntity London => new() { Location = londonPoint };
     private TestEntity Manchester => new() { Location = manchesterPoint };
-    private TestEntity NoLocation => new() { Location = null };
 
     [Fact]
     public void Apply_ShouldReturnUnmodifiedQuery_WhenCoordinatesAreInvalid()
@@ -73,21 +72,11 @@ public sealed class GeometrySpecificationTests
     public void Apply_ShouldReturnUnmodifiedQuery_WhenProviderReturnsNull()
     {
         geometryProvider.Setup(p => p.CreatePoint(It.IsAny<double?>(), It.IsAny<double?>())).Returns((Point?)null);
-        var query = new[] { NoLocation }.AsQueryable();
+        var query = new[] { London }.AsQueryable();
 
         var result = sut.Apply(query, LondonParams with { RadiusKm = 10 });
 
         Assert.Equal(query, result);
-    }
-
-    [Fact]
-    public void Apply_ShouldFilterOutEntities_WhenLocationIsNull()
-    {
-        var query = new[] { NoLocation }.AsQueryable();
-
-        var result = sut.Apply(query, LondonParams with { RadiusKm = 10 });
-
-        Assert.Empty(result);
     }
 
     [Fact]
@@ -123,7 +112,7 @@ public sealed class GeometrySpecificationTests
     private sealed class TestEntity : IIdEntity, IHasLocation
     {
         public int Id { get; set; }
-        public Point? Location { get; set; }
+        public Point Location { get; set; } = null!;
     }
 
     private sealed record TestGeoParams(double? Latitude, double? Longitude, int? RadiusKm = null) : IGeoParams;

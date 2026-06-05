@@ -10,7 +10,6 @@ internal static class QueryableArtistHeaderMappers
         this IQueryable<ArtistReadModel> query,
         IQueryable<ArtistRatingProjection> ratings) =>
         from a in query.AsExpandable()
-        where a.Address != null
         join r in ratings on a.Id equals r.ArtistId into rg
         from rating in rg.DefaultIfEmpty()
         select new ArtistHeader
@@ -19,8 +18,8 @@ internal static class QueryableArtistHeaderMappers
             Name = a.Name,
             ImageUrl = a.Avatar,
             Rating = rating != null ? rating.AverageRating : null,
-            County = a.Address!.County,
-            Town = a.Address!.Town,
+            County = a.Address.County,
+            Town = a.Address.Town,
             Genres = ArtistSearchGenreSelectors.FromArtist.Invoke(a)
         };
 }

@@ -16,6 +16,6 @@ public sealed class ConcertReadModel : IIdEntity, IHasName, IHasLocation, IEntit
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public DateTime? DatePosted { get; set; }
-    public Point? Location { get; set; }
+    public Point Location { get; set; } = null!;
     public HashSet<ConcertReadModelGenre> ConcertGenres { get; set; } = [];
 }
