@@ -180,4 +180,106 @@ public sealed class HeaderApiTests : IAsyncLifetime
     }
 
     #endregion
+
+    #region Sort
+
+    [Fact]
+    public async Task Search_ShouldOrderVenuesByNameDescending_WhenSortIsNameDesc()
+    {
+        // Arrange
+        var client = fixture.CreateClient();
+
+        // Act
+        var response = await client.GetAsync("/api/Header?headerType=Venue&sort=name_desc&pageSize=100");
+
+        // Assert
+        await response.ShouldBe(HttpStatusCode.OK);
+        var result = await response.Content.ReadAsync<PaginationResponse<VenueHeader>>();
+        Assert.NotNull(result);
+        var names = result.Data.Select(h => h.Name).ToArray();
+        Assert.NotEmpty(names);
+        Assert.Equal(names.OrderByDescending(n => n, StringComparer.InvariantCultureIgnoreCase), names);
+    }
+
+    [Fact]
+    public async Task Search_ShouldOrderVenuesByNameAscending_WhenSortHasNoDirection()
+    {
+        // Arrange
+        var client = fixture.CreateClient();
+
+        // Act
+        var response = await client.GetAsync("/api/Header?headerType=Venue&sort=name&pageSize=100");
+
+        // Assert
+        await response.ShouldBe(HttpStatusCode.OK);
+        var result = await response.Content.ReadAsync<PaginationResponse<VenueHeader>>();
+        Assert.NotNull(result);
+        var names = result.Data.Select(h => h.Name).ToArray();
+        Assert.NotEmpty(names);
+        Assert.Equal(names.OrderBy(n => n, StringComparer.InvariantCultureIgnoreCase), names);
+    }
+
+    [Fact]
+    public async Task Search_ShouldOrderConcertsByStartDateAscending_WhenSortIsDateAsc()
+    {
+        // Arrange
+        var client = fixture.CreateClient();
+
+        // Act
+        var response = await client.GetAsync("/api/Header?headerType=Concert&sort=date_asc&pageSize=100");
+
+        // Assert
+        await response.ShouldBe(HttpStatusCode.OK);
+        var result = await response.Content.ReadAsync<PaginationResponse<ConcertHeader>>();
+        Assert.NotNull(result);
+        var dates = result.Data.Select(h => h.StartDate).ToArray();
+        Assert.NotEmpty(dates);
+        Assert.Equal(dates.OrderBy(d => d), dates);
+    }
+
+    [Fact]
+    public async Task Search_ShouldOrderConcertsByStartDateDescending_WhenSortIsDateDesc()
+    {
+        // Arrange
+        var client = fixture.CreateClient();
+
+        // Act
+        var response = await client.GetAsync("/api/Header?headerType=Concert&sort=date_desc&pageSize=100");
+
+        // Assert
+        await response.ShouldBe(HttpStatusCode.OK);
+        var result = await response.Content.ReadAsync<PaginationResponse<ConcertHeader>>();
+        Assert.NotNull(result);
+        var dates = result.Data.Select(h => h.StartDate).ToArray();
+        Assert.NotEmpty(dates);
+        Assert.Equal(dates.OrderByDescending(d => d), dates);
+    }
+
+    [Fact]
+    public async Task Search_ShouldReturn400_WhenSortFieldIsUnsupported()
+    {
+        // Arrange
+        var client = fixture.CreateClient();
+
+        // Act
+        var response = await client.GetAsync("/api/Header?headerType=Concert&sort=rating_asc");
+
+        // Assert
+        await response.ShouldBe(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task Search_ShouldReturn400_WhenSortIsNotAValidToken()
+    {
+        // Arrange
+        var client = fixture.CreateClient();
+
+        // Act
+        var response = await client.GetAsync("/api/Header?headerType=Venue&sort=banana");
+
+        // Assert
+        await response.ShouldBe(HttpStatusCode.BadRequest);
+    }
+
+    #endregion
 }

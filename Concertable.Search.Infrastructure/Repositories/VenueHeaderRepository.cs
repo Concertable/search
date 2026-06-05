@@ -13,13 +13,13 @@ internal sealed class VenueHeaderRepository : IVenueHeaderRepository
     private readonly ISearchDbContext context;
     private readonly IVenueSearchSpecification searchSpecification;
     private readonly IGeometrySpecification<VenueReadModel> geometrySpecification;
-    private readonly ISortSpecification<VenueHeader> sortSpecification;
+    private readonly ISortSpecification<VenueReadModel> sortSpecification;
 
     public VenueHeaderRepository(
         ISearchDbContext context,
         IVenueSearchSpecification searchSpecification,
         IGeometrySpecification<VenueReadModel> geometrySpecification,
-        ISortSpecification<VenueHeader> sortSpecification)
+        ISortSpecification<VenueReadModel> sortSpecification)
     {
         this.context = context;
         this.searchSpecification = searchSpecification;
@@ -31,10 +31,10 @@ internal sealed class VenueHeaderRepository : IVenueHeaderRepository
     {
         var query = searchSpecification.Apply(context.Venues.AsNoTracking(), searchParams);
         query = geometrySpecification.Apply(query, searchParams);
-        var dtos = sortSpecification.Apply(
-            query.ToHeaderDtos(context.VenueRatingProjections.AsNoTracking()),
-            searchParams);
-        return await dtos.ToPaginationAsync(searchParams);
+        query = sortSpecification.Apply(query, searchParams.Sort);
+        return await query
+            .ToHeaderDtos(context.VenueRatingProjections.AsNoTracking())
+            .ToPaginationAsync(searchParams);
     }
 
     public async Task<IEnumerable<VenueHeader>> GetByAmountAsync(int amount) =>

@@ -1,18 +1,14 @@
-
-using Concertable.Search.Application.DTOs;
-using Concertable.Search.Application.Interfaces;
-
 namespace Concertable.Search.Infrastructure.Specifications;
 
-internal sealed class ConcertSortSpecification : ISortSpecification<ConcertHeader>
+internal sealed class ConcertSortSpecification : ISortSpecification<ConcertReadModel>
 {
-    public IQueryable<ConcertHeader> Apply(IQueryable<ConcertHeader> query, ISortParams sortParams) =>
-        sortParams.Sort?.ToLower() switch
+    public IQueryable<ConcertReadModel> Apply(IQueryable<ConcertReadModel> query, Sort? sort) =>
+        sort switch
         {
-            "name_asc" => query.OrderBy(c => c.Name),
-            "name_desc" => query.OrderByDescending(c => c.Name),
-            "date_asc" => query.OrderBy(c => c.StartDate),
-            "date_desc" => query.OrderByDescending(c => c.StartDate),
+            { Field: SortField.Name, Direction: SortDirection.Asc } => query.OrderBy(c => c.Name),
+            { Field: SortField.Name, Direction: SortDirection.Desc } => query.OrderByDescending(c => c.Name),
+            { Field: SortField.Date, Direction: SortDirection.Asc } => query.OrderBy(c => c.StartDate),
+            { Field: SortField.Date, Direction: SortDirection.Desc } => query.OrderByDescending(c => c.StartDate),
             _ => query.OrderBy(c => c.StartDate)
         };
 }

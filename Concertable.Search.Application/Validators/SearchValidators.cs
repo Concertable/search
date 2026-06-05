@@ -6,17 +6,11 @@ namespace Concertable.Search.Application.Validators;
 
 internal sealed class SearchParamsValidator : AbstractValidator<SearchParams>
 {
-    private static readonly string[] ValidSortValues = ["name_asc", "name_desc", "date_asc", "date_desc"];
-
     public SearchParamsValidator()
     {
         Include(new PageParamsValidator());
         Include(new GeoParamsValidator());
         RuleFor(x => x.HeaderType).NotNull();
-        RuleFor(x => x.Sort)
-            .Must(s => ValidSortValues.Contains(s!.ToLower()))
-            .When(x => x.Sort is not null)
-            .WithMessage($"Sort must be one of: {string.Join(", ", ValidSortValues)}.");
     }
 }
 

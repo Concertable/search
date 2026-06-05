@@ -13,13 +13,13 @@ internal sealed class ArtistHeaderRepository : IArtistHeaderRepository
     private readonly ISearchDbContext context;
     private readonly IArtistSearchSpecification searchSpecification;
     private readonly IGeometrySpecification<ArtistReadModel> geometrySpecification;
-    private readonly ISortSpecification<ArtistHeader> sortSpecification;
+    private readonly ISortSpecification<ArtistReadModel> sortSpecification;
 
     public ArtistHeaderRepository(
         ISearchDbContext context,
         IArtistSearchSpecification searchSpecification,
         IGeometrySpecification<ArtistReadModel> geometrySpecification,
-        ISortSpecification<ArtistHeader> sortSpecification)
+        ISortSpecification<ArtistReadModel> sortSpecification)
     {
         this.context = context;
         this.searchSpecification = searchSpecification;
@@ -31,10 +31,10 @@ internal sealed class ArtistHeaderRepository : IArtistHeaderRepository
     {
         var query = searchSpecification.Apply(context.Artists.AsNoTracking(), searchParams);
         query = geometrySpecification.Apply(query, searchParams);
-        var dtos = sortSpecification.Apply(
-            query.ToHeaderDtos(context.ArtistRatingProjections.AsNoTracking()),
-            searchParams);
-        return await dtos.ToPaginationAsync(searchParams);
+        query = sortSpecification.Apply(query, searchParams.Sort);
+        return await query
+            .ToHeaderDtos(context.ArtistRatingProjections.AsNoTracking())
+            .ToPaginationAsync(searchParams);
     }
 
     public async Task<IEnumerable<ArtistHeader>> GetByAmountAsync(int amount) =>

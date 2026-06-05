@@ -15,14 +15,14 @@ internal sealed class ConcertHeaderRepository : IConcertHeaderRepository
     private readonly ISearchDbContext context;
     private readonly IConcertSearchSpecification searchSpecification;
     private readonly IGeometrySpecification<ConcertReadModel> geometrySpecification;
-    private readonly ISortSpecification<ConcertHeader> sortSpecification;
+    private readonly ISortSpecification<ConcertReadModel> sortSpecification;
     private readonly TimeProvider timeProvider;
 
     public ConcertHeaderRepository(
         ISearchDbContext context,
         IConcertSearchSpecification searchSpecification,
         IGeometrySpecification<ConcertReadModel> geometrySpecification,
-        ISortSpecification<ConcertHeader> sortSpecification,
+        ISortSpecification<ConcertReadModel> sortSpecification,
         TimeProvider timeProvider)
     {
         this.context = context;
@@ -36,10 +36,10 @@ internal sealed class ConcertHeaderRepository : IConcertHeaderRepository
     {
         var query = searchSpecification.Apply(context.Concerts, searchParams);
         query = geometrySpecification.Apply(query, searchParams);
-        var dtos = sortSpecification.Apply(
-            query.ToHeaderDtos(context.Artists, context.Venues, context.ConcertRatingProjections),
-            searchParams);
-        return await dtos.ToPaginationAsync(searchParams);
+        query = sortSpecification.Apply(query, searchParams.Sort);
+        return await query
+            .ToHeaderDtos(context.Artists, context.Venues, context.ConcertRatingProjections)
+            .ToPaginationAsync(searchParams);
     }
 
     public async Task<IEnumerable<ConcertHeader>> GetByAmountAsync(int amount) =>
