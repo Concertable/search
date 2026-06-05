@@ -50,9 +50,9 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IVenueSearchSpecification, VenueSearchSpecification>();
         services.AddSingleton<IConcertSearchSpecification, ConcertSearchSpecification>();
 
-        services.AddSingleton<ISortSpecification<ArtistHeader>, HeaderSortSpecification<ArtistHeader>>();
-        services.AddSingleton<ISortSpecification<VenueHeader>, HeaderSortSpecification<VenueHeader>>();
-        services.AddSingleton<ISortSpecification<ConcertHeader>, ConcertSortSpecification>();
+        services.AddSingleton<ISortSpecification<ArtistReadModel>, SortSpecification<ArtistReadModel>>();
+        services.AddSingleton<ISortSpecification<VenueReadModel>, SortSpecification<VenueReadModel>>();
+        services.AddSingleton<ISortSpecification<ConcertReadModel>, ConcertSortSpecification>();
 
         services.AddScoped<IArtistAutocompleteRepository, ArtistAutocompleteRepository>();
         services.AddScoped<IVenueAutocompleteRepository, VenueAutocompleteRepository>();
