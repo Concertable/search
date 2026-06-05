@@ -7,7 +7,6 @@ public sealed class SearchParams : IPageParams, IGeoParams
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 10;
     public string? SearchTerm { get; set; }
-    public HeaderType? HeaderType { get; set; }
     public DateOnly? From { get; set; }
     public DateOnly? To { get; set; }
     public Sort? Sort { get; set; }

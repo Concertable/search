@@ -14,9 +14,9 @@ internal sealed class HeaderDispatcher : IHeaderDispatcher
         this.headerServiceFactory = headerServiceFactory;
     }
 
-    public async Task<IPagination<IHeader>> SearchAsync(SearchParams searchParams)
+    public async Task<IPagination<IHeader>> SearchAsync(HeaderType type, SearchParams searchParams)
     {
-        var service = headerServiceFactory.Create(searchParams.HeaderType!.Value);
+        var service = headerServiceFactory.Create(type);
         return await service.SearchAsync(searchParams);
     }
 

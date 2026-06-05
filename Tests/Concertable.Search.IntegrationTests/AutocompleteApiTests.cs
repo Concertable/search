@@ -1,4 +1,5 @@
 using System.Net;
+using Concertable.Search.Application;
 using Concertable.Search.Application.DTOs;
 using Xunit.Abstractions;
 
@@ -70,6 +71,6 @@ public sealed class AutocompleteApiTests : IAsyncLifetime
         await response.ShouldBe(HttpStatusCode.OK);
         var results = await response.Content.ReadAsync<Autocomplete[]>();
         Assert.NotNull(results);
-        Assert.Contains(results, r => r.Name == artist.Name && r.Type == "artist");
+        Assert.Contains(results, r => r.Name == artist.Name && r.Type == HeaderType.Artist);
     }
 }

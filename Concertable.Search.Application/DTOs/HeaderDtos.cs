@@ -4,9 +4,9 @@ using System.Text.Json.Serialization;
 
 namespace Concertable.Search.Application.DTOs;
 
-[JsonDerivedType(typeof(ArtistHeader), "artist")]
-[JsonDerivedType(typeof(VenueHeader), "venue")]
-[JsonDerivedType(typeof(ConcertHeader), "concert")]
+[JsonDerivedType(typeof(ArtistHeader), HeaderTypeNames.Artist)]
+[JsonDerivedType(typeof(VenueHeader), HeaderTypeNames.Venue)]
+[JsonDerivedType(typeof(ConcertHeader), HeaderTypeNames.Concert)]
 public interface IHeader : IHasRating, IAddress
 {
     string Name { get; }
@@ -52,7 +52,7 @@ public sealed record ConcertHeader : IHeader, IAddress
 public sealed class Autocomplete : IHasName
 {
     [JsonPropertyName("$type")]
-    public required string Type { get; init; }
+    public required HeaderType Type { get; init; }
     public required int Id { get; init; }
     public required string Name { get; init; }
 }

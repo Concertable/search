@@ -10,7 +10,6 @@ internal sealed class SearchParamsValidator : AbstractValidator<SearchParams>
     {
         Include(new PageParamsValidator());
         Include(new GeoParamsValidator());
-        RuleFor(x => x.HeaderType).NotNull();
     }
 }
 

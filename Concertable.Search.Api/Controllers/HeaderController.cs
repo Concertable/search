@@ -1,6 +1,7 @@
 ﻿using Concertable.Search.Application.Params;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Concertable.Search.Api.Controllers;
 
@@ -17,15 +18,10 @@ internal sealed class HeaderController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> Search([FromQuery] SearchParams searchParams)
-        => Ok(await headerDispatcher.SearchAsync(searchParams));
+    public async Task<IActionResult> Search([FromQuery, BindRequired] HeaderType headerType, [FromQuery] SearchParams searchParams)
+        => Ok(await headerDispatcher.SearchAsync(headerType, searchParams));
 
     [HttpGet("amount/{amount}")]
-    public async Task<IActionResult> GetByAmount(int amount, [FromQuery] HeaderType? headerType)
-    {
-        if (headerType is null)
-            return BadRequest("Header type is required.");
-
-        return Ok(await headerDispatcher.GetByAmountAsync(headerType.Value, amount));
-    }
+    public async Task<IActionResult> GetByAmount(int amount, [FromQuery, BindRequired] HeaderType headerType)
+        => Ok(await headerDispatcher.GetByAmountAsync(headerType, amount));
 }
