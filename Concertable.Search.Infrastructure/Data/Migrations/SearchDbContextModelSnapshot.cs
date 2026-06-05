@@ -169,10 +169,6 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ArtistId");
-
-                    b.HasIndex("VenueId");
-
                     b.ToTable("Concerts", "search");
                 });
 
@@ -297,25 +293,6 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Artist");
-                });
-
-            modelBuilder.Entity("Concertable.Search.Domain.Models.ConcertReadModel", b =>
-                {
-                    b.HasOne("Concertable.Search.Domain.Models.ArtistReadModel", "Artist")
-                        .WithMany()
-                        .HasForeignKey("ArtistId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Concertable.Search.Domain.Models.VenueReadModel", "Venue")
-                        .WithMany()
-                        .HasForeignKey("VenueId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Artist");
-
-                    b.Navigation("Venue");
                 });
 
             modelBuilder.Entity("Concertable.Search.Domain.Models.ConcertReadModelGenre", b =>

@@ -1,5 +1,4 @@
-﻿using System.Net;
-using Concertable.Contracts;
+using System.Net;
 using Concertable.Search.Application.DTOs;
 using Xunit.Abstractions;
 
@@ -40,9 +39,10 @@ public sealed class ConcertHeaderApiTests : IAsyncLifetime
     #region GetFree
 
     [Fact]
-    public async Task GetFree_ShouldReturn200_WithEmptyList_WhenNoPaidConcerts()
+    public async Task GetFree_ShouldReturn200_WithEmptyList_WhenNoFreeConcerts()
     {
         var client = fixture.CreateClient();
+        Assert.DoesNotContain(fixture.SeedState.Concerts, c => c.Price == 0);
 
         var response = await client.GetAsync("/api/concert/headers/free");
 
@@ -84,7 +84,8 @@ public sealed class ConcertHeaderApiTests : IAsyncLifetime
     {
         var client = fixture.CreateClient(fixture.SeedState.Customer);
 
-        var response = await client.GetAsync($"/api/concert/headers/recommended?genres={Genre.Rock}");
+        var response = await client.GetAsync(
+            $"/api/concert/headers/recommended?genres={fixture.SeedState.GenreWithActiveConcerts}");
 
         await response.ShouldBe(HttpStatusCode.OK);
         var concerts = await response.Content.ReadAsync<ConcertHeader[]>();
@@ -97,7 +98,8 @@ public sealed class ConcertHeaderApiTests : IAsyncLifetime
     {
         var client = fixture.CreateClient(fixture.SeedState.Customer);
 
-        var response = await client.GetAsync($"/api/concert/headers/recommended?genres={Genre.Jazz}");
+        var response = await client.GetAsync(
+            $"/api/concert/headers/recommended?genres={fixture.SeedState.GenreWithoutActiveConcerts}");
 
         await response.ShouldBe(HttpStatusCode.OK);
         var concerts = await response.Content.ReadAsync<ConcertHeader[]>();
@@ -112,7 +114,8 @@ public sealed class ConcertHeaderApiTests : IAsyncLifetime
         var client = fixture.CreateClient(fixture.SeedState.Customer);
 
         // Act
-        var response = await client.GetAsync($"/api/concert/headers/recommended?genres={Genre.Rock},{Genre.Jazz}");
+        var response = await client.GetAsync(
+            $"/api/concert/headers/recommended?genres={fixture.SeedState.GenreWithActiveConcerts},{fixture.SeedState.GenreWithoutActiveConcerts}");
 
         // Assert
         await response.ShouldBe(HttpStatusCode.OK);

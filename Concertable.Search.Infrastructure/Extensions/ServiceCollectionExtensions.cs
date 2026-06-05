@@ -1,7 +1,11 @@
 ﻿using Concertable.B2B.Artist.Contracts.Events;
 using Concertable.B2B.Concert.Contracts.Events;
+using Concertable.B2B.Seed.Contracts;
 using Concertable.DataAccess.Infrastructure;
 using Concertable.Search.Domain.Models;
+using Concertable.Search.Infrastructure.Data.Seeders;
+using Concertable.Search.Seed.Infrastructure;
+using Concertable.Seed.Shared;
 using Concertable.Search.Application.Validators;
 using Concertable.Search.Infrastructure.Data;
 using Concertable.Search.Infrastructure.Handlers;
@@ -77,6 +81,14 @@ public static class ServiceCollectionExtensions
 
         services.AddValidatorsFromAssemblyContaining<SearchParamsValidator>();
 
+        return services;
+    }
+
+    public static IServiceCollection AddSearchProjectionTestSeeder(this IServiceCollection services)
+    {
+        services.AddSingleton<SeedCatalog>();
+        services.AddScoped<SeedState>();
+        services.AddScoped<ITestSeeder, SearchProjectionTestSeeder>();
         return services;
     }
 

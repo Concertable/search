@@ -14,16 +14,6 @@ internal sealed class ConcertReadModelConfiguration : IEntityTypeConfiguration<C
         builder.Property(x => x.Name).IsRequired();
         builder.Property(x => x.Location).HasColumnType("geography");
 
-        builder.HasOne(x => x.Artist)
-            .WithMany()
-            .HasForeignKey(x => x.ArtistId)
-            .OnDelete(DeleteBehavior.NoAction);
-
-        builder.HasOne(x => x.Venue)
-            .WithMany()
-            .HasForeignKey(x => x.VenueId)
-            .OnDelete(DeleteBehavior.NoAction);
-
         builder.HasMany(x => x.ConcertGenres)
             .WithOne(x => x.Concert)
             .HasForeignKey(x => x.ConcertId)

@@ -62,6 +62,29 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Concerts",
+                schema: "search",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false),
+                    ArtistId = table.Column<int>(type: "int", nullable: false),
+                    VenueId = table.Column<int>(type: "int", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Avatar = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TotalTickets = table.Column<int>(type: "int", nullable: false),
+                    AvailableTickets = table.Column<int>(type: "int", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DatePosted = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Location = table.Column<Point>(type: "geography", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Concerts", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "VenueRatingProjections",
                 schema: "search",
                 columns: table => new
@@ -114,41 +137,6 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Concerts",
-                schema: "search",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false),
-                    ArtistId = table.Column<int>(type: "int", nullable: false),
-                    VenueId = table.Column<int>(type: "int", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Avatar = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TotalTickets = table.Column<int>(type: "int", nullable: false),
-                    AvailableTickets = table.Column<int>(type: "int", nullable: false),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DatePosted = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Location = table.Column<Point>(type: "geography", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Concerts", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Concerts_Artists_ArtistId",
-                        column: x => x.ArtistId,
-                        principalSchema: "search",
-                        principalTable: "Artists",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Concerts_Venues_VenueId",
-                        column: x => x.VenueId,
-                        principalSchema: "search",
-                        principalTable: "Venues",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ConcertGenres",
                 schema: "search",
                 columns: table => new
@@ -167,18 +155,6 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Concerts_ArtistId",
-                schema: "search",
-                table: "Concerts",
-                column: "ArtistId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Concerts_VenueId",
-                schema: "search",
-                table: "Concerts",
-                column: "VenueId");
         }
 
         /// <inheritdoc />
@@ -205,7 +181,7 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
                 schema: "search");
 
             migrationBuilder.DropTable(
-                name: "Concerts",
+                name: "Venues",
                 schema: "search");
 
             migrationBuilder.DropTable(
@@ -213,7 +189,7 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
                 schema: "search");
 
             migrationBuilder.DropTable(
-                name: "Venues",
+                name: "Concerts",
                 schema: "search");
         }
     }

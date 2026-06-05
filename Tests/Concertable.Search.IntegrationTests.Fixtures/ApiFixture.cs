@@ -1,6 +1,6 @@
-using Concertable.Search.Infrastructure.Data;
-using Concertable.Search.Infrastructure.Data.Seeders;
-using Concertable.Seed.Identity;
+using Concertable.Search.Infrastructure.Extensions;
+using Concertable.Search.Seed.Infrastructure;
+using Concertable.Seed.Shared;
 using Concertable.Testing.Integration;
 using Concertable.Testing.Integration.Logging;
 using Microsoft.AspNetCore.Authentication;
@@ -24,7 +24,7 @@ public sealed class ApiFixture : IAsyncLifetime
     public void AttachOutput(ITestOutputHelper output) => outputAccessor.Output = output;
     public void DetachOutput() => outputAccessor.Output = null;
 
-    public SeedState SeedState { get; } = new SeedState();
+    public SeedState SeedState { get; private set; } = null!;
 
     public async Task InitializeAsync()
     {
@@ -59,6 +59,8 @@ public sealed class ApiFixture : IAsyncLifetime
                 });
                 services.AddAuthentication()
                     .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.SchemeName, _ => { });
+
+                services.AddSearchProjectionTestSeeder();
             });
         });
 
@@ -71,8 +73,13 @@ public sealed class ApiFixture : IAsyncLifetime
         await sqlFixture.ResetAsync();
 
         await using var scope = factory.Services.CreateAsyncScope();
-        var db = scope.ServiceProvider.GetRequiredService<SearchDbContext>();
-        await SearchTestSeeder.SeedAsync(db);
+        foreach (var seeder in scope.ServiceProvider.GetServices<ITestSeeder>().OrderBy(s => s.Order))
+        {
+            await seeder.MigrateAsync();
+            await seeder.SeedAsync();
+        }
+
+        SeedState = scope.ServiceProvider.GetRequiredService<SeedState>();
     }
 
     public async Task DisposeAsync()

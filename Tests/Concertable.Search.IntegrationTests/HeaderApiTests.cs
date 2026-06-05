@@ -1,5 +1,4 @@
-﻿using System.Net;
-using Concertable.Contracts;
+using System.Net;
 using Concertable.Search.Application.DTOs;
 using Xunit.Abstractions;
 
@@ -28,27 +27,27 @@ public sealed class HeaderApiTests : IAsyncLifetime
     public async Task GetByAmount_ShouldReturn200_WithArtists()
     {
         var client = fixture.CreateClient();
+        var expected = fixture.SeedState.Artists.OrderBy(a => a.Id).Take(5).Select(a => a.Name).ToArray();
 
         var response = await client.GetAsync("/api/Header/amount/5?headerType=Artist");
         await response.ShouldBe(HttpStatusCode.OK);
         var headers = await response.Content.ReadAsync<ArtistHeader[]>();
         Assert.NotNull(headers);
-        Assert.Single(headers);
-        Assert.Equal("Test Artist", headers[0].Name);
+        Assert.Equal(expected, headers.Select(h => h.Name).ToArray());
     }
 
     [Fact]
     public async Task GetByAmount_ShouldReturn200_WithVenues()
     {
         var client = fixture.CreateClient();
+        var expected = fixture.SeedState.Venues.OrderBy(v => v.Id).Take(5).Select(v => v.Name).ToArray();
 
         var response = await client.GetAsync("/api/Header/amount/5?headerType=Venue");
 
         await response.ShouldBe(HttpStatusCode.OK);
         var headers = await response.Content.ReadAsync<VenueHeader[]>();
         Assert.NotNull(headers);
-        Assert.Single(headers);
-        Assert.Equal("Test Venue", headers[0].Name);
+        Assert.Equal(expected, headers.Select(h => h.Name).ToArray());
     }
 
     [Fact]
@@ -81,14 +80,16 @@ public sealed class HeaderApiTests : IAsyncLifetime
     public async Task Search_ShouldReturn200_WithPaginatedArtists()
     {
         var client = fixture.CreateClient();
+        var artist = fixture.SeedState.Artist;
+        var expected = fixture.SeedState.Artists.Where(a => a.Name.Contains(artist.Name)).Select(a => a.Name).ToHashSet();
 
-        var response = await client.GetAsync("/api/Header?headerType=Artist&searchTerm=Test");
+        var response = await client.GetAsync($"/api/Header?headerType=Artist&searchTerm={Uri.EscapeDataString(artist.Name)}");
 
         await response.ShouldBe(HttpStatusCode.OK);
         var result = await response.Content.ReadAsync<PaginationResponse<ArtistHeader>>();
         Assert.NotNull(result);
-        Assert.Single(result.Data);
-        Assert.Equal("Test Artist", result.Data.First().Name);
+        Assert.Equal(expected.Count, result.TotalCount);
+        Assert.All(result.Data, h => Assert.Contains(h.Name, expected));
     }
 
     [Fact]
@@ -101,8 +102,9 @@ public sealed class HeaderApiTests : IAsyncLifetime
         await response.ShouldBe(HttpStatusCode.OK);
         var result = await response.Content.ReadAsync<PaginationResponse<VenueHeader>>();
         Assert.NotNull(result);
-        Assert.Single(result.Data);
-        Assert.Equal("Test Venue", result.Data.First().Name);
+        Assert.Equal(fixture.SeedState.Venues.Count, result.TotalCount);
+        var venueNames = fixture.SeedState.Venues.Select(v => v.Name).ToHashSet();
+        Assert.All(result.Data, h => Assert.Contains(h.Name, venueNames));
     }
 
     [Fact]
@@ -136,31 +138,45 @@ public sealed class HeaderApiTests : IAsyncLifetime
     {
         // Arrange
         var client = fixture.CreateClient();
+        var genres = fixture.SeedState.Artists
+            .SelectMany(a => a.ArtistGenres).Select(g => g.Genre).Distinct().Take(2).ToArray();
+        var expected = fixture.SeedState.Artists
+            .Where(a => a.ArtistGenres.Any(g => genres.Contains(g.Genre)))
+            .Select(a => a.Name)
+            .ToHashSet();
 
         // Act
-        var response = await client.GetAsync($"/api/Header?headerType=Artist&genres={Genre.Rock},{Genre.Jazz}");
+        var response = await client.GetAsync($"/api/Header?headerType=Artist&genres={string.Join(',', genres)}");
 
         // Assert
         await response.ShouldBe(HttpStatusCode.OK);
         var result = await response.Content.ReadAsync<PaginationResponse<ArtistHeader>>();
         Assert.NotNull(result);
-        Assert.NotEmpty(result.Data);
+        Assert.Equal(expected.Count, result.TotalCount);
+        Assert.All(result.Data, h => Assert.Contains(h.Name, expected));
     }
 
     [Fact]
-    public async Task Search_ShouldReturn200_WithEmptyData_WhenCommaDelimitedGenreIdsHaveNoMatch()
+    public async Task Search_ShouldReturn200_WithOnlyMatchingArtists_WhenGenreFiltered()
     {
         // Arrange
         var client = fixture.CreateClient();
+        var genre = fixture.SeedState.Artists
+            .SelectMany(a => a.ArtistGenres).Select(g => g.Genre).First();
+        var expected = fixture.SeedState.Artists
+            .Where(a => a.ArtistGenres.Any(g => g.Genre == genre))
+            .Select(a => a.Name)
+            .ToHashSet();
 
         // Act
-        var response = await client.GetAsync($"/api/Header?headerType=Artist&genres={Genre.Jazz},{Genre.Electronic}");
+        var response = await client.GetAsync($"/api/Header?headerType=Artist&genres={genre}");
 
         // Assert
         await response.ShouldBe(HttpStatusCode.OK);
         var result = await response.Content.ReadAsync<PaginationResponse<ArtistHeader>>();
         Assert.NotNull(result);
-        Assert.Empty(result.Data);
+        Assert.Equal(expected.Count, result.TotalCount);
+        Assert.All(result.Data, h => Assert.Contains(h.Name, expected));
     }
 
     #endregion

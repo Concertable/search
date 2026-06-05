@@ -23,8 +23,9 @@ public sealed class AutocompleteApiTests : IAsyncLifetime
     public async Task GetHeaders_ShouldReturn200_WithResults_WhenSearchTermMatches()
     {
         var client = fixture.CreateClient();
+        var venue = fixture.SeedState.Venue;
 
-        var response = await client.GetAsync("/api/Autocomplete?searchTerm=Test");
+        var response = await client.GetAsync($"/api/Autocomplete?searchTerm={Uri.EscapeDataString(venue.Name)}");
 
         await response.ShouldBe(HttpStatusCode.OK);
         var results = await response.Content.ReadAsync<Autocomplete[]>();
@@ -62,12 +63,13 @@ public sealed class AutocompleteApiTests : IAsyncLifetime
     public async Task GetHeaders_ShouldReturn200_WithArtistResult_WhenArtistNameMatches()
     {
         var client = fixture.CreateClient();
+        var artist = fixture.SeedState.Artist;
 
-        var response = await client.GetAsync("/api/Autocomplete?searchTerm=Test Artist");
+        var response = await client.GetAsync($"/api/Autocomplete?searchTerm={Uri.EscapeDataString(artist.Name)}");
 
         await response.ShouldBe(HttpStatusCode.OK);
         var results = await response.Content.ReadAsync<Autocomplete[]>();
         Assert.NotNull(results);
-        Assert.Contains(results, r => r.Name == "Test Artist" && r.Type == "artist");
+        Assert.Contains(results, r => r.Name == artist.Name && r.Type == "artist");
     }
 }

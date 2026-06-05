@@ -17,7 +17,5 @@ public sealed class ConcertReadModel : IIdEntity, IHasName, IHasLocation, IEntit
     public DateTime EndDate { get; set; }
     public DateTime? DatePosted { get; set; }
     public Point? Location { get; set; }
-    public ArtistReadModel Artist { get; set; } = null!;
-    public VenueReadModel Venue { get; set; } = null!;
     public HashSet<ConcertReadModelGenre> ConcertGenres { get; set; } = [];
 }

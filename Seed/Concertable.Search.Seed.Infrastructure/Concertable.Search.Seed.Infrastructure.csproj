@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Concertable.Search.Domain\Concertable.Search.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Concertable.B2B\Seed\Concertable.B2B.Seed.Contracts\Concertable.B2B.Seed.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\Shared\Concertable.Kernel\Concertable.Kernel.csproj" />
+    <ProjectReference Include="..\..\..\Shared\Seed\Concertable.Seed.Identity\Concertable.Seed.Identity.csproj" />
+  </ItemGroup>
+
+</Project>

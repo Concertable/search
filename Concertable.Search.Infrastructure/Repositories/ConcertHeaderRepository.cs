@@ -37,7 +37,7 @@ internal sealed class ConcertHeaderRepository : IConcertHeaderRepository
         var query = searchSpecification.Apply(context.Concerts, searchParams);
         query = geometrySpecification.Apply(query, searchParams);
         var dtos = sortSpecification.Apply(
-            query.ToHeaderDtos(context.ConcertRatingProjections),
+            query.ToHeaderDtos(context.Artists, context.Venues, context.ConcertRatingProjections),
             searchParams);
         return await dtos.ToPaginationAsync(searchParams);
     }
@@ -45,14 +45,14 @@ internal sealed class ConcertHeaderRepository : IConcertHeaderRepository
     public async Task<IEnumerable<ConcertHeader>> GetByAmountAsync(int amount) =>
         await context.Concerts.Active(timeProvider.GetUtcNow().DateTime)
             .OrderByDescending(c => c.DatePosted)
-            .ToHeaderDtos(context.ConcertRatingProjections)
+            .ToHeaderDtos(context.Artists, context.Venues, context.ConcertRatingProjections)
             .Take(amount)
             .ToListAsync();
 
     public async Task<IEnumerable<ConcertHeader>> GetPopularAsync() =>
         await context.Concerts.Active(timeProvider.GetUtcNow().DateTime)
             .OrderByDescending(c => c.TotalTickets - c.AvailableTickets)
-            .ToHeaderDtos(context.ConcertRatingProjections)
+            .ToHeaderDtos(context.Artists, context.Venues, context.ConcertRatingProjections)
             .Take(10)
             .ToListAsync();
 
@@ -60,7 +60,7 @@ internal sealed class ConcertHeaderRepository : IConcertHeaderRepository
         await context.Concerts.Active(timeProvider.GetUtcNow().DateTime)
             .Where(c => c.Price == 0)
             .OrderByDescending(c => c.DatePosted)
-            .ToHeaderDtos(context.ConcertRatingProjections)
+            .ToHeaderDtos(context.Artists, context.Venues, context.ConcertRatingProjections)
             .Take(10)
             .ToListAsync();
 
@@ -78,7 +78,7 @@ internal sealed class ConcertHeaderRepository : IConcertHeaderRepository
             : query.OrderBy(c => c.StartDate);
 
         return await query
-            .ToHeaderDtos(context.ConcertRatingProjections)
+            .ToHeaderDtos(context.Artists, context.Venues, context.ConcertRatingProjections)
             .Take(10)
             .ToListAsync();
     }

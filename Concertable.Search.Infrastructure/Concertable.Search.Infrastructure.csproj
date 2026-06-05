@@ -21,6 +21,9 @@
     <ProjectReference Include="..\..\Shared\Concertable.Kernel\Concertable.Kernel.csproj" />
     <ProjectReference Include="..\..\Concertable.Messaging\Concertable.Messaging.Contracts\Concertable.Messaging.Contracts.csproj" />
     <ProjectReference Include="..\..\Concertable.Messaging\Concertable.Messaging.Domain\Concertable.Messaging.Domain.csproj" />
+    <ProjectReference Include="..\..\Concertable.B2B\Seed\Concertable.B2B.Seed.Contracts\Concertable.B2B.Seed.Contracts.csproj" />
+    <ProjectReference Include="..\Seed\Concertable.Search.Seed.Infrastructure\Concertable.Search.Seed.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Shared\Seed\Concertable.Seed.Shared\Concertable.Seed.Shared.csproj" />
   </ItemGroup>
 
 </Project>
