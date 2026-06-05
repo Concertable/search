@@ -28,6 +28,6 @@ internal sealed class GeometrySpecification<TEntity> : IGeometrySpecification<TE
 
         var radiusMeters = (geoParams.RadiusKm ?? 10) * 1000;
 
-        return query.Where(e => e.Location != null && e.Location.Distance(center) <= radiusMeters);
+        return query.Where(e => e.Location.Distance(center) <= radiusMeters);
     }
 }

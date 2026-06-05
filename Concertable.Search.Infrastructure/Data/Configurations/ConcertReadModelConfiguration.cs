@@ -12,7 +12,8 @@ internal sealed class ConcertReadModelConfiguration : IEntityTypeConfiguration<C
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).ValueGeneratedNever();
         builder.Property(x => x.Name).IsRequired();
-        builder.Property(x => x.Location).HasColumnType("geography");
+        builder.Property(x => x.Location).HasColumnType("geography").IsRequired();
+        builder.Property(x => x.Price).HasPrecision(18, 2);
 
         builder.HasMany(x => x.ConcertGenres)
             .WithOne(x => x.Concert)

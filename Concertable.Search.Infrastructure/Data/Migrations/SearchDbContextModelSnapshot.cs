@@ -98,9 +98,11 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Avatar")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Point>("Location")
+                        .IsRequired()
                         .HasColumnType("geography");
 
                     b.Property<string>("Name")
@@ -149,6 +151,7 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<Point>("Location")
+                        .IsRequired()
                         .HasColumnType("geography");
 
                     b.Property<string>("Name")
@@ -156,6 +159,7 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("StartDate")
@@ -191,9 +195,11 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Avatar")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Point>("Location")
+                        .IsRequired()
                         .HasColumnType("geography");
 
                     b.Property<string>("Name")
@@ -281,7 +287,8 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
                                 .HasForeignKey("ArtistReadModelId");
                         });
 
-                    b.Navigation("Address");
+                    b.Navigation("Address")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Concertable.Search.Domain.Models.ArtistReadModelGenre", b =>
@@ -331,7 +338,8 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
                                 .HasForeignKey("VenueReadModelId");
                         });
 
-                    b.Navigation("Address");
+                    b.Navigation("Address")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Concertable.Search.Domain.Models.ArtistReadModel", b =>
