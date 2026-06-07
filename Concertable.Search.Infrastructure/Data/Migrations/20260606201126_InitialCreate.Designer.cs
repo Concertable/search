@@ -13,7 +13,7 @@ using NetTopologySuite.Geometries;
 namespace Concertable.Search.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(SearchDbContext))]
-    [Migration("20260605160026_InitialCreate")]
+    [Migration("20260606201126_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
