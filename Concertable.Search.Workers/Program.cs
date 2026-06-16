@@ -38,13 +38,8 @@ services.AddInbox(opt => opt.UseSqlServer(builder.Configuration.GetConnectionStr
 
 var app = builder.Build();
 
-// The projection handlers write SearchDbContext's tables (search.Venues/Artists/Concerts/...).
-// Migrate that context here — before app.Run() starts the message pump — so the consumer never
-// processes a projection event before those tables exist. Otherwise the first events lose the
-// startup race against the Search.Web migration, fail with "Invalid object name 'search.*'", and
-// are dropped; the Search-backed find query inner-joins concerts -> venues -> artists, so every
-// concert at an un-projected venue silently vanishes from results. MigrateAsync is idempotent and
-// guarded by EF's migration app-lock, so Web migrating the same context concurrently is safe.
+// Migrate the projection tables before app.Run() starts the consumer, so events are never
+// handled before their tables exist (app-lock-guarded, so Web migrating concurrently is safe).
 using (var scope = app.Services.CreateScope())
 {
     var serviceProvider = scope.ServiceProvider;
