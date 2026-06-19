@@ -4,6 +4,7 @@ using Concertable.ServiceDefaults;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Concertable.Search.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,8 +43,12 @@ services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 services.AddAuthorization();
 
+services.AddExceptionHandler<GlobalExceptionHandler>();
+services.AddProblemDetails();
+
 var app = builder.Build();
 
+app.UseExceptionHandler();
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
