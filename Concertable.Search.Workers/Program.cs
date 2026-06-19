@@ -4,6 +4,7 @@ using Concertable.Messaging.Application.Extensions;
 using Concertable.Messaging.AzureServiceBus.Extensions;
 using Concertable.Messaging.Infrastructure.Extensions;
 using Concertable.Messaging.Infrastructure.Inbox;
+using Concertable.Search.Infrastructure.Data;
 using Concertable.Search.Infrastructure.Extensions;
 using Concertable.ServiceDefaults;
 using Concertable.B2B.Venue.Contracts.Events;
@@ -37,7 +38,13 @@ services.AddInbox(opt => opt.UseSqlServer(builder.Configuration.GetConnectionStr
 
 var app = builder.Build();
 
+// Migrate the projection tables before app.Run() starts the consumer, so events are never
+// handled before their tables exist (app-lock-guarded, so Web migrating concurrently is safe).
 using (var scope = app.Services.CreateScope())
-    await scope.ServiceProvider.GetRequiredService<InboxDbContext>().Database.MigrateAsync();
+{
+    var serviceProvider = scope.ServiceProvider;
+    await serviceProvider.GetRequiredService<SearchDbContext>().Database.MigrateAsync();
+    await serviceProvider.GetRequiredService<InboxDbContext>().Database.MigrateAsync();
+}
 
 app.Run();
