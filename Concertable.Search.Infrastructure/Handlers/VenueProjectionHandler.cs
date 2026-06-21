@@ -28,29 +28,19 @@ internal sealed class VenueProjectionHandler : IIntegrationEventHandler<VenueCha
 
         context.AddInboxMessage(envelope, nameof(VenueProjectionHandler));
 
-        var location = geometryProvider.CreatePoint(e.Latitude, e.Longitude);
-
         var venue = await context.Set<VenueReadModel>()
             .FirstOrDefaultAsync(v => v.Id == e.VenueId, ct);
 
         if (venue is null)
         {
-            context.Set<VenueReadModel>().Add(new VenueReadModel
-            {
-                Id = e.VenueId,
-                UserId = e.UserId,
-                Name = e.Name,
-                Avatar = e.Avatar,
-                Location = location,
-                Address = new Address(e.County, e.Town)
-            });
+            context.Set<VenueReadModel>().Add(e.ToReadModel(geometryProvider));
         }
         else
         {
             venue.UserId = e.UserId;
             venue.Name = e.Name;
             venue.Avatar = e.Avatar;
-            venue.Location = location;
+            venue.Location = geometryProvider.CreatePoint(e.Latitude, e.Longitude);
             venue.Address = new Address(e.County, e.Town);
         }
 
