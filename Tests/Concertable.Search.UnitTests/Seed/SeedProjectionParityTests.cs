@@ -9,10 +9,10 @@ using NetTopologySuite.Geometries;
 
 namespace Concertable.Search.UnitTests.Seed;
 
-// Search builds its read-model rows two ways that a project-reference boundary forbids merging into one
-// mapper: the seed/test direct-insert path (SeedSpecMappers.ToReadModel, in Seed.Infrastructure) and the
-// live projection-handler path (ProjectionMappers.ToReadModel off the XChangedEvent, in Infrastructure).
-// SeedCatalog claims both produce identical rows; this proves it for every seed spec instead of trusting it.
+/* Search builds its read-model rows two ways that a project-reference boundary forbids merging into one
+   mapper: the seed/test direct-insert path (SeedSpecMappers.ToReadModel, in Seed.Infrastructure) and the
+   live projection-handler path (ProjectionMappers.ToReadModel off the XChangedEvent, in Infrastructure).
+   SeedCatalog claims both produce identical rows; this proves it for every seed spec instead of trusting it. */
 public sealed class SeedProjectionParityTests
 {
     private static readonly GeographicGeometryProvider Geo =
