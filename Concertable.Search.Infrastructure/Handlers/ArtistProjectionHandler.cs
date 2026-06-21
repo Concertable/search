@@ -28,34 +28,20 @@ internal sealed class ArtistProjectionHandler : IIntegrationEventHandler<ArtistC
 
         context.AddInboxMessage(envelope, nameof(ArtistProjectionHandler));
 
-        var location = geometryProvider.CreatePoint(e.Latitude, e.Longitude);
-
         var artist = await context.Set<ArtistReadModel>()
             .Include(a => a.ArtistGenres)
             .FirstOrDefaultAsync(a => a.Id == e.ArtistId, ct);
 
         if (artist is null)
         {
-            artist = new ArtistReadModel
-            {
-                Id = e.ArtistId,
-                UserId = e.UserId,
-                Name = e.Name,
-                Avatar = e.Avatar,
-                Location = location,
-                Address = new Address(e.County, e.Town)
-            };
-            context.Set<ArtistReadModel>().Add(artist);
-
-            foreach (var genre in e.Genres)
-                artist.ArtistGenres.Add(new ArtistReadModelGenre { ArtistId = e.ArtistId, Genre = genre });
+            context.Set<ArtistReadModel>().Add(e.ToReadModel(geometryProvider));
         }
         else
         {
             artist.UserId = e.UserId;
             artist.Name = e.Name;
             artist.Avatar = e.Avatar;
-            artist.Location = location;
+            artist.Location = geometryProvider.CreatePoint(e.Latitude, e.Longitude);
             artist.Address = new Address(e.County, e.Town);
 
             var desired = e.Genres.ToHashSet();

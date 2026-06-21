@@ -28,33 +28,13 @@ internal sealed class ConcertProjectionHandler : IIntegrationEventHandler<Concer
 
         context.AddInboxMessage(envelope, nameof(ConcertProjectionHandler));
 
-        var location = geometryProvider.CreatePoint(e.Latitude, e.Longitude);
-
         var concert = await context.Set<ConcertReadModel>()
             .Include(c => c.ConcertGenres)
             .FirstOrDefaultAsync(c => c.Id == e.ConcertId, ct);
 
         if (concert is null)
         {
-            concert = new ConcertReadModel
-            {
-                Id = e.ConcertId,
-                ArtistId = e.ArtistId,
-                VenueId = e.VenueId,
-                Name = e.Name,
-                Avatar = e.Avatar,
-                Price = e.Price,
-                TotalTickets = e.TotalTickets,
-                AvailableTickets = e.AvailableTickets,
-                StartDate = e.Period.Start,
-                EndDate = e.Period.End,
-                DatePosted = e.DatePosted,
-                Location = location
-            };
-            context.Set<ConcertReadModel>().Add(concert);
-
-            foreach (var genre in e.Genres)
-                concert.ConcertGenres.Add(new ConcertReadModelGenre { ConcertId = e.ConcertId, Genre = genre });
+            context.Set<ConcertReadModel>().Add(e.ToReadModel(geometryProvider));
         }
         else
         {
@@ -68,7 +48,7 @@ internal sealed class ConcertProjectionHandler : IIntegrationEventHandler<Concer
             concert.StartDate = e.Period.Start;
             concert.EndDate = e.Period.End;
             concert.DatePosted = e.DatePosted;
-            concert.Location = location;
+            concert.Location = geometryProvider.CreatePoint(e.Latitude, e.Longitude);
 
             var desired = e.Genres.ToHashSet();
             var current = concert.ConcertGenres.Select(g => g.Genre).ToHashSet();
