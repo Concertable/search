@@ -5,4 +5,12 @@
     <NoWarn>$(NoWarn);NU1510</NoWarn>
   </PropertyGroup>
 
+  <!-- Publishing is opt-in: a project sets <IsPackable>true</IsPackable> when it becomes a
+       published package (in its phase). Default off so a solution-wide `dotnet pack` emits
+       only intended packages. MinVer + package metadata are added to a folder when it starts
+       publishing (this folder doesn't yet). -->
+  <PropertyGroup>
+    <IsPackable Condition="'$(IsPackable)' == ''">false</IsPackable>
+  </PropertyGroup>
+
 </Project>
