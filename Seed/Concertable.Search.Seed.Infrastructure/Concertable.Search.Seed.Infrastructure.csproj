@@ -8,9 +8,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Concertable.Search.Domain\Concertable.Search.Domain.csproj" />
-    <ProjectReference Include="..\..\..\Concertable.B2B\Seed\Concertable.B2B.Seed.Contracts\Concertable.B2B.Seed.Contracts.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Concertable.Kernel\Concertable.Kernel.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Seed\Concertable.Seed.Identity\Concertable.Seed.Identity.csproj" />
+  </ItemGroup>
+
+  <!-- Never a ProjectReference: would break Search's standalone carve. -->
+  <ItemGroup>
+    <PackageReference Include="Concertable.B2B.Seed.Contracts" />
+    <PackageReference Include="Concertable.Kernel" />
+    <PackageReference Include="Concertable.Seed.Identity" />
   </ItemGroup>
 
 </Project>

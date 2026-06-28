@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <ConcertablePlatformVersion>0.1.0-alpha.0.531</ConcertablePlatformVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,6 +23,26 @@
     <PackageVersion Include="coverlet.collector" Version="6.0.0" />
     <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.0.2" />
+  </ItemGroup>
+
+  <!-- Shared platform + cross-service contracts from the org feed, pinned lockstep via
+       ConcertablePlatformVersion above. Bump only to a version already published to the feed,
+       else restore fails NU1101. -->
+  <ItemGroup>
+    <PackageVersion Include="Concertable.B2B.Artist.Contracts" Version="$(ConcertablePlatformVersion)" />
+    <PackageVersion Include="Concertable.B2B.Venue.Contracts" Version="$(ConcertablePlatformVersion)" />
+    <PackageVersion Include="Concertable.B2B.Concert.Contracts" Version="$(ConcertablePlatformVersion)" />
+    <PackageVersion Include="Concertable.B2B.Seed.Contracts" Version="$(ConcertablePlatformVersion)" />
+    <PackageVersion Include="Concertable.Kernel" Version="$(ConcertablePlatformVersion)" />
+    <PackageVersion Include="Concertable.DataAccess.Infrastructure" Version="$(ConcertablePlatformVersion)" />
+    <PackageVersion Include="Concertable.Messaging.Contracts" Version="$(ConcertablePlatformVersion)" />
+    <PackageVersion Include="Concertable.Messaging.Domain" Version="$(ConcertablePlatformVersion)" />
+    <PackageVersion Include="Concertable.Messaging.Infrastructure" Version="$(ConcertablePlatformVersion)" />
+    <PackageVersion Include="Concertable.Messaging.AzureServiceBus" Version="$(ConcertablePlatformVersion)" />
+    <PackageVersion Include="Concertable.ServiceDefaults" Version="$(ConcertablePlatformVersion)" />
+    <PackageVersion Include="Concertable.Shared.Api" Version="$(ConcertablePlatformVersion)" />
+    <PackageVersion Include="Concertable.Seed.Shared" Version="$(ConcertablePlatformVersion)" />
+    <PackageVersion Include="Concertable.Seed.Identity" Version="$(ConcertablePlatformVersion)" />
   </ItemGroup>
 
   <ItemGroup>

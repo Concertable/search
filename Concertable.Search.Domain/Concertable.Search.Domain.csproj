@@ -5,8 +5,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+  <!-- Never a ProjectReference: would break Search's standalone carve. -->
   <ItemGroup>
-    <ProjectReference Include="..\..\Shared\Concertable.Kernel\Concertable.Kernel.csproj" />
+    <PackageReference Include="Concertable.Kernel" />
   </ItemGroup>
 
 </Project>
