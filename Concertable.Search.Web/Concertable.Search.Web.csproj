@@ -21,8 +21,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Concertable.Search.Api\Concertable.Search.Api.csproj" />
-    <ProjectReference Include="..\..\Concertable.ServiceDefaults\Concertable.ServiceDefaults.csproj" />
-    <ProjectReference Include="..\..\Shared\Concertable.Shared.Api\Concertable.Shared.Api.csproj" />
+  </ItemGroup>
+
+  <!-- Never a ProjectReference: would break Search's standalone carve. -->
+  <ItemGroup>
+    <PackageReference Include="Concertable.ServiceDefaults" />
+    <PackageReference Include="Concertable.Shared.Api" />
   </ItemGroup>
 
 </Project>

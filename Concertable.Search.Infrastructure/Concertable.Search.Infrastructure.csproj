@@ -12,18 +12,22 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Concertable.B2B\Modules\Artist\Concertable.B2B.Artist.Contracts\Concertable.B2B.Artist.Contracts.csproj" />
-    <ProjectReference Include="..\..\Concertable.B2B\Modules\Venue\Concertable.B2B.Venue.Contracts\Concertable.B2B.Venue.Contracts.csproj" />
-    <ProjectReference Include="..\..\Concertable.B2B\Modules\Concert\Concertable.B2B.Concert.Contracts\Concertable.B2B.Concert.Contracts.csproj" />
     <ProjectReference Include="..\Concertable.Search.Application\Concertable.Search.Application.csproj" />
     <ProjectReference Include="..\Concertable.Search.Domain\Concertable.Search.Domain.csproj" />
-    <ProjectReference Include="..\..\Concertable.DataAccess\Concertable.DataAccess.Infrastructure\Concertable.DataAccess.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\Shared\Concertable.Kernel\Concertable.Kernel.csproj" />
-    <ProjectReference Include="..\..\Concertable.Messaging\Concertable.Messaging.Contracts\Concertable.Messaging.Contracts.csproj" />
-    <ProjectReference Include="..\..\Concertable.Messaging\Concertable.Messaging.Domain\Concertable.Messaging.Domain.csproj" />
-    <ProjectReference Include="..\..\Concertable.B2B\Seed\Concertable.B2B.Seed.Contracts\Concertable.B2B.Seed.Contracts.csproj" />
     <ProjectReference Include="..\Seed\Concertable.Search.Seed.Infrastructure\Concertable.Search.Seed.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\Shared\Seed\Concertable.Seed.Shared\Concertable.Seed.Shared.csproj" />
+  </ItemGroup>
+
+  <!-- Never a ProjectReference: would break Search's standalone carve. -->
+  <ItemGroup>
+    <PackageReference Include="Concertable.B2B.Artist.Contracts" />
+    <PackageReference Include="Concertable.B2B.Venue.Contracts" />
+    <PackageReference Include="Concertable.B2B.Concert.Contracts" />
+    <PackageReference Include="Concertable.B2B.Seed.Contracts" />
+    <PackageReference Include="Concertable.DataAccess.Infrastructure" />
+    <PackageReference Include="Concertable.Kernel" />
+    <PackageReference Include="Concertable.Messaging.Contracts" />
+    <PackageReference Include="Concertable.Messaging.Domain" />
+    <PackageReference Include="Concertable.Seed.Shared" />
   </ItemGroup>
 
 </Project>

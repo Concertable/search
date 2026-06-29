@@ -20,9 +20,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Concertable.Search.Infrastructure\Concertable.Search.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\Concertable.Messaging\Concertable.Messaging.AzureServiceBus\Concertable.Messaging.AzureServiceBus.csproj" />
-    <ProjectReference Include="..\..\Concertable.Messaging\Concertable.Messaging.Infrastructure\Concertable.Messaging.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\Concertable.ServiceDefaults\Concertable.ServiceDefaults.csproj" />
+  </ItemGroup>
+
+  <!-- Never a ProjectReference: would break Search's standalone carve. -->
+  <ItemGroup>
+    <PackageReference Include="Concertable.Messaging.AzureServiceBus" />
+    <PackageReference Include="Concertable.Messaging.Infrastructure" />
+    <PackageReference Include="Concertable.ServiceDefaults" />
   </ItemGroup>
 
 </Project>
