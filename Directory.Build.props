@@ -5,6 +5,19 @@
     <NoWarn>$(NoWarn);NU1510</NoWarn>
   </PropertyGroup>
 
+  <!-- Service-build-separation guardrail. Sets EnforceServiceBoundary, which gates the
+       _ValidateServiceBoundary check in Directory.Build.targets. Off for AppHost (composition) and
+       Tests/E2E-harness projects, which reference cross-folder projects by design, and for
+       UseLocalCore=true builds, whose in-repo core refs escape on purpose. Rule + rationale:
+       api/ARCHITECTURE.md ("Per-folder build closures"). -->
+  <PropertyGroup>
+    <ConcertableServiceRoot>$(MSBuildThisFileDirectory)</ConcertableServiceRoot>
+    <EnforceServiceBoundary Condition="'$(EnforceServiceBoundary)' == ''">true</EnforceServiceBoundary>
+    <EnforceServiceBoundary Condition="$(MSBuildProjectName.Contains('.AppHost'))">false</EnforceServiceBoundary>
+    <EnforceServiceBoundary Condition="$([System.Text.RegularExpressions.Regex]::IsMatch('$(MSBuildProjectFullPath)', '[\\/]Tests[\\/]'))">false</EnforceServiceBoundary>
+    <EnforceServiceBoundary Condition="'$(UseLocalCore)' == 'true'">false</EnforceServiceBoundary>
+  </PropertyGroup>
+
   <!-- Publishing is opt-in: a project sets <IsPackable>true</IsPackable> when it becomes a
        published package (in its phase). Default off so a solution-wide `dotnet pack` emits
        only intended packages. MinVer + package metadata are added to a folder when it starts
