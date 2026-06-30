@@ -5,6 +5,21 @@
     <NoWarn>$(NoWarn);NU1510</NoWarn>
   </PropertyGroup>
 
+  <!-- Service-build-separation guardrail (Phase 7). A deployable-closure project must reach
+       cross-folder code as a NuGet PackageReference, never a ProjectReference escaping this service
+       folder — otherwise the standalone carve (and a future repo split) fails to restore. The check
+       runs in Directory.Build.targets; this just decides whether it applies. Exempt: the AppHost
+       (composition) and Tests/E2E-harness layers, which legitimately reference cross-folder projects
+       by design, and any UseLocalCore=true build, whose deliberate in-repo core ProjectReferences
+       escape on purpose. -->
+  <PropertyGroup>
+    <ConcertableServiceRoot>$(MSBuildThisFileDirectory)</ConcertableServiceRoot>
+    <EnforceServiceBoundary Condition="'$(EnforceServiceBoundary)' == ''">true</EnforceServiceBoundary>
+    <EnforceServiceBoundary Condition="$(MSBuildProjectName.Contains('.AppHost'))">false</EnforceServiceBoundary>
+    <EnforceServiceBoundary Condition="$([System.Text.RegularExpressions.Regex]::IsMatch('$(MSBuildProjectFullPath)', '[\\/]Tests[\\/]'))">false</EnforceServiceBoundary>
+    <EnforceServiceBoundary Condition="'$(UseLocalCore)' == 'true'">false</EnforceServiceBoundary>
+  </PropertyGroup>
+
   <!-- Publishing is opt-in: a project sets <IsPackable>true</IsPackable> when it becomes a
        published package (in its phase). Default off so a solution-wide `dotnet pack` emits
        only intended packages. MinVer + package metadata are added to a folder when it starts
