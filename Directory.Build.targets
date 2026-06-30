@@ -1,0 +1,18 @@
+<Project>
+
+  <!-- Service-build-separation guardrail (Phase 7). See Directory.Build.props for the rule + the
+       exemptions that gate EnforceServiceBoundary. Runs after the project's items are populated, so
+       @(ProjectReference) is final. Any ProjectReference whose path leaves this service folder fails
+       the build — a re-introduced cross-folder source edge is caught at the desk, not just at the
+       carve CI gate. -->
+  <Target Name="_ValidateServiceBoundary" BeforeTargets="BeforeBuild"
+          Condition="'$(EnforceServiceBoundary)' == 'true' and '@(ProjectReference)' != ''">
+    <ItemGroup>
+      <_EscapingServiceRef Include="@(ProjectReference)"
+          Condition="'%(FullPath)' != '' and $([MSBuild]::MakeRelative('$(ConcertableServiceRoot)', '%(FullPath)').StartsWith('..'))" />
+    </ItemGroup>
+    <Error Condition="'@(_EscapingServiceRef)' != ''"
+           Text="Service-build-separation violation in $(MSBuildProjectName): ProjectReference(s) escape the service folder ($(ConcertableServiceRoot)): @(_EscapingServiceRef->'%(Identity)', ', '). A deployable-closure project must consume cross-folder code as a NuGet PackageReference, not a ProjectReference (see api/ARCHITECTURE.md). AppHost/Tests projects are exempt; for local cross-cutting core dev use -p:UseLocalCore=true." />
+  </Target>
+
+</Project>
