@@ -1,6 +1,6 @@
 <Project>
 
-  <!-- Service-build-separation guardrail (Phase 7). See Directory.Build.props for the rule + the
+  <!-- Service-build-separation guardrail. See Directory.Build.props for the rule + the
        exemptions that gate EnforceServiceBoundary. Runs after the project's items are populated, so
        @(ProjectReference) is final. Any ProjectReference whose path leaves this service folder fails
        the build — a re-introduced cross-folder source edge is caught at the desk, not just at the

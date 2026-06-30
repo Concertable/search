@@ -5,13 +5,11 @@
     <NoWarn>$(NoWarn);NU1510</NoWarn>
   </PropertyGroup>
 
-  <!-- Service-build-separation guardrail (Phase 7). A deployable-closure project must reach
-       cross-folder code as a NuGet PackageReference, never a ProjectReference escaping this service
-       folder — otherwise the standalone carve (and a future repo split) fails to restore. The check
-       runs in Directory.Build.targets; this just decides whether it applies. Exempt: the AppHost
-       (composition) and Tests/E2E-harness layers, which legitimately reference cross-folder projects
-       by design, and any UseLocalCore=true build, whose deliberate in-repo core ProjectReferences
-       escape on purpose. -->
+  <!-- Service-build-separation guardrail. Sets EnforceServiceBoundary, which gates the
+       _ValidateServiceBoundary check in Directory.Build.targets. Off for AppHost (composition) and
+       Tests/E2E-harness projects, which reference cross-folder projects by design, and for
+       UseLocalCore=true builds, whose in-repo core refs escape on purpose. Rule + rationale:
+       api/ARCHITECTURE.md ("Per-folder build closures"). -->
   <PropertyGroup>
     <ConcertableServiceRoot>$(MSBuildThisFileDirectory)</ConcertableServiceRoot>
     <EnforceServiceBoundary Condition="'$(EnforceServiceBoundary)' == ''">true</EnforceServiceBoundary>
