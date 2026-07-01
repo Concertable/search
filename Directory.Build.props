@@ -14,7 +14,7 @@
     <ConcertableServiceRoot>$(MSBuildThisFileDirectory)</ConcertableServiceRoot>
     <EnforceServiceBoundary Condition="'$(EnforceServiceBoundary)' == ''">true</EnforceServiceBoundary>
     <EnforceServiceBoundary Condition="$(MSBuildProjectName.Contains('.AppHost'))">false</EnforceServiceBoundary>
-    <EnforceServiceBoundary Condition="$([System.Text.RegularExpressions.Regex]::IsMatch('$(MSBuildProjectFullPath)', '[\\/]Tests[\\/]'))">false</EnforceServiceBoundary>
+    <EnforceServiceBoundary Condition="$([System.Text.RegularExpressions.Regex]::IsMatch('$(MSBuildProjectFullPath)', '[\\/][Tt]ests[\\/]'))">false</EnforceServiceBoundary>
     <EnforceServiceBoundary Condition="'$(UseLocalCore)' == 'true'">false</EnforceServiceBoundary>
   </PropertyGroup>
 
