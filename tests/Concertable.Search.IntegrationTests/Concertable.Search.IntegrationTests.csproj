@@ -18,7 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Concertable.Search.IntegrationTests.Fixtures\Concertable.Search.IntegrationTests.Fixtures.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Tests\Concertable.Testing\Concertable.Testing.csproj" />
+    <ProjectReference Include="..\..\..\Concertable.Shared\tests\Concertable.Testing\Concertable.Testing.csproj" />
     <ProjectReference Include="..\..\src\Concertable.Search.Application\Concertable.Search.Application.csproj" />
   </ItemGroup>
 
