@@ -1,18 +1,18 @@
 <Solution>
-  <Project Path="Concertable.Search.AppHost.Extensions/Concertable.Search.AppHost.Extensions.csproj" />
-  <Project Path="Concertable.Search.Web/Concertable.Search.Web.csproj" />
-  <Project Path="Concertable.Search.Workers/Concertable.Search.Workers.csproj" />
-  <Project Path="Concertable.Search.Api/Concertable.Search.Api.csproj" />
-  <Project Path="Concertable.Search.Application/Concertable.Search.Application.csproj" />
-  <Project Path="Concertable.Search.Domain/Concertable.Search.Domain.csproj" />
-  <Project Path="Concertable.Search.Infrastructure/Concertable.Search.Infrastructure.csproj" />
+  <Project Path="src/Concertable.Search.AppHost.Extensions/Concertable.Search.AppHost.Extensions.csproj" />
+  <Project Path="src/Concertable.Search.Web/Concertable.Search.Web.csproj" />
+  <Project Path="src/Concertable.Search.Workers/Concertable.Search.Workers.csproj" />
+  <Project Path="src/Concertable.Search.Api/Concertable.Search.Api.csproj" />
+  <Project Path="src/Concertable.Search.Application/Concertable.Search.Application.csproj" />
+  <Project Path="src/Concertable.Search.Domain/Concertable.Search.Domain.csproj" />
+  <Project Path="src/Concertable.Search.Infrastructure/Concertable.Search.Infrastructure.csproj" />
   <Folder Name="/Seed/">
-    <Project Path="Seed/Concertable.Search.Seed.Infrastructure/Concertable.Search.Seed.Infrastructure.csproj" />
+    <Project Path="src/Seed/Concertable.Search.Seed.Infrastructure/Concertable.Search.Seed.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/Tests/">
-    <Project Path="Tests/Concertable.Search.IntegrationTests/Concertable.Search.IntegrationTests.csproj" />
-    <Project Path="Tests/Concertable.Search.IntegrationTests.Fixtures/Concertable.Search.IntegrationTests.Fixtures.csproj" />
-    <Project Path="Tests/Concertable.Search.UnitTests/Concertable.Search.UnitTests.csproj" />
-    <Project Path="Tests/E2ETests/Concertable.Search.E2ETests.Helpers/Concertable.Search.E2ETests.Helpers.csproj" />
+    <Project Path="tests/Concertable.Search.IntegrationTests/Concertable.Search.IntegrationTests.csproj" />
+    <Project Path="tests/Concertable.Search.IntegrationTests.Fixtures/Concertable.Search.IntegrationTests.Fixtures.csproj" />
+    <Project Path="tests/Concertable.Search.UnitTests/Concertable.Search.UnitTests.csproj" />
+    <Project Path="tests/E2ETests/Concertable.Search.E2ETests.Helpers/Concertable.Search.E2ETests.Helpers.csproj" />
   </Folder>
 </Solution>
