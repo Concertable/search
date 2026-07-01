@@ -56,7 +56,7 @@ public static class SearchServiceExtensions
         }
 
         public string ProjectPath => Path.GetFullPath(Path.Combine(
-            appHostDirectory, "..", "..", "Concertable.Search", "Concertable.Search.Web", "Concertable.Search.Web.csproj"));
+            appHostDirectory, "..", "..", "..", "Concertable.Search", "src", "Concertable.Search.Web", "Concertable.Search.Web.csproj"));
     }
 
     private sealed class SearchWorkersProject : IProjectMetadata
@@ -69,6 +69,6 @@ public static class SearchServiceExtensions
         }
 
         public string ProjectPath => Path.GetFullPath(Path.Combine(
-            appHostDirectory, "..", "..", "Concertable.Search", "Concertable.Search.Workers", "Concertable.Search.Workers.csproj"));
+            appHostDirectory, "..", "..", "..", "Concertable.Search", "src", "Concertable.Search.Workers", "Concertable.Search.Workers.csproj"));
     }
 }
