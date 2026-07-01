@@ -6,26 +6,25 @@
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
-    <NoWarn>$(NoWarn);xUnit1000</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="Moq" />
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Concertable.Search.IntegrationTests.Fixtures\Concertable.Search.IntegrationTests.Fixtures.csproj" />
+    <ProjectReference Include="..\..\src\Concertable.Search.Application\Concertable.Search.Application.csproj" />
+    <ProjectReference Include="..\..\src\Concertable.Search.Infrastructure\Concertable.Search.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\Shared\Tests\Concertable.Testing\Concertable.Testing.csproj" />
-    <ProjectReference Include="..\..\Concertable.Search.Application\Concertable.Search.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Using Include="Xunit" />
-    <Using Include="Concertable.Search.IntegrationTests.Fixtures" />
-    <Using Include="Concertable.Testing" />
+    <Using Include="Concertable.Search.Application" />
     <Using Include="Concertable.Search.Application" />
   </ItemGroup>
 
