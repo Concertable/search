@@ -10,7 +10,7 @@ seed time, a `*.Seed.Simulator` replays them.
 
 Development happens in the **monorepo** ([`Concertable/concertable`](https://github.com/Concertable/concertable)),
 under `api/Concertable.Search/`. That folder is **automatically mirrored** to the read-only repo
-[`Concertable/concertable-search`](https://github.com/Concertable/concertable-search) on every push
+[`Concertable/search`](https://github.com/Concertable/search) on every push
 to `master`. **Don't open PRs against the mirror** — nothing flows back from it.
 
 ## Building standalone
