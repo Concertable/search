@@ -264,7 +264,7 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("Concertable.Search.Domain.Models.ArtistReadModel", b =>
                 {
-                    b.OwnsOne("Concertable.Kernel.Address", "Address", b1 =>
+                    b.OwnsOne("Concertable.Kernel.ValueObjects.Address", "Address", b1 =>
                         {
                             b1.Property<int>("ArtistReadModelId")
                                 .HasColumnType("int");
@@ -315,7 +315,7 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("Concertable.Search.Domain.Models.VenueReadModel", b =>
                 {
-                    b.OwnsOne("Concertable.Kernel.Address", "Address", b1 =>
+                    b.OwnsOne("Concertable.Kernel.ValueObjects.Address", "Address", b1 =>
                         {
                             b1.Property<int>("VenueReadModelId")
                                 .HasColumnType("int");
