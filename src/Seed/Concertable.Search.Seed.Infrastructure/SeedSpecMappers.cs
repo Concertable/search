@@ -1,5 +1,5 @@
 using Concertable.B2B.Seed.Contracts.Specs;
-using Concertable.Kernel;
+using Concertable.Kernel.ValueObjects;
 using Concertable.Search.Domain.Models;
 using NetTopologySuite.Geometries;
 

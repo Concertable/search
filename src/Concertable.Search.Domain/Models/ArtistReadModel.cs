@@ -1,4 +1,5 @@
 ﻿using Concertable.Kernel;
+using Concertable.Kernel.ValueObjects;
 using NetTopologySuite.Geometries;
 
 namespace Concertable.Search.Domain.Models;
