@@ -1,5 +1,5 @@
 using Concertable.B2B.Seed.Contracts;
-using Concertable.Contracts;
+using Concertable.Contracts.Enums;
 using Concertable.Search.Domain.Models;
 using Concertable.Seed.Identity;
 
