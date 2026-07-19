@@ -3,7 +3,7 @@ using Concertable.B2B.Concert.Contracts.Events;
 using Concertable.B2B.Venue.Contracts.Events;
 using Concertable.Kernel;
 using Concertable.Kernel.Geometry;
-using Concertable.Search.Domain.Models;
+using Concertable.Search.Domain.ReadModels;
 
 namespace Concertable.Search.Infrastructure.Handlers;
 

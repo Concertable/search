@@ -1,4 +1,4 @@
-namespace Concertable.Search.Domain.Projections;
+namespace Concertable.Search.Domain.ReadModels;
 
 public sealed class VenueRatingProjection
 {
