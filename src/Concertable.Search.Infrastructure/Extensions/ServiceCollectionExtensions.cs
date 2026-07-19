@@ -2,7 +2,7 @@
 using Concertable.B2B.Concert.Contracts.Events;
 using Concertable.B2B.Seed.Contracts;
 using Concertable.DataAccess.Infrastructure;
-using Concertable.Search.Domain.Models;
+using Concertable.Search.Domain.ReadModels;
 using Concertable.Search.Infrastructure.Data.Seeders;
 using Concertable.Search.Seed.Infrastructure;
 using Concertable.Seed.Shared;

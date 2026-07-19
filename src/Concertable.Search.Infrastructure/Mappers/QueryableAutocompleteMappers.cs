@@ -1,6 +1,6 @@
 ﻿using Concertable.Search.Application;
 using Concertable.Search.Application.DTOs;
-using Concertable.Search.Domain.Models;
+using Concertable.Search.Domain.ReadModels;
 
 namespace Concertable.Search.Infrastructure.Mappers;
 
