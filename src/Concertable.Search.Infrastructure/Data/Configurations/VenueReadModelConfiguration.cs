@@ -1,5 +1,5 @@
 ﻿using Concertable.Kernel;
-using Concertable.Search.Domain.Models;
+using Concertable.Search.Domain.ReadModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

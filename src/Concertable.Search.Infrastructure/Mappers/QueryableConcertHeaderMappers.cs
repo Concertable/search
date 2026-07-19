@@ -1,5 +1,5 @@
 using Concertable.Search.Application.DTOs;
-using Concertable.Search.Domain.Models;
+using Concertable.Search.Domain.ReadModels;
 using LinqKit;
 
 namespace Concertable.Search.Infrastructure.Mappers;

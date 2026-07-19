@@ -1,7 +1,7 @@
 ﻿using Concertable.Kernel;
 using NetTopologySuite.Geometries;
 
-namespace Concertable.Search.Domain.Models;
+namespace Concertable.Search.Domain.ReadModels;
 
 public sealed class ConcertReadModel : IIdEntity, IHasName, IHasLocation, IEntity
 {

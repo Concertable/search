@@ -1,6 +1,6 @@
 using Concertable.B2B.Seed.Contracts;
 using Concertable.Contracts.Enums;
-using Concertable.Search.Domain.Models;
+using Concertable.Search.Domain.ReadModels;
 using Concertable.Seed.Identity;
 
 namespace Concertable.Search.Seed.Infrastructure;
