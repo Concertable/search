@@ -1,4 +1,4 @@
-﻿using Concertable.Search.Domain.Models;
+﻿using Concertable.Search.Domain.ReadModels;
 
 namespace Concertable.Search.Infrastructure.Extensions;
 

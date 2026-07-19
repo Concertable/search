@@ -1,6 +1,6 @@
 ﻿using Concertable.Contracts.Enums;
 
-namespace Concertable.Search.Domain.Models;
+namespace Concertable.Search.Domain.ReadModels;
 
 public sealed class ConcertReadModelGenre
 {

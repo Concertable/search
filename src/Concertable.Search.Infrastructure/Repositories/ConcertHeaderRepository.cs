@@ -2,7 +2,7 @@
 using Concertable.DataAccess;
 using Concertable.Search.Application.DTOs;
 using Concertable.Search.Application.Params;
-using Concertable.Search.Domain.Models;
+using Concertable.Search.Domain.ReadModels;
 using Concertable.Search.Infrastructure.Data;
 using Concertable.Search.Infrastructure.Extensions;
 using Concertable.Search.Infrastructure.Mappers;

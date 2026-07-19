@@ -1,6 +1,6 @@
 ﻿using Concertable.Search.Application.Interfaces;
 using Concertable.Search.Application.Params;
-using Concertable.Search.Domain.Models;
+using Concertable.Search.Domain.ReadModels;
 
 namespace Concertable.Search.Infrastructure.Specifications;
 

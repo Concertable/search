@@ -2,9 +2,9 @@
 using Concertable.Kernel.ValueObjects;
 using NetTopologySuite.Geometries;
 
-namespace Concertable.Search.Domain.Models;
+namespace Concertable.Search.Domain.ReadModels;
 
-public sealed class ArtistReadModel : IIdEntity, IHasName, IHasLocation, IEntity
+public sealed class VenueReadModel : IIdEntity, IHasName, IHasLocation, IEntity
 {
     public int Id { get; set; }
     public Guid UserId { get; set; }
@@ -12,5 +12,4 @@ public sealed class ArtistReadModel : IIdEntity, IHasName, IHasLocation, IEntity
     public string Avatar { get; set; } = null!;
     public Point Location { get; set; } = null!;
     public Address Address { get; set; } = null!;
-    public HashSet<ArtistReadModelGenre> ArtistGenres { get; set; } = [];
 }
