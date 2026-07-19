@@ -13,7 +13,7 @@ using NetTopologySuite.Geometries;
 namespace Concertable.Search.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(SearchDbContext))]
-    [Migration("20260718202951_InitialCreate")]
+    [Migration("20260719004954_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -95,7 +95,23 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Concertable.Search.Domain.Models.ArtistReadModel", b =>
+            modelBuilder.Entity("Concertable.Search.Domain.ReadModels.ArtistRatingProjection", b =>
+                {
+                    b.Property<int>("ArtistId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("AverageRating")
+                        .HasColumnType("float");
+
+                    b.Property<int>("ReviewCount")
+                        .HasColumnType("int");
+
+                    b.HasKey("ArtistId");
+
+                    b.ToTable("ArtistRatingProjections", "search");
+                });
+
+            modelBuilder.Entity("Concertable.Search.Domain.ReadModels.ArtistReadModel", b =>
                 {
                     b.Property<int>("Id")
                         .HasColumnType("int");
@@ -120,7 +136,7 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
                     b.ToTable("Artists", "search");
                 });
 
-            modelBuilder.Entity("Concertable.Search.Domain.Models.ArtistReadModelGenre", b =>
+            modelBuilder.Entity("Concertable.Search.Domain.ReadModels.ArtistReadModelGenre", b =>
                 {
                     b.Property<int>("ArtistId")
                         .HasColumnType("int");
@@ -133,7 +149,23 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
                     b.ToTable("ArtistGenres", "search");
                 });
 
-            modelBuilder.Entity("Concertable.Search.Domain.Models.ConcertReadModel", b =>
+            modelBuilder.Entity("Concertable.Search.Domain.ReadModels.ConcertRatingProjection", b =>
+                {
+                    b.Property<int>("ConcertId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("AverageRating")
+                        .HasColumnType("float");
+
+                    b.Property<int>("ReviewCount")
+                        .HasColumnType("int");
+
+                    b.HasKey("ConcertId");
+
+                    b.ToTable("ConcertRatingProjections", "search");
+                });
+
+            modelBuilder.Entity("Concertable.Search.Domain.ReadModels.ConcertReadModel", b =>
                 {
                     b.Property<int>("Id")
                         .HasColumnType("int");
@@ -179,7 +211,7 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
                     b.ToTable("Concerts", "search");
                 });
 
-            modelBuilder.Entity("Concertable.Search.Domain.Models.ConcertReadModelGenre", b =>
+            modelBuilder.Entity("Concertable.Search.Domain.ReadModels.ConcertReadModelGenre", b =>
                 {
                     b.Property<int>("ConcertId")
                         .HasColumnType("int");
@@ -192,7 +224,23 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
                     b.ToTable("ConcertGenres", "search");
                 });
 
-            modelBuilder.Entity("Concertable.Search.Domain.Models.VenueReadModel", b =>
+            modelBuilder.Entity("Concertable.Search.Domain.ReadModels.VenueRatingProjection", b =>
+                {
+                    b.Property<int>("VenueId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("AverageRating")
+                        .HasColumnType("float");
+
+                    b.Property<int>("ReviewCount")
+                        .HasColumnType("int");
+
+                    b.HasKey("VenueId");
+
+                    b.ToTable("VenueRatingProjections", "search");
+                });
+
+            modelBuilder.Entity("Concertable.Search.Domain.ReadModels.VenueReadModel", b =>
                 {
                     b.Property<int>("Id")
                         .HasColumnType("int");
@@ -217,55 +265,7 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
                     b.ToTable("Venues", "search");
                 });
 
-            modelBuilder.Entity("Concertable.Search.Domain.Projections.ArtistRatingProjection", b =>
-                {
-                    b.Property<int>("ArtistId")
-                        .HasColumnType("int");
-
-                    b.Property<double>("AverageRating")
-                        .HasColumnType("float");
-
-                    b.Property<int>("ReviewCount")
-                        .HasColumnType("int");
-
-                    b.HasKey("ArtistId");
-
-                    b.ToTable("ArtistRatingProjections", "search");
-                });
-
-            modelBuilder.Entity("Concertable.Search.Domain.Projections.ConcertRatingProjection", b =>
-                {
-                    b.Property<int>("ConcertId")
-                        .HasColumnType("int");
-
-                    b.Property<double>("AverageRating")
-                        .HasColumnType("float");
-
-                    b.Property<int>("ReviewCount")
-                        .HasColumnType("int");
-
-                    b.HasKey("ConcertId");
-
-                    b.ToTable("ConcertRatingProjections", "search");
-                });
-
-            modelBuilder.Entity("Concertable.Search.Domain.Projections.VenueRatingProjection", b =>
-                {
-                    b.Property<int>("VenueId")
-                        .HasColumnType("int");
-
-                    b.Property<double>("AverageRating")
-                        .HasColumnType("float");
-
-                    b.Property<int>("ReviewCount")
-                        .HasColumnType("int");
-
-                    b.HasKey("VenueId");
-
-                    b.ToTable("VenueRatingProjections", "search");
-                });
-
-            modelBuilder.Entity("Concertable.Search.Domain.Models.ArtistReadModel", b =>
+            modelBuilder.Entity("Concertable.Search.Domain.ReadModels.ArtistReadModel", b =>
                 {
                     b.OwnsOne("Concertable.Kernel.ValueObjects.Address", "Address", b1 =>
                         {
@@ -294,9 +294,9 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Concertable.Search.Domain.Models.ArtistReadModelGenre", b =>
+            modelBuilder.Entity("Concertable.Search.Domain.ReadModels.ArtistReadModelGenre", b =>
                 {
-                    b.HasOne("Concertable.Search.Domain.Models.ArtistReadModel", "Artist")
+                    b.HasOne("Concertable.Search.Domain.ReadModels.ArtistReadModel", "Artist")
                         .WithMany("ArtistGenres")
                         .HasForeignKey("ArtistId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -305,9 +305,9 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
                     b.Navigation("Artist");
                 });
 
-            modelBuilder.Entity("Concertable.Search.Domain.Models.ConcertReadModelGenre", b =>
+            modelBuilder.Entity("Concertable.Search.Domain.ReadModels.ConcertReadModelGenre", b =>
                 {
-                    b.HasOne("Concertable.Search.Domain.Models.ConcertReadModel", "Concert")
+                    b.HasOne("Concertable.Search.Domain.ReadModels.ConcertReadModel", "Concert")
                         .WithMany("ConcertGenres")
                         .HasForeignKey("ConcertId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -316,7 +316,7 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
                     b.Navigation("Concert");
                 });
 
-            modelBuilder.Entity("Concertable.Search.Domain.Models.VenueReadModel", b =>
+            modelBuilder.Entity("Concertable.Search.Domain.ReadModels.VenueReadModel", b =>
                 {
                     b.OwnsOne("Concertable.Kernel.ValueObjects.Address", "Address", b1 =>
                         {
@@ -345,12 +345,12 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Concertable.Search.Domain.Models.ArtistReadModel", b =>
+            modelBuilder.Entity("Concertable.Search.Domain.ReadModels.ArtistReadModel", b =>
                 {
                     b.Navigation("ArtistGenres");
                 });
 
-            modelBuilder.Entity("Concertable.Search.Domain.Models.ConcertReadModel", b =>
+            modelBuilder.Entity("Concertable.Search.Domain.ReadModels.ConcertReadModel", b =>
                 {
                     b.Navigation("ConcertGenres");
                 });

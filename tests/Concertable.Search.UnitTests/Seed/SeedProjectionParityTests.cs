@@ -1,7 +1,7 @@
 using Concertable.B2B.Seed.Contracts;
 using Concertable.Contracts.Enums;
 using Concertable.Kernel.Services.Geometry;
-using Concertable.Search.Domain.Models;
+using Concertable.Search.Domain.ReadModels;
 using Concertable.Search.Infrastructure.Handlers;
 using Concertable.Search.Seed.Infrastructure;
 using NetTopologySuite;

@@ -1,5 +1,4 @@
-﻿using Concertable.Search.Domain.Models;
-using Concertable.Search.Domain.Projections;
+﻿using Concertable.Search.Domain.ReadModels;
 
 namespace Concertable.Search.Infrastructure.Data;
 
