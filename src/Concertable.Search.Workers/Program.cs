@@ -23,7 +23,8 @@ services.AddSearchProjectionHandlers();
 services.AddAzureServiceBusTransport(
     opts =>
     {
-        opts.ConnectionString = builder.Configuration.GetConnectionString("asb") ?? "";
+        opts.ConnectionString = builder.Configuration.GetConnectionString("asb")
+            ?? throw new InvalidOperationException("Connection string 'asb' is required.");
         opts.ServiceName = "concertable-search";
     },
     reg => reg
