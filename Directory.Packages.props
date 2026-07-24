@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <ConcertablePlatformVersion>0.1.0-alpha.0.639</ConcertablePlatformVersion>
+    <ConcertablePlatformVersion>0.1.0-alpha.0.658</ConcertablePlatformVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -47,6 +47,7 @@
 
   <ItemGroup>
     <GlobalPackageReference Include="Meziantou.Analyzer" Version="3.0.98" />
+    <GlobalPackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="3.3.4" />
   </ItemGroup>
 
 </Project>
