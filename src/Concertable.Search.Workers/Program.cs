@@ -2,6 +2,7 @@ using Concertable.B2B.Artist.Contracts.Events;
 using Concertable.B2B.Concert.Contracts.Events;
 using Concertable.Messaging.Application.Extensions;
 using Concertable.Messaging.AzureServiceBus.Extensions;
+using Concertable.Messaging.AzureServiceBus.Options;
 using Concertable.Messaging.Infrastructure.Extensions;
 using Concertable.Messaging.Infrastructure.Inbox;
 using Concertable.Search.Infrastructure.Data;
@@ -26,7 +27,9 @@ services.AddAzureServiceBusTransport(
         opts.ConnectionString = builder.Configuration.GetConnectionString("asb")
             ?? (builder.Environment.IsEnvironment("Testing") ? null!
                 : throw new InvalidOperationException("Connection string 'asb' is required."));
-        opts.ServiceName = "concertable-search";
+        opts.ServiceName = builder.Configuration[AzureServiceBusOptions.ServiceNameConfigKey]
+            ?? (builder.Environment.IsEnvironment("Testing") ? "concertable-search"
+                : throw new InvalidOperationException($"Configuration '{AzureServiceBusOptions.ServiceNameConfigKey}' is required."));
     },
     reg => reg
         .SubscribeTo<ArtistChangedEvent>()
