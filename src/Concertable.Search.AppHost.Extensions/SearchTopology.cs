@@ -1,11 +1,15 @@
+using Concertable.B2B.Artist.Contracts.Events;
+using Concertable.B2B.Concert.Contracts.Events;
+using Concertable.B2B.Venue.Contracts.Events;
+
 public static class SearchTopology
 {
     public static AsbTopology AddSearchTopology(this AsbTopology topology) =>
         topology
-            .Subscribe("event-concertchangedevent",       "search-concert-changed",        "concertable-search")
-            .Subscribe("event-artistchangedevent",        "search-artist-changed",         "concertable-search")
-            .Subscribe("event-venuechangedevent",         "search-venue-changed",          "concertable-search")
-            .Subscribe("event-artistratingupdatedevent",  "search-artist-rating-updated",  "concertable-search")
-            .Subscribe("event-venueratingupdatedevent",   "search-venue-rating-updated",   "concertable-search")
-            .Subscribe("event-concertratingupdatedevent", "search-concert-rating-updated", "concertable-search");
+            .Subscribe<ConcertChangedEvent>("search-concert-changed",        "concertable-search")
+            .Subscribe<ArtistChangedEvent>("search-artist-changed",         "concertable-search")
+            .Subscribe<VenueChangedEvent>("search-venue-changed",          "concertable-search")
+            .Subscribe<ArtistRatingUpdatedEvent>("search-artist-rating-updated",  "concertable-search")
+            .Subscribe<VenueRatingUpdatedEvent>("search-venue-rating-updated",   "concertable-search")
+            .Subscribe<ConcertRatingUpdatedEvent>("search-concert-rating-updated", "concertable-search");
 }

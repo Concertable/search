@@ -9,6 +9,9 @@
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.Azure.ServiceBus" />
     <ProjectReference Include="..\..\..\Concertable.AppHost.Shared\Concertable.AppHost.Shared.csproj" IsAspireProjectResource="false" />
+    <ProjectReference Include="..\..\..\Concertable.B2B\src\Modules\Concert\Concertable.B2B.Concert.Contracts\Concertable.B2B.Concert.Contracts.csproj" IsAspireProjectResource="false" />
+    <ProjectReference Include="..\..\..\Concertable.B2B\src\Modules\Artist\Concertable.B2B.Artist.Contracts\Concertable.B2B.Artist.Contracts.csproj" IsAspireProjectResource="false" />
+    <ProjectReference Include="..\..\..\Concertable.B2B\src\Modules\Venue\Concertable.B2B.Venue.Contracts\Concertable.B2B.Venue.Contracts.csproj" IsAspireProjectResource="false" />
   </ItemGroup>
 
 </Project>
