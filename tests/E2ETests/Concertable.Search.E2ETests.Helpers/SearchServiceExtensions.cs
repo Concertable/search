@@ -2,6 +2,7 @@ using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Azure;
 using Aspire.Hosting.Testing;
+using Concertable.Messaging.AzureServiceBus.Options;
 
 namespace Concertable.Search.E2ETests.Helpers;
 
@@ -41,6 +42,7 @@ public static class SearchServiceExtensions
             .WaitFor(searchDb)
             .WithReference(asbBuilder)
             .WaitFor(asbBuilder)
+            .WithEnvironment(AzureServiceBusOptions.ServiceNameEnvVar, AppHostConstants.ServiceNames.Search)
             .WithEnvironment("DOTNET_ENVIRONMENT", "E2E");
 
         return builder;
