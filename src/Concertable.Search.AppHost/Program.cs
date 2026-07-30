@@ -6,7 +6,7 @@ var b2bDb = sql.AddDatabase(AppHostConstants.Databases.B2B);
 var searchDb = sql.AddDatabase(AppHostConstants.Databases.Search);
 
 var asb = builder.AddServiceBus();
-asb.Topology().AddSearchTopology();
+asb.Topology().AddSearchTopology().AddAuthTopology();
 
 var auth = builder.AddAuth<Projects.Concertable_Auth>(authDb, b2bDb, asb);
 auth.WithEnvironment("ServiceAuth__AuthClientId", "concertable-auth");
