@@ -26,6 +26,7 @@ builder.Services.AddCors(options =>
 
 var services = builder.Services;
 
+services.AddProblemDetails();
 services.AddControllers()
     .AddApplicationPart(typeof(Concertable.Shared.Api.Controllers.GenreController).Assembly);
 services.AddSearchApi(builder.Configuration);
@@ -45,7 +46,6 @@ services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 services.AddAuthorization();
 
 services.AddExceptionHandler<GlobalExceptionHandler>();
-services.AddProblemDetails();
 
 var app = builder.Build();
 
