@@ -7,5 +7,5 @@ namespace Concertable.Search.Application.Interfaces;
 internal interface IHeaderDispatcher
 {
     Task<IPagination<IHeader>> SearchAsync(HeaderType type, SearchParams searchParams);
-    Task<IEnumerable<IHeader>> GetByAmountAsync(HeaderType type, int amount);
+    Task<IReadOnlyList<IHeader>> GetByAmountAsync(HeaderType type, int amount);
 }
