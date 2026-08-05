@@ -6,5 +6,5 @@ namespace Concertable.Search.Application.Interfaces;
 
 internal interface IVenueHeaderRepository : IHeaderRepository<VenueHeader>
 {
-    Task<IEnumerable<VenueHeader>> GetByAmountAsync(int amount);
+    Task<IReadOnlyList<VenueHeader>> GetByAmountAsync(int amount);
 }

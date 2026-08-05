@@ -20,7 +20,7 @@ internal sealed class HeaderDispatcher : IHeaderDispatcher
         return await service.SearchAsync(searchParams);
     }
 
-    public async Task<IEnumerable<IHeader>> GetByAmountAsync(HeaderType type, int amount)
+    public async Task<IReadOnlyList<IHeader>> GetByAmountAsync(HeaderType type, int amount)
     {
         var service = headerServiceFactory.Create(type);
         return await service.GetByAmountAsync(amount);
