@@ -23,11 +23,11 @@ public static class SearchServiceExtensions
         var auth = builder.Resources.OfType<ProjectResource>()
             .Single(r => r.Name == AppHostConstants.ResourceNames.Auth);
 
-        var searchDb = builder.CreateResourceBuilder(sql).AddDatabase(AppHostConstants.Databases.Search);
+        var searchDb = builder.CreateResourceBuilder(sql).AddDatabase(SearchConstants.Database);
         var authBuilder = builder.CreateResourceBuilder(auth);
         var asbBuilder = builder.CreateResourceBuilder(asb);
 
-        builder.AddResource(new ProjectResource(AppHostConstants.ResourceNames.SearchWeb))
+        builder.AddResource(new ProjectResource(SearchConstants.WebResource))
             .WithAnnotation(new SearchWebProject(builder.AppHostDirectory))
             .WithReference(searchDb)
             .WaitFor(searchDb)
@@ -36,13 +36,13 @@ public static class SearchServiceExtensions
             .WithEnvironment("ASPNETCORE_URLS", searchApiBaseUrl)
             .WithEnvironment("Auth__Authority", authBaseUrl);
 
-        builder.AddResource(new ProjectResource(AppHostConstants.ResourceNames.SearchWorkers))
+        builder.AddResource(new ProjectResource(SearchConstants.WorkersResource))
             .WithAnnotation(new SearchWorkersProject(builder.AppHostDirectory))
             .WithReference(searchDb)
             .WaitFor(searchDb)
             .WithReference(asbBuilder)
             .WaitFor(asbBuilder)
-            .WithEnvironment(AzureServiceBusOptions.ServiceNameEnvVar, AppHostConstants.ServiceNames.Search)
+            .WithEnvironment(AzureServiceBusOptions.ServiceNameEnvVar, SearchConstants.ServiceName)
             .WithEnvironment("DOTNET_ENVIRONMENT", "E2E");
 
         return builder;
