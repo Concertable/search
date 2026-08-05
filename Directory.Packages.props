@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <ConcertablePlatformVersion>0.1.0-alpha.0.798</ConcertablePlatformVersion>
+    <ConcertablePlatformVersion>0.1.0-alpha.0.802</ConcertablePlatformVersion>
   </PropertyGroup>
 
   <ItemGroup>
