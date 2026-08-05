@@ -20,15 +20,15 @@ internal sealed class ConcertHeaderService : IHeaderService, IConcertHeaderServi
         return new Pagination<ConcertHeader>(result.Data, result.TotalCount, result.PageNumber, result.PageSize);
     }
 
-    public async Task<IEnumerable<IHeader>> GetByAmountAsync(int amount) =>
+    public async Task<IReadOnlyList<IHeader>> GetByAmountAsync(int amount) =>
         await concertHeaderRepository.GetByAmountAsync(amount);
 
-    public async Task<IEnumerable<ConcertHeader>> GetPopularAsync() =>
+    public async Task<IReadOnlyList<ConcertHeader>> GetPopularAsync() =>
         await concertHeaderRepository.GetPopularAsync();
 
-    public async Task<IEnumerable<ConcertHeader>> GetFreeAsync() =>
+    public async Task<IReadOnlyList<ConcertHeader>> GetFreeAsync() =>
         await concertHeaderRepository.GetFreeAsync();
 
-    public async Task<IEnumerable<ConcertHeader>> GetRecommendedAsync(ConcertParams concertParams) =>
+    public async Task<IReadOnlyList<ConcertHeader>> GetRecommendedAsync(ConcertParams concertParams) =>
         await concertHeaderRepository.GetRecommendedAsync(concertParams);
 }

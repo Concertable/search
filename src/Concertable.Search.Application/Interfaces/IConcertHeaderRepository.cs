@@ -5,8 +5,8 @@ namespace Concertable.Search.Application.Interfaces;
 
 internal interface IConcertHeaderRepository : IHeaderRepository<ConcertHeader>
 {
-    Task<IEnumerable<ConcertHeader>> GetByAmountAsync(int amount);
-    Task<IEnumerable<ConcertHeader>> GetPopularAsync();
-    Task<IEnumerable<ConcertHeader>> GetFreeAsync();
-    Task<IEnumerable<ConcertHeader>> GetRecommendedAsync(ConcertParams concertParams);
+    Task<IReadOnlyList<ConcertHeader>> GetByAmountAsync(int amount);
+    Task<IReadOnlyList<ConcertHeader>> GetPopularAsync();
+    Task<IReadOnlyList<ConcertHeader>> GetFreeAsync();
+    Task<IReadOnlyList<ConcertHeader>> GetRecommendedAsync(ConcertParams concertParams);
 }
