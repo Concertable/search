@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Concertable.AppHost.Shared\Concertable.AppHost.Shared.csproj" />
+    <ProjectReference Include="..\..\..\..\Concertable.Auth\src\Concertable.Auth.AppHost.Extensions\Concertable.Auth.AppHost.Extensions.csproj" />
     <ProjectReference Include="..\..\..\src\Concertable.Search.AppHost.Extensions\Concertable.Search.AppHost.Extensions.csproj" />
     <ProjectReference Include="..\..\..\src\Concertable.Search.Web\Concertable.Search.Web.csproj" />
     <ProjectReference Include="..\..\..\src\Concertable.Search.Workers\Concertable.Search.Workers.csproj" />
