@@ -42,21 +42,21 @@ internal sealed class ConcertHeaderRepository : IConcertHeaderRepository
             .ToPaginationAsync(searchParams);
     }
 
-    public async Task<IEnumerable<ConcertHeader>> GetByAmountAsync(int amount) =>
+    public async Task<IReadOnlyList<ConcertHeader>> GetByAmountAsync(int amount) =>
         await context.Concerts.Active(timeProvider.GetUtcNow().DateTime)
             .OrderByDescending(c => c.DatePosted)
             .ToHeaderDtos(context.Artists, context.Venues, context.ConcertRatingProjections)
             .Take(amount)
             .ToListAsync();
 
-    public async Task<IEnumerable<ConcertHeader>> GetPopularAsync() =>
+    public async Task<IReadOnlyList<ConcertHeader>> GetPopularAsync() =>
         await context.Concerts.Active(timeProvider.GetUtcNow().DateTime)
             .OrderByDescending(c => c.TotalTickets - c.AvailableTickets)
             .ToHeaderDtos(context.Artists, context.Venues, context.ConcertRatingProjections)
             .Take(10)
             .ToListAsync();
 
-    public async Task<IEnumerable<ConcertHeader>> GetFreeAsync() =>
+    public async Task<IReadOnlyList<ConcertHeader>> GetFreeAsync() =>
         await context.Concerts.Active(timeProvider.GetUtcNow().DateTime)
             .Where(c => c.Price == 0)
             .OrderByDescending(c => c.DatePosted)
@@ -64,7 +64,7 @@ internal sealed class ConcertHeaderRepository : IConcertHeaderRepository
             .Take(10)
             .ToListAsync();
 
-    public async Task<IEnumerable<ConcertHeader>> GetRecommendedAsync(ConcertParams concertParams)
+    public async Task<IReadOnlyList<ConcertHeader>> GetRecommendedAsync(ConcertParams concertParams)
     {
         var query = context.Concerts.Active(timeProvider.GetUtcNow().DateTime);
 
