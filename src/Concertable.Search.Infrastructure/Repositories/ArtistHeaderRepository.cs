@@ -37,7 +37,7 @@ internal sealed class ArtistHeaderRepository : IArtistHeaderRepository
             .ToPaginationAsync(searchParams);
     }
 
-    public async Task<IEnumerable<ArtistHeader>> GetByAmountAsync(int amount) =>
+    public async Task<IReadOnlyList<ArtistHeader>> GetByAmountAsync(int amount) =>
         await context.Artists.OrderBy(a => a.Id)
             .ToHeaderDtos(context.ArtistRatingProjections.AsNoTracking())
             .Take(amount)
