@@ -3,7 +3,7 @@ var builder = DistributedApplication.CreateBuilder(args);
 var sql = builder.AddSqlServerContainer("concertable-search-sql-data");
 var authDb = sql.AddDatabase(AppHostConstants.Databases.Auth);
 var b2bDb = sql.AddDatabase(AppHostConstants.Databases.B2B);
-var searchDb = sql.AddDatabase(AppHostConstants.Databases.Search);
+var searchDb = sql.AddDatabase(SearchConstants.Database);
 
 var asb = builder.AddServiceBus();
 asb.Topology().AddSearchTopology().AddAuthTopology();
