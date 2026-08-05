@@ -4,5 +4,5 @@ namespace Concertable.Search.Application.Interfaces;
 
 internal interface IAutocompleteService
 {
-    Task<IEnumerable<Autocomplete>> GetAsync(string? searchTerm);
+    Task<IReadOnlyList<Autocomplete>> GetAsync(string? searchTerm);
 }

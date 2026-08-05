@@ -23,7 +23,7 @@ internal sealed class AllAutocompleteRepository : IAllAutocompleteRepository
         this.concertSpecification = concertSpecification;
     }
 
-    public async Task<IEnumerable<Autocomplete>> GetAsync(string? searchTerm)
+    public async Task<IReadOnlyList<Autocomplete>> GetAsync(string? searchTerm)
     {
         var searchParams = new SearchParams { SearchTerm = searchTerm };
 
