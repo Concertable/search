@@ -20,6 +20,6 @@ internal sealed class VenueHeaderService : IHeaderService
         return new Pagination<VenueHeader>(result.Data, result.TotalCount, result.PageNumber, result.PageSize);
     }
 
-    public async Task<IEnumerable<IHeader>> GetByAmountAsync(int amount) =>
+    public async Task<IReadOnlyList<IHeader>> GetByAmountAsync(int amount) =>
         await venueHeaderRepository.GetByAmountAsync(amount);
 }
