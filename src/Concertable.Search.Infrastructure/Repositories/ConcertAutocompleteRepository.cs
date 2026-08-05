@@ -17,7 +17,7 @@ internal sealed class ConcertAutocompleteRepository : IConcertAutocompleteReposi
         this.specification = specification;
     }
 
-    public async Task<IEnumerable<Autocomplete>> GetAsync(string? searchTerm) =>
+    public async Task<IReadOnlyList<Autocomplete>> GetAsync(string? searchTerm) =>
         await specification
             .Apply(context.Concerts, new SearchParams { SearchTerm = searchTerm })
             .ToAutocompletes()
