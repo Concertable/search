@@ -37,7 +37,7 @@ internal sealed class VenueHeaderRepository : IVenueHeaderRepository
             .ToPaginationAsync(searchParams);
     }
 
-    public async Task<IEnumerable<VenueHeader>> GetByAmountAsync(int amount) =>
+    public async Task<IReadOnlyList<VenueHeader>> GetByAmountAsync(int amount) =>
         await context.Venues.OrderBy(v => v.Id)
             .ToHeaderDtos(context.VenueRatingProjections.AsNoTracking())
             .Take(amount)
