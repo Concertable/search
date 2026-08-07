@@ -21,7 +21,7 @@ public static class SearchServiceExtensions
         var sql = builder.Resources.OfType<SqlServerServerResource>().Single();
         var asb = builder.Resources.OfType<AzureServiceBusResource>().Single();
         var auth = builder.Resources.OfType<ProjectResource>()
-            .Single(r => r.Name == AppHostConstants.ResourceNames.Auth);
+            .Single(r => r.Name == AuthConstants.Resource);
 
         var searchDb = builder.CreateResourceBuilder(sql).AddDatabase(SearchConstants.Database);
         var authBuilder = builder.CreateResourceBuilder(auth);
