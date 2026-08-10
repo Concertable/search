@@ -1,3 +1,5 @@
+using Concertable.Search.Hosting;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 var sql = builder.AddSqlServerContainer("concertable-search-sql-data");

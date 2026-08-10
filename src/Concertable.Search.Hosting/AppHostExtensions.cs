@@ -3,7 +3,9 @@ using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Azure;
 using Concertable.Messaging.AzureServiceBus.Options;
 
-public static class SearchAppHostExtensions
+namespace Concertable.Search.Hosting;
+
+public static class AppHostExtensions
 {
     public static IResourceBuilder<ProjectResource> AddSearchWeb<TProject>(
         this IDistributedApplicationBuilder builder,
