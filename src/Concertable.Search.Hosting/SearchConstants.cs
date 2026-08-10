@@ -1,3 +1,5 @@
+namespace Concertable.Search.Hosting;
+
 public static class SearchConstants
 {
     public const string Database = "SearchDb";
