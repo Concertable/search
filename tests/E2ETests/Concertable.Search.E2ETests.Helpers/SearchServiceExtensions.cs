@@ -3,6 +3,7 @@ using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Azure;
 using Aspire.Hosting.Testing;
 using Concertable.Messaging.AzureServiceBus.Options;
+using Concertable.Search.Hosting;
 
 namespace Concertable.Search.E2ETests.Helpers;
 
