@@ -1,5 +1,5 @@
 <Solution>
-  <Project Path="src/Concertable.Search.AppHost.Extensions/Concertable.Search.AppHost.Extensions.csproj" />
+  <Project Path="src/Concertable.Search.Hosting/Concertable.Search.Hosting.csproj" />
   <Project Path="src/Concertable.Search.Web/Concertable.Search.Web.csproj" />
   <Project Path="src/Concertable.Search.Workers/Concertable.Search.Workers.csproj" />
   <Project Path="src/Concertable.Search.Api/Concertable.Search.Api.csproj" />
