@@ -4,6 +4,7 @@ using Concertable.Seed.Shared;
 using Concertable.Testing.Integration;
 using Concertable.Testing.Integration.Logging;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
@@ -31,7 +32,7 @@ public sealed class ApiFixture : IAsyncLifetime
 
         factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
-            builder.UseEnvironment(HostEnvironments.Integration);
+            builder.UseEnvironment(Environments.Integration);
             builder.ConfigureAppConfiguration((_, config) =>
             {
                 config.AddInMemoryCollection(new Dictionary<string, string?>
