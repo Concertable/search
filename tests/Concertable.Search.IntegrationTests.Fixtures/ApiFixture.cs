@@ -3,13 +3,12 @@ using Concertable.Search.Seed.Infrastructure;
 using Concertable.Seed.Shared;
 using Concertable.Testing.Integration;
 using Concertable.Testing.Integration.Logging;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -33,7 +32,7 @@ public sealed class ApiFixture : IAsyncLifetime
 
         factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
-            builder.UseEnvironment("Testing");
+            builder.UseEnvironment(Environments.Integration);
             builder.ConfigureAppConfiguration((_, config) =>
             {
                 config.AddInMemoryCollection(new Dictionary<string, string?>
@@ -44,22 +43,8 @@ public sealed class ApiFixture : IAsyncLifetime
 
             builder.ConfigureTestServices(services =>
             {
-                services.AddLogging(b =>
-                {
-                    b.ClearProviders();
-                    b.AddProvider(new XunitLoggerProvider(outputAccessor));
-                    b.SetMinimumLevel(LogLevel.Information);
-                });
-
-                services.PostConfigure<AuthenticationOptions>(opts =>
-                {
-                    opts.DefaultAuthenticateScheme = TestAuthHandler.SchemeName;
-                    opts.DefaultChallengeScheme = TestAuthHandler.SchemeName;
-                    opts.DefaultScheme = TestAuthHandler.SchemeName;
-                });
-                services.AddAuthentication()
-                    .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.SchemeName, _ => { });
-
+                services.AddXunitLogging(outputAccessor);
+                services.AddTestAuthentication();
                 services.AddSearchProjectionTestSeeder();
             });
         });
