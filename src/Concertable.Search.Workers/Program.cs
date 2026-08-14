@@ -1,4 +1,5 @@
 using Concertable.B2B.Artist.Contracts.Events;
+using Concertable.Kernel;
 using Concertable.B2B.Concert.Contracts.Events;
 using Concertable.Messaging.Application.Extensions;
 using Concertable.Messaging.AzureServiceBus.Extensions;
@@ -24,10 +25,10 @@ services.AddAzureServiceBusTransport(
     opts =>
     {
         opts.ConnectionString = builder.Configuration.GetConnectionString("asb")
-            ?? (builder.Environment.IsEnvironment("Integration") ? null!
+            ?? (builder.Environment.IsIntegration() ? null!
                 : throw new InvalidOperationException("Connection string 'asb' is required."));
         opts.ServiceName = builder.Configuration["ServiceBus:ServiceName"]
-            ?? (builder.Environment.IsEnvironment("Integration") ? "concertable-search"
+            ?? (builder.Environment.IsIntegration() ? "concertable-search"
                 : throw new InvalidOperationException("Configuration 'ServiceBus:ServiceName' is required."));
     },
     reg => reg
