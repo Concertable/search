@@ -1,6 +1,7 @@
 using Concertable.Search.Infrastructure.Extensions;
 using Concertable.Search.Seed.Infrastructure;
 using Concertable.Seed.Shared;
+using Concertable.Kernel;
 using Concertable.Testing.Integration;
 using Concertable.Testing.Integration.Logging;
 using Microsoft.AspNetCore.Hosting;
