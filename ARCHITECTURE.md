@@ -1,7 +1,7 @@
 # Concertable.Search — Architecture
 
 > Cross-service plan and design rationale: [`api/docs/MICROSERVICES_ARCHITECTURE.md`](../docs/MICROSERVICES_ARCHITECTURE.md)
-> Internal module rules: [`api/agents/MODULAR_MONOLITH_RULES.md`](../agents/MODULAR_MONOLITH_RULES.md)
+> Internal module rules: [`api/agents/CONVENTIONS.md`](../agents/CONVENTIONS.md)
 > Outstanding gaps: [`TECH_DEBT.md`](./TECH_DEBT.md)
 
 ---
