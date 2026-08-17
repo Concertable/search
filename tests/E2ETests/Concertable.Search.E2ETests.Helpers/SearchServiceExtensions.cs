@@ -28,9 +28,12 @@ public static class SearchServiceExtensions
         var searchDb = builder.CreateResourceBuilder(sql).AddDatabase(SearchConstants.Database);
         var authBuilder = builder.CreateResourceBuilder(auth);
         var asbBuilder = builder.CreateResourceBuilder(asb);
+        var searchApiUri = new Uri(searchApiBaseUrl);
 
-        builder.AddResource(new ProjectResource(SearchConstants.WebResource))
+        var searchWeb = builder.AddResource(new ProjectResource(SearchConstants.WebResource))
             .WithAnnotation(new SearchWebProject(builder.AppHostDirectory))
+            .WithHttpsEndpoint(port: searchApiUri.Port, isProxied: false)
+            .WithHttpHealthCheck("/health", endpointName: "https")
             .WithReference(searchDb)
             .WaitFor(searchDb)
             .WaitFor(authBuilder)
@@ -44,6 +47,7 @@ public static class SearchServiceExtensions
             .WaitFor(searchDb)
             .WithReference(asbBuilder)
             .WaitFor(asbBuilder)
+            .WaitFor(searchWeb)
             .WithEnvironment(AzureServiceBusOptions.ServiceNameEnvVar, SearchConstants.ServiceName)
             .WithEnvironment("DOTNET_ENVIRONMENT", "E2E");
 
