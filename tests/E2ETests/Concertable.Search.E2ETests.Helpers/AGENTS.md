@@ -1,5 +1,3 @@
 # Concertable.Search.E2ETests.Helpers — e2e tests
 
-Conventions: [E2E_CONVENTIONS.md](../../../../agents/E2E_CONVENTIONS.md)
-
-@../../../../agents/E2E_CONVENTIONS.md
+Scenario authoring: the `e2e-scenarios` skill. Suite mechanics (baseline, run script, seeded fast-forward): [`Concertable.Testing.E2E`](../../../../Concertable.Shared/tests/Concertable.Testing.E2E/AGENTS.md).
