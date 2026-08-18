@@ -3,6 +3,5 @@
 **A support library, not a suite: it holds the fixture the tests boot, so it declares
 `<IsTestProject>false</IsTestProject>` and contains no tests of its own.**
 
-Fixtures and harness inventory: [INTEGRATION_CONVENTIONS.md](../../../agents/INTEGRATION_CONVENTIONS.md)
-
-@../../../agents/INTEGRATION_CONVENTIONS.md
+Conventions: the `integration-testing` skill, plus `concertable-integration-testing` for this
+system's fixture roster and shared harness.
