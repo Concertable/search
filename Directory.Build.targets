@@ -14,5 +14,7 @@
     <Error Condition="'@(_EscapingServiceRef)' != ''"
            Text="Service-build-separation violation in $(MSBuildProjectName): ProjectReference(s) escape the service folder ($(ConcertableServiceRoot)): @(_EscapingServiceRef->'%(Identity)', ', '). A deployable-closure project must consume cross-folder code as a NuGet PackageReference, not a ProjectReference (see api/ARCHITECTURE.md). AppHost/Tests projects are exempt; for local cross-cutting core dev use -p:UseLocalCore=true." />
   </Target>
+  <Import Project="$(MSBuildThisFileDirectory)../TestConventions.targets"
+          Condition="Exists('$(MSBuildThisFileDirectory)../TestConventions.targets')" />
 
 </Project>
