@@ -1,12 +1,14 @@
 using Concertable.Search.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Concertable.Search.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 [AllowAnonymous]
+[EnableRateLimiting(RateLimitPolicies.Search)]
 internal sealed class AutocompleteController : ControllerBase
 {
     private readonly IAutocompleteServiceFactory autocompleteServiceFactory;

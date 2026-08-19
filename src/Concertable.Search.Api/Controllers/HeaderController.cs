@@ -2,12 +2,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Concertable.Search.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 [AllowAnonymous]
+[EnableRateLimiting(RateLimitPolicies.Search)]
 internal sealed class HeaderController : ControllerBase
 {
     private readonly IHeaderDispatcher headerDispatcher;
