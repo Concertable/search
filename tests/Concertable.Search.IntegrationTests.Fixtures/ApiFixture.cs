@@ -1,3 +1,4 @@
+using Concertable.Search.Api;
 using Concertable.Search.Infrastructure.Extensions;
 using Concertable.Search.Seed.Infrastructure;
 using Concertable.Seed.Shared;
@@ -40,6 +41,7 @@ public sealed class ApiFixture : IAsyncLifetime
                 {
                     ["ConnectionStrings:SearchDb"] = sqlFixture.ConnectionString,
                 });
+                config.RelaxRateLimiting(RateLimitPolicies.All);
             });
 
             builder.ConfigureTestServices(services =>

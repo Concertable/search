@@ -1,6 +1,7 @@
 ﻿using Concertable.Search.Application.Params;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Concertable.Search.Api.Controllers;
 
@@ -16,11 +17,13 @@ internal sealed class ConcertHeaderController : ControllerBase
     }
 
     [AllowAnonymous]
+    [EnableRateLimiting(RateLimitPolicies.Search)]
     [HttpGet("popular")]
     public async Task<IActionResult> GetPopular()
         => Ok(await concertheaderDispatcher.GetPopularAsync());
 
     [AllowAnonymous]
+    [EnableRateLimiting(RateLimitPolicies.Search)]
     [HttpGet("free")]
     public async Task<IActionResult> GetFree()
         => Ok(await concertheaderDispatcher.GetFreeAsync());
