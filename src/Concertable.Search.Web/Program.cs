@@ -1,9 +1,11 @@
+using Concertable.Search.Api;
 using Concertable.Search.Api.Extensions;
 using Concertable.Search.Infrastructure.Data;
 using Concertable.Shared.Api.Exceptions;
 using Concertable.Shared.Api.Extensions;
 using Concertable.ServiceDefaults;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Concertable.Search.Web;
@@ -49,12 +51,20 @@ services.AddAuthorization();
 
 services.AddExceptionHandler<GlobalExceptionHandler>();
 
+services.Configure<ForwardedHeadersOptions>(options =>
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto);
+
+builder.AddDefaultRateLimiting();
+builder.AddRateLimitPolicy(RateLimitPolicies.Search, new RateLimitWindow { PermitLimit = 120, WindowSeconds = 60 }, perUser: false);
+
 var app = builder.Build();
 
+app.UseForwardedHeaders();
 app.UseExceptionHandler();
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseDefaultRateLimiting();
 
 app.MapDefaultEndpoints();
 app.MapControllers();
