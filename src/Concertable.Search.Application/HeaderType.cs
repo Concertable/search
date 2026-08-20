@@ -1,15 +1,9 @@
-using System.Text.Json.Serialization;
-
 namespace Concertable.Search.Application;
 
-[JsonConverter(typeof(JsonStringEnumConverter<HeaderType>))]
 public enum HeaderType
 {
-    [JsonStringEnumMemberName(HeaderTypeNames.Artist)]
     Artist,
-    [JsonStringEnumMemberName(HeaderTypeNames.Venue)]
     Venue,
-    [JsonStringEnumMemberName(HeaderTypeNames.Concert)]
     Concert
 }
 
