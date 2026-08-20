@@ -16,8 +16,8 @@ internal sealed class ArtistHeaderService : IHeaderService
 
     public async Task<IPagination<IHeader>> SearchAsync(SearchParams searchParams)
     {
-        var result = await artistHeaderRepository.SearchAsync(searchParams);
-        return new Pagination<ArtistHeader>(result.Data, result.TotalCount, result.PageNumber, result.PageSize);
+        // IPagination<out T> is covariant, so the repository's page IS an IPagination<IHeader>.
+        return await artistHeaderRepository.SearchAsync(searchParams);
     }
 
     public async Task<IReadOnlyList<IHeader>> GetByAmountAsync(int amount) =>
