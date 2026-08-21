@@ -4,7 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <!-- AppHost composition is exempt from deployable-closure boundaries; see api/ARCHITECTURE.md. -->
+    <!-- AppHost composition is exempt from deployable-closure boundaries; see the packages skill. -->
     <EnforceServiceBoundary>false</EnforceServiceBoundary>
   </PropertyGroup>
 
