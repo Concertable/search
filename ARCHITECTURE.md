@@ -10,7 +10,7 @@
 
 Search owns the anonymous **marketplace read surface**: browse/search, autocomplete, and geo/radius queries over concerts, venues, and artists. It maintains read-optimised projections built **purely from `*.Contracts` integration events** — it has no write endpoints, publishes no events (there is no `Search.Contracts` project), and holds no source-of-truth data.
 
-Search does **not** serve entity-details pages — those are the frozen public wire contract owned by B2B and Customer (`api/AGENTS.md` "DTOs vs Responses"). It is not the canonical catalog (B2B) and not the source of ratings (Customer reviews). Everything in `SearchDb` is a derived projection.
+Search does **not** serve entity-details pages — those are the frozen public wire contract owned by B2B and Customer (DTOs-vs-`Response` is the `dotnet:http-api` skill). It is not the canonical catalog (B2B) and not the source of ratings (Customer reviews). Everything in `SearchDb` is a derived projection.
 
 ---
 
@@ -57,7 +57,7 @@ Search subscribes to six B2B-owned events (Workers `Program.cs`); each handler (
 | `VenueRatingUpdatedEvent` | `Concertable.B2B.Venue.Contracts.Events` | `VenueRatingProjectionHandler` → `VenueRatingProjections` |
 | `ConcertRatingUpdatedEvent` | `Concertable.B2B.Concert.Contracts.Events` | `ConcertRatingProjectionHandler` → `ConcertRatingProjections` |
 
-**Ratings originate in Customer** (`CustomerReviewSubmittedEvent`), but B2B consumes that, recomputes the average, and **re-publishes its own** `*RatingUpdatedEvent`. Search binds to those B2B contracts and **never references Customer's contracts or runtime** — every consuming csproj pins the B2B contracts as a `PackageReference` marked *"Never a ProjectReference: would break Search's standalone carve."* This keeps Search a data service that depends on no other data service's runtime (`api/AGENTS.md`).
+**Ratings originate in Customer** (`CustomerReviewSubmittedEvent`), but B2B consumes that, recomputes the average, and **re-publishes its own** `*RatingUpdatedEvent`. Search binds to those B2B contracts and **never references Customer's contracts or runtime** — every consuming csproj pins the B2B contracts as a `PackageReference` marked *"Never a ProjectReference: would break Search's standalone carve."* This keeps Search a data service that depends on no other data service's runtime (the `microservice-boundaries` skill).
 
 Every handler is idempotent: inbox dedup on `(MessageId, ConsumerName)` (`DbContextBase.IsInboxMessageProcessedAsync`) plus upsert-by-id (find-then-insert-or-mutate; genre child sets reconciled by diff).
 
