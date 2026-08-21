@@ -9,7 +9,7 @@
        _ValidateServiceBoundary check in Directory.Build.targets. Off for AppHost (composition) and
        Tests/E2E-harness projects, which reference cross-folder projects by design, and for
        UseLocalCore=true builds, whose in-repo core refs escape on purpose. Rule + rationale:
-       api/ARCHITECTURE.md ("Per-folder build closures"). -->
+       the `packages` skill. -->
   <PropertyGroup>
     <ConcertableServiceRoot>$(MSBuildThisFileDirectory)</ConcertableServiceRoot>
     <EnforceServiceBoundary Condition="'$(EnforceServiceBoundary)' == ''">true</EnforceServiceBoundary>
