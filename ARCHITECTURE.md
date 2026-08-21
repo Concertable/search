@@ -1,6 +1,6 @@
 # Concertable.Search — Architecture
 
-> Cross-service plan and design rationale: [`api/docs/MICROSERVICES_ARCHITECTURE.md`](../docs/MICROSERVICES_ARCHITECTURE.md)
+> Cross-service design rationale and decision history: the `microservices-architecture` skill
 > Internal module rules: the `dotnet-standards:module-structure` and `dotnet:module-structure` skills
 > Outstanding gaps: [`TECH_DEBT.md`](./TECH_DEBT.md)
 
