@@ -10,7 +10,7 @@
 
 Search owns the anonymous **marketplace read surface**: browse/search, autocomplete, and geo/radius queries over concerts, venues, and artists. It maintains read-optimised projections built **purely from `*.Contracts` integration events** — it has no write endpoints, publishes no events (there is no `Search.Contracts` project), and holds no source-of-truth data.
 
-Search does **not** serve entity-details pages — those are the frozen public wire contract owned by B2B and Customer (`api/AGENTS.md` "DTOs vs Responses"). It is not the canonical catalog (B2B) and not the source of ratings (Customer reviews). Everything in `SearchDb` is a derived projection.
+Search does **not** serve entity-details pages — those are the frozen public wire contract owned by B2B and Customer (DTOs-vs-`Response` is the `dotnet:http-api` skill). It is not the canonical catalog (B2B) and not the source of ratings (Customer reviews). Everything in `SearchDb` is a derived projection.
 
 ---
 
