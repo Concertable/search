@@ -4,4 +4,4 @@
 infrastructure. Tests that execute requests, business operations or infrastructure belong in integration
 or E2E projects.**
 
-Host coverage and activation rules: [`../../../../ARCHITECTURE.md`](../../../../ARCHITECTURE.md).
+Host coverage and activation rules: the `composition-testing` skill.
