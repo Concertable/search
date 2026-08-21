@@ -57,7 +57,7 @@ Search subscribes to six B2B-owned events (Workers `Program.cs`); each handler (
 | `VenueRatingUpdatedEvent` | `Concertable.B2B.Venue.Contracts.Events` | `VenueRatingProjectionHandler` → `VenueRatingProjections` |
 | `ConcertRatingUpdatedEvent` | `Concertable.B2B.Concert.Contracts.Events` | `ConcertRatingProjectionHandler` → `ConcertRatingProjections` |
 
-**Ratings originate in Customer** (`CustomerReviewSubmittedEvent`), but B2B consumes that, recomputes the average, and **re-publishes its own** `*RatingUpdatedEvent`. Search binds to those B2B contracts and **never references Customer's contracts or runtime** — every consuming csproj pins the B2B contracts as a `PackageReference` marked *"Never a ProjectReference: would break Search's standalone carve."* This keeps Search a data service that depends on no other data service's runtime (`api/AGENTS.md`).
+**Ratings originate in Customer** (`CustomerReviewSubmittedEvent`), but B2B consumes that, recomputes the average, and **re-publishes its own** `*RatingUpdatedEvent`. Search binds to those B2B contracts and **never references Customer's contracts or runtime** — every consuming csproj pins the B2B contracts as a `PackageReference` marked *"Never a ProjectReference: would break Search's standalone carve."* This keeps Search a data service that depends on no other data service's runtime (the `microservice-boundaries` skill).
 
 Every handler is idempotent: inbox dedup on `(MessageId, ConsumerName)` (`DbContextBase.IsInboxMessageProcessedAsync`) plus upsert-by-id (find-then-insert-or-mutate; genre child sets reconciled by diff).
 
