@@ -34,8 +34,7 @@ public static class HostExtensions
             services.AddProblemDetails();
             services.AddControllers()
                 .AddApplicationPart(typeof(Concertable.Shared.Api.Controllers.GenreController).Assembly)
-                .AddApplicationJson()
-                .AddControllersAsServices();
+                .AddApplicationJson();
             services.AddSearchApi(builder.Configuration);
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opts =>
