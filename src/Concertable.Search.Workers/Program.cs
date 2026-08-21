@@ -1,45 +1,11 @@
-using Concertable.B2B.Artist.Contracts.Events;
-using Concertable.Kernel;
-using Concertable.B2B.Concert.Contracts.Events;
-using Concertable.Messaging.Application.Extensions;
-using Concertable.Messaging.AzureServiceBus.Extensions;
-using Concertable.Messaging.Infrastructure.Extensions;
 using Concertable.Messaging.Infrastructure.Inbox;
 using Concertable.Search.Infrastructure.Data;
-using Concertable.Search.Infrastructure.Extensions;
-using Concertable.ServiceDefaults;
-using Concertable.B2B.Venue.Contracts.Events;
+using Concertable.Search.Workers;
 using Microsoft.EntityFrameworkCore;
 
 var builder = Host.CreateApplicationBuilder(args);
 
-builder.AddServiceDefaults();
-builder.Configuration.AddEnvironmentVariables();
-
-var services = builder.Services;
-
-services.AddSearchModule(builder.Configuration);
-services.AddSearchProjectionHandlers();
-
-services.AddAzureServiceBusTransport(
-    opts =>
-    {
-        opts.ConnectionString = builder.Configuration.GetConnectionString("asb")
-            ?? (builder.Environment.IsIntegration() ? null!
-                : throw new InvalidOperationException("Connection string 'asb' is required."));
-        opts.ServiceName = builder.Configuration["ServiceBus:ServiceName"]
-            ?? (builder.Environment.IsIntegration() ? "concertable-search"
-                : throw new InvalidOperationException("Configuration 'ServiceBus:ServiceName' is required."));
-    },
-    reg => reg
-        .SubscribeTo<ArtistChangedEvent>()
-        .SubscribeTo<VenueChangedEvent>()
-        .SubscribeTo<ConcertChangedEvent>()
-        .SubscribeTo<ArtistRatingUpdatedEvent>()
-        .SubscribeTo<VenueRatingUpdatedEvent>()
-        .SubscribeTo<ConcertRatingUpdatedEvent>());
-
-services.AddInbox(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("SearchDb")));
+builder.AddSearchWorkerHost();
 
 var app = builder.Build();
 
