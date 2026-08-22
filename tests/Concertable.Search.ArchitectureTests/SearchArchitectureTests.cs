@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
 using Xunit;
 
-namespace Concertable.Search.CompositionTests;
+namespace Concertable.Search.ArchitectureTests;
 
-public sealed class SearchCompositionTests
+public sealed class SearchArchitectureTests
 {
     [Fact]
     public void Web_ProductionGraphAndStrictValidation_AreValid()
