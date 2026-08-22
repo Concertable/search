@@ -6,7 +6,7 @@
     <ProjectReference Include="..\..\src\Concertable.Search.Web\Concertable.Search.Web.csproj" />
     <ProjectReference Include="..\..\src\Concertable.Search.Workers\Concertable.Search.Workers.csproj" />
     <ProjectReference Include="..\..\src\Concertable.Search.AppHost\Concertable.Search.AppHost.csproj" />
-    <ProjectReference Include="..\..\..\Concertable.Shared\tests\Concertable.Composition.Testing\Concertable.Composition.Testing.csproj" Condition="'$(UseLocalPlatformPackages)' != 'true' And Exists('..\..\..\Concertable.Shared\tests\Concertable.Composition.Testing\Concertable.Composition.Testing.csproj')" />
-    <PackageReference Include="Concertable.Composition.Testing" Condition="'$(UseLocalPlatformPackages)' == 'true' Or !Exists('..\..\..\Concertable.Shared\tests\Concertable.Composition.Testing\Concertable.Composition.Testing.csproj')" />
+    <ProjectReference Include="..\..\..\Concertable.Shared\tests\Concertable.Testing.Architecture\Concertable.Testing.Architecture.csproj" Condition="'$(UseLocalPlatformPackages)' != 'true' And Exists('..\..\..\Concertable.Shared\tests\Concertable.Testing.Architecture\Concertable.Testing.Architecture.csproj')" />
+    <PackageReference Include="Concertable.Testing.Architecture" Condition="'$(UseLocalPlatformPackages)' == 'true' Or !Exists('..\..\..\Concertable.Shared\tests\Concertable.Testing.Architecture\Concertable.Testing.Architecture.csproj')" />
   </ItemGroup>
 </Project>
