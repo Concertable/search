@@ -1,6 +1,6 @@
-using Concertable.Composition.Testing;
 using Concertable.Search.Web;
 using Concertable.Search.Workers;
+using Concertable.Testing.Architecture;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
 using Xunit;
