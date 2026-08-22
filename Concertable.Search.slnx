@@ -11,7 +11,7 @@
   </Folder>
   <Folder Name="/Tests/">
     <Project Path="tests/Concertable.Search.IntegrationTests/Concertable.Search.IntegrationTests.csproj" />
-    <Project Path="tests/Concertable.Search.CompositionTests/Concertable.Search.CompositionTests.csproj" />
+    <Project Path="tests/Concertable.Search.ArchitectureTests/Concertable.Search.ArchitectureTests.csproj" />
     <Project Path="tests/Concertable.Search.IntegrationTests.Fixtures/Concertable.Search.IntegrationTests.Fixtures.csproj" />
     <Project Path="tests/Concertable.Search.UnitTests/Concertable.Search.UnitTests.csproj" />
     <Project Path="tests/E2ETests/Concertable.Search.E2ETests.Helpers/Concertable.Search.E2ETests.Helpers.csproj" />
