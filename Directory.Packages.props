@@ -6,7 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageVersion Include="Concertable.Testing" Version="$(ConcertablePlatformVersion)" />
     <PackageVersion Include="Concertable.Testing.Architecture" Version="$(ConcertablePlatformVersion)" />
+    <PackageVersion Include="Concertable.Testing.Integration" Version="$(ConcertablePlatformVersion)" />
     <PackageVersion Include="Aspire.Hosting.Azure.ServiceBus" Version="13.3.2" />
     <PackageVersion Include="Aspire.Hosting.SqlServer" Version="13.3.2" />
     <PackageVersion Include="Aspire.Hosting.Testing" Version="13.3.2" />
