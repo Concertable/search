@@ -26,11 +26,7 @@
     <IsPackable Condition="'$(IsPackable)' == ''">false</IsPackable>
   </PropertyGroup>
 
-  <!-- Container images. A deployable opts in with <ContainerRepository>, exactly as a library opts into
-       packaging with <IsPackable>true</IsPackable>; publish-images.yml derives its matrix from that one
-       property, so there is no second list to keep in sync. The registry lives here rather than in the
-       workflow so it survives the carve into a service repository. Images are built by the .NET SDK
-       (`-t:PublishContainer`), so there are no Dockerfiles; see plans/platform/DEPLOYMENT.md. -->
+  <!-- Registry lives here, not in publish-images.yml: a carve takes only the service folder. -->
   <PropertyGroup>
     <ContainerRegistry Condition="'$(ContainerRegistry)' == ''">ghcr.io</ContainerRegistry>
   </PropertyGroup>
