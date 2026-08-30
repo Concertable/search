@@ -26,6 +26,15 @@
     <IsPackable Condition="'$(IsPackable)' == ''">false</IsPackable>
   </PropertyGroup>
 
+  <!-- Container images. A deployable opts in with <ContainerRepository>, exactly as a library opts into
+       packaging with <IsPackable>true</IsPackable>; publish-images.yml derives its matrix from that one
+       property, so there is no second list to keep in sync. The registry lives here rather than in the
+       workflow so it survives the carve into a service repository. Images are built by the .NET SDK
+       (`-t:PublishContainer`), so there are no Dockerfiles; see plans/platform/DEPLOYMENT.md. -->
+  <PropertyGroup>
+    <ContainerRegistry Condition="'$(ContainerRegistry)' == ''">ghcr.io</ContainerRegistry>
+  </PropertyGroup>
+
   <!-- Banned-API list for Microsoft.CodeAnalysis.BannedApiAnalyzers (shared across services). -->
   <ItemGroup>
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)../BannedSymbols.txt" Condition="Exists('$(MSBuildThisFileDirectory)../BannedSymbols.txt')" />
