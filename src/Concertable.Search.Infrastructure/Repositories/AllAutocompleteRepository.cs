@@ -7,37 +7,37 @@ namespace Concertable.Search.Infrastructure.Repositories;
 internal sealed class AllAutocompleteRepository : IAllAutocompleteRepository
 {
     private readonly ISearchDbContext context;
-    private readonly IArtistSearchSpecification artistSpecification;
-    private readonly IVenueSearchSpecification venueSpecification;
-    private readonly IConcertSearchSpecification concertSpecification;
+    private readonly IArtistSearchQuery artistQuery;
+    private readonly IVenueSearchQuery venueQuery;
+    private readonly IConcertSearchQuery concertQuery;
 
     public AllAutocompleteRepository(
         ISearchDbContext context,
-        IArtistSearchSpecification artistSpecification,
-        IVenueSearchSpecification venueSpecification,
-        IConcertSearchSpecification concertSpecification)
+        IArtistSearchQuery artistQuery,
+        IVenueSearchQuery venueQuery,
+        IConcertSearchQuery concertQuery)
     {
         this.context = context;
-        this.artistSpecification = artistSpecification;
-        this.venueSpecification = venueSpecification;
-        this.concertSpecification = concertSpecification;
+        this.artistQuery = artistQuery;
+        this.venueQuery = venueQuery;
+        this.concertQuery = concertQuery;
     }
 
     public async Task<IReadOnlyList<Autocomplete>> GetAsync(string? searchTerm)
     {
         var searchParams = new SearchParams { SearchTerm = searchTerm };
 
-        return await artistSpecification
+        return await artistQuery
             .Apply(context.Artists, searchParams)
             .ToAutocompletes()
             .Take(20)
             .Concat(
-                venueSpecification
+                venueQuery
                     .Apply(context.Venues, searchParams)
                     .ToAutocompletes()
                     .Take(20))
             .Concat(
-                concertSpecification
+                concertQuery
                     .Apply(context.Concerts, searchParams)
                     .ToAutocompletes()
                     .Take(20))
