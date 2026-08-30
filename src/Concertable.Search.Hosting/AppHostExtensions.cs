@@ -7,7 +7,7 @@ namespace Concertable.Search.Hosting;
 
 public static class AppHostExtensions
 {
-    public static IResourceBuilder<ContainerResource> AddSearchWeb(
+    public static IResourceBuilder<ServiceContainerResource> AddSearchWeb(
         this IDistributedApplicationBuilder builder,
         string image,
         string digest,
@@ -50,7 +50,7 @@ public static class AppHostExtensions
                       .WithEnvironment(AzureServiceBusOptions.ServiceNameEnvVar, SearchConstants.ServiceName);
     }
 
-    public static IResourceBuilder<ContainerResource> AddSearchWorkers(
+    public static IResourceBuilder<ServiceContainerResource> AddSearchWorkers(
         this IDistributedApplicationBuilder builder,
         string image,
         string digest,
