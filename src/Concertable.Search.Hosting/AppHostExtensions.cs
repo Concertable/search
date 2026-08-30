@@ -11,7 +11,7 @@ public static class AppHostExtensions
         this IDistributedApplicationBuilder builder,
         string image,
         string digest,
-        IResourceBuilder<ProjectResource> auth,
+        IResourceBuilder<IResourceWithServiceDiscovery> auth,
         IResourceBuilder<SqlServerDatabaseResource> searchDb)
     {
         return builder.AddContainerImage(SearchConstants.WebResource, image, digest)
@@ -24,7 +24,7 @@ public static class AppHostExtensions
 
     public static IResourceBuilder<ProjectResource> AddSearchWeb<TProject>(
         this IDistributedApplicationBuilder builder,
-        IResourceBuilder<ProjectResource> auth,
+        IResourceBuilder<IResourceWithServiceDiscovery> auth,
         IResourceBuilder<SqlServerDatabaseResource> searchDb)
         where TProject : IProjectMetadata, new()
     {
