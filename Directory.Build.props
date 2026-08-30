@@ -18,12 +18,20 @@
     <EnforceServiceBoundary Condition="'$(UseLocalCore)' == 'true'">false</EnforceServiceBoundary>
   </PropertyGroup>
 
-  <!-- Publishing is opt-in: a project sets <IsPackable>true</IsPackable> when it becomes a
-       published package (in its phase). Default off so a solution-wide `dotnet pack` emits
-       only intended packages. MinVer + package metadata are added to a folder when it starts
-       publishing (this folder doesn't yet). -->
+  <!-- Package publishing. Projects opt in with <IsPackable>true</IsPackable>; everything
+       else stays unpackable so a solution-wide `dotnet pack` produces only the intended
+       packages. Version is MinVer-derived (GlobalPackageReference in
+       Directory.Packages.props); untagged builds -> 0.1.0-alpha.N. -->
   <PropertyGroup>
     <IsPackable Condition="'$(IsPackable)' == ''">false</IsPackable>
+    <Authors>Concertable</Authors>
+    <Company>Concertable</Company>
+    <RepositoryUrl>https://github.com/Concertable/concertable</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/Concertable/concertable</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <MinVerTagPrefix>v</MinVerTagPrefix>
+    <MinVerMinimumMajorMinor>0.1</MinVerMinimumMajorMinor>
   </PropertyGroup>
 
   <!-- Registry lives here, not in publish-images.yml: a carve takes only the service folder. -->
