@@ -26,8 +26,8 @@
     <IsPackable Condition="'$(IsPackable)' == ''">false</IsPackable>
     <Authors>Concertable</Authors>
     <Company>Concertable</Company>
-    <RepositoryUrl>https://github.com/Concertable/concertable</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/Concertable/concertable</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Concertable/search</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/Concertable/search</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <MinVerTagPrefix>v</MinVerTagPrefix>
