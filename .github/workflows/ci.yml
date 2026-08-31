@@ -37,6 +37,17 @@ jobs:
       - name: Build Search Workers
         run: dotnet build src/Concertable.Search.Workers/Concertable.Search.Workers.csproj --configuration Release
 
+      - name: Pack Search Hosting
+        run: dotnet pack src/Concertable.Search.Hosting/Concertable.Search.Hosting.csproj --configuration Release --output artifacts/packages
+
+      - name: Upload package candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: search-hosting-${{ github.sha }}
+          path: artifacts/packages/*.nupkg
+          if-no-files-found: error
+          retention-days: 7
+
       - name: Run unit tests
         run: dotnet test tests/Concertable.Search.UnitTests/Concertable.Search.UnitTests.csproj --configuration Release
 
