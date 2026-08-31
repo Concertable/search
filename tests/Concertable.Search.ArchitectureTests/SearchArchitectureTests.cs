@@ -4,8 +4,11 @@ using Concertable.Auth.Hosting;
 using Concertable.Search.Web;
 using Concertable.Search.Workers;
 using Concertable.Testing.Architecture;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Xunit;
 
 namespace Concertable.Search.ArchitectureTests;
@@ -22,6 +25,9 @@ public sealed class SearchArchitectureTests
         {
             RootAssemblies = [typeof(Concertable.Search.Web.HostExtensions).Assembly]
         });
+        var jwtOptions = app.Services.GetRequiredService<IOptionsMonitor<JwtBearerOptions>>()
+            .Get(JwtBearerDefaults.AuthenticationScheme);
+        Assert.False(jwtOptions.RequireHttpsMetadata);
         var invalidBuilder = WebApplication.CreateBuilder(CompositionTestArguments.Create());
         invalidBuilder.AddSearchWebHost();
         invalidBuilder.Services.AddInvalidLifetimeGraph();
@@ -48,7 +54,7 @@ public sealed class SearchArchitectureTests
     public void AppHost_ProductionGraphAndStrictValidation_AreValid()
     {
         var validBuilder = SearchAppHost.CreateBuilder([]);
-        AssertImageEndpoint(validBuilder, AuthConstants.Resource);
+        AssertImageEndpoint(validBuilder, AuthConstants.Resource, "https");
         using var app = validBuilder.Build();
         var builder = SearchAppHost.CreateBuilder([]);
         builder.Services.AddInvalidLifetimeGraph();
@@ -57,13 +63,16 @@ public sealed class SearchArchitectureTests
 
     private static void AssertImageEndpoint(
         IDistributedApplicationBuilder builder,
-        string resourceName)
+        string resourceName,
+        string endpointName)
     {
         var resource = Assert.IsType<ServiceContainerResource>(
             builder.Resources.Single(resource => resource.Name == resourceName));
-        var endpoint = Assert.Single(resource.Annotations.OfType<EndpointAnnotation>());
+        var endpoint = Assert.Single(
+            resource.Annotations.OfType<EndpointAnnotation>(),
+            endpoint => endpoint.Name == endpointName);
 
-        Assert.Equal("https", endpoint.Name);
+        Assert.Equal(endpointName, endpoint.Name);
         Assert.Equal("http", endpoint.UriScheme);
         Assert.Equal(8080, endpoint.TargetPort);
     }
