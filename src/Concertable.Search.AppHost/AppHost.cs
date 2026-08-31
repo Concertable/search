@@ -3,7 +3,7 @@ using Concertable.Auth.Hosting;
 using Concertable.B2B.Hosting;
 using Concertable.Search.Hosting;
 
-public static class SearchAppHost
+public static class AppHost
 {
     private const string AuthImage = "ghcr.io/concertable/auth";
     private const string AuthDigest = "sha256:8b7ba47efb319e6e1f1b5b86223d4075b9c8e09920933dae24fbf35f72851a63";

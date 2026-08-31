@@ -67,10 +67,10 @@ public sealed class SearchArchitectureTests
     [Fact]
     public void AppHost_ProductionGraphAndStrictValidation_AreValid()
     {
-        var validBuilder = SearchAppHost.CreateBuilder([]);
+        var validBuilder = AppHost.CreateBuilder([]);
         AssertImageEndpoint(validBuilder, AuthConstants.Resource, "https");
         using var app = validBuilder.Build();
-        var builder = SearchAppHost.CreateBuilder([]);
+        var builder = AppHost.CreateBuilder([]);
         builder.Services.AddInvalidLifetimeGraph();
         Assert.ThrowsAny<Exception>(() => builder.Build());
     }
