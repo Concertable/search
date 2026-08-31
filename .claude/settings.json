@@ -1,0 +1,23 @@
+{
+  "extraKnownMarketplaces": {
+    "agent-standards": {
+      "source": {
+        "source": "github",
+        "repo": "Concertable/agent-standards"
+      },
+      "autoUpdate": true
+    },
+    "dotagents": {
+      "source": {
+        "source": "github",
+        "repo": "tomjseery/dotagents"
+      },
+      "autoUpdate": true
+    }
+  },
+  "enabledPlugins": {
+    "concertable@agent-standards": true,
+    "dotnet@agent-standards": true,
+    "dotnet-standards@dotagents": true
+  }
+}
