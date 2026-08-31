@@ -35,6 +35,20 @@ public sealed class SearchArchitectureTests
     }
 
     [Fact]
+    public void Web_ProductionEnvironment_RequiresHttpsMetadata()
+    {
+        var arguments = CompositionTestArguments.Create();
+        arguments[0] = "--environment=Production";
+        var builder = WebApplication.CreateBuilder(arguments);
+        builder.AddSearchWebHost();
+        using var app = builder.Build();
+        var jwtOptions = app.Services.GetRequiredService<IOptionsMonitor<JwtBearerOptions>>()
+            .Get(JwtBearerDefaults.AuthenticationScheme);
+
+        Assert.True(jwtOptions.RequireHttpsMetadata);
+    }
+
+    [Fact]
     public void Workers_ProductionGraphAndStrictValidation_AreValid()
     {
         var builder = Host.CreateApplicationBuilder(CompositionTestArguments.Create());
