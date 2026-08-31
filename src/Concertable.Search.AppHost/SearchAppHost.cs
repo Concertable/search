@@ -18,7 +18,8 @@ public static class SearchAppHost
         var searchDb = sql.AddDatabase(SearchConstants.Database);
         var asb = builder.AddServiceBus();
         asb.Topology().AddSearchTopology().AddAuthTopology().RunAsEmulator();
-        var auth = builder.AddAuth(AuthImage, AuthDigest, authDb, asb);
+        var auth = builder.AddAuth(AuthImage, AuthDigest, authDb, asb)
+                          .WithHttpEndpoint(targetPort: 8080, name: "https");
         auth.WithEnvironment("ServiceAuth__AuthClientId", "concertable-auth");
         builder.AddSearchWeb<Projects.Concertable_Search_Web>(auth, searchDb);
         builder.AddSearchWorkers<Projects.Concertable_Search_Workers>(searchDb, asb);
