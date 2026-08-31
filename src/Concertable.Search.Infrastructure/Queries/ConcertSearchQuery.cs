@@ -7,19 +7,19 @@ namespace Concertable.Search.Infrastructure.Queries;
 
 internal sealed class ConcertSearchQuery : IConcertSearchQuery
 {
-    private readonly IConcertSearchSpecification concertSearchSpecification;
-    private readonly ISortSpecification<ConcertReadModel> sortSpecification;
+    private readonly IConcertSearchSpecification concertSearchSpec;
+    private readonly ISortSpecification<ConcertReadModel> sortSpec;
 
     public ConcertSearchQuery(
-        IConcertSearchSpecification concertSearchSpecification,
-        ISortSpecification<ConcertReadModel> sortSpecification)
+        IConcertSearchSpecification concertSearchSpec,
+        ISortSpecification<ConcertReadModel> sortSpec)
     {
-        this.concertSearchSpecification = concertSearchSpecification;
-        this.sortSpecification = sortSpecification;
+        this.concertSearchSpec = concertSearchSpec;
+        this.sortSpec = sortSpec;
     }
 
     public IQueryable<ConcertReadModel> Apply(IQueryable<ConcertReadModel> query, SearchParams @params)
         => query
-            .Where(this.concertSearchSpecification.ToExpression(@params))
-            .ApplyOrders(this.sortSpecification.ToOrders(@params.Sort));
+            .Where(this.concertSearchSpec.ToExpression(@params))
+            .ApplyOrders(this.sortSpec.ToOrders(@params.Sort));
 }

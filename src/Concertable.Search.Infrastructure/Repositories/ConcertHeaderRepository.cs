@@ -15,18 +15,18 @@ internal sealed class ConcertHeaderRepository : IConcertHeaderRepository
 {
     private readonly ISearchDbContext context;
     private readonly IConcertSearchQuery searchQuery;
-    private readonly IGeometrySpecification<ConcertReadModel> geometrySpecification;
+    private readonly IGeometrySpecification<ConcertReadModel> geometrySpec;
     private readonly TimeProvider timeProvider;
 
     public ConcertHeaderRepository(
         ISearchDbContext context,
         IConcertSearchQuery searchQuery,
-        IGeometrySpecification<ConcertReadModel> geometrySpecification,
+        IGeometrySpecification<ConcertReadModel> geometrySpec,
         TimeProvider timeProvider)
     {
         this.context = context;
         this.searchQuery = searchQuery;
-        this.geometrySpecification = geometrySpecification;
+        this.geometrySpec = geometrySpec;
         this.timeProvider = timeProvider;
     }
 
@@ -67,7 +67,7 @@ internal sealed class ConcertHeaderRepository : IConcertHeaderRepository
         if (concertParams.Genres.Any())
             query = query.Where(c => c.ConcertGenres.Any(eg => concertParams.Genres.Contains(eg.Genre)));
 
-        query = query.Where(this.geometrySpecification.ToExpression(concertParams));
+        query = query.Where(this.geometrySpec.ToExpression(concertParams));
 
         query = concertParams.OrderByRecent
             ? query.OrderByDescending(c => c.DatePosted)

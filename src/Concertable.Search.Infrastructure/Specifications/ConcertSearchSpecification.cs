@@ -8,14 +8,14 @@ namespace Concertable.Search.Infrastructure.Specifications;
 internal sealed class ConcertSearchSpecification
     : PredicateSpecification<ConcertReadModel, SearchParams>, IConcertSearchSpecification
 {
-    private readonly ISearchSpecification<ConcertReadModel> searchSpecification;
+    private readonly ISearchSpecification<ConcertReadModel> searchSpec;
     private readonly TimeProvider timeProvider;
 
     public ConcertSearchSpecification(
-        ISearchSpecification<ConcertReadModel> searchSpecification,
+        ISearchSpecification<ConcertReadModel> searchSpec,
         TimeProvider timeProvider)
     {
-        this.searchSpecification = searchSpecification;
+        this.searchSpec = searchSpec;
         this.timeProvider = timeProvider;
     }
 
@@ -23,7 +23,7 @@ internal sealed class ConcertSearchSpecification
     {
         var now = this.timeProvider.GetUtcNow();
 
-        return this.searchSpecification
+        return this.searchSpec
             .And(concert =>
                 concert.DatePosted != null
                 && concert.EndDate > now
