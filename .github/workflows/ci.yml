@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  merge_group:
+
+permissions:
+  contents: read
+  packages: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci-complete:
+    name: ci-complete
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GITHUB_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      TESTCONTAINERS_RYUK_DISABLED: "true"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.x
+
+      - name: Build Search Web
+        run: dotnet build src/Concertable.Search.Web/Concertable.Search.Web.csproj --configuration Release
+
+      - name: Build Search Workers
+        run: dotnet build src/Concertable.Search.Workers/Concertable.Search.Workers.csproj --configuration Release
+
+      - name: Run unit tests
+        run: dotnet test tests/Concertable.Search.UnitTests/Concertable.Search.UnitTests.csproj --configuration Release
+
+      - name: Run integration tests
+        run: dotnet test tests/Concertable.Search.IntegrationTests/Concertable.Search.IntegrationTests.csproj --configuration Release
