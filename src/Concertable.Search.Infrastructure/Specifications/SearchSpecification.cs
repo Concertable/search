@@ -8,22 +8,22 @@ namespace Concertable.Search.Infrastructure.Specifications;
 internal sealed class SearchSpecification<TEntity> : ISearchSpecification<TEntity>
     where TEntity : class, IIdEntity, IHasName, IHasLocation
 {
-    private readonly INameSpecification<TEntity> nameSpecification;
-    private readonly IGenreSpecification<TEntity> genreSpecification;
-    private readonly IGeometrySpecification<TEntity> geometrySpecification;
+    private readonly INameSpecification<TEntity> nameSpec;
+    private readonly IGenreSpecification<TEntity> genreSpec;
+    private readonly IGeometrySpecification<TEntity> geometrySpec;
 
     public SearchSpecification(
-        INameSpecification<TEntity> nameSpecification,
-        IGenreSpecification<TEntity> genreSpecification,
-        IGeometrySpecification<TEntity> geometrySpecification)
+        INameSpecification<TEntity> nameSpec,
+        IGenreSpecification<TEntity> genreSpec,
+        IGeometrySpecification<TEntity> geometrySpec)
     {
-        this.nameSpecification = nameSpecification;
-        this.genreSpecification = genreSpecification;
-        this.geometrySpecification = geometrySpecification;
+        this.nameSpec = nameSpec;
+        this.genreSpec = genreSpec;
+        this.geometrySpec = geometrySpec;
     }
 
     public Expression<Func<TEntity, bool>> ToExpression(SearchParams @params) =>
-        this.nameSpecification.ToExpression(@params.SearchTerm)
-            .And(this.genreSpecification.ToExpression(@params))
-            .And(this.geometrySpecification.ToExpression(@params));
+        this.nameSpec.ToExpression(@params.SearchTerm)
+            .And(this.genreSpec.ToExpression(@params))
+            .And(this.geometrySpec.ToExpression(@params));
 }

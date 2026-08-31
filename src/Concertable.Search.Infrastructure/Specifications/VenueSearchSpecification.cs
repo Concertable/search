@@ -7,18 +7,18 @@ namespace Concertable.Search.Infrastructure.Specifications;
 
 internal sealed class VenueSearchSpecification : ISearchSpecification<VenueReadModel>
 {
-    private readonly INameSpecification<VenueReadModel> nameSpecification;
-    private readonly IGeometrySpecification<VenueReadModel> geometrySpecification;
+    private readonly INameSpecification<VenueReadModel> nameSpec;
+    private readonly IGeometrySpecification<VenueReadModel> geometrySpec;
 
     public VenueSearchSpecification(
-        INameSpecification<VenueReadModel> nameSpecification,
-        IGeometrySpecification<VenueReadModel> geometrySpecification)
+        INameSpecification<VenueReadModel> nameSpec,
+        IGeometrySpecification<VenueReadModel> geometrySpec)
     {
-        this.nameSpecification = nameSpecification;
-        this.geometrySpecification = geometrySpecification;
+        this.nameSpec = nameSpec;
+        this.geometrySpec = geometrySpec;
     }
 
     public Expression<Func<VenueReadModel, bool>> ToExpression(SearchParams @params) =>
-        this.nameSpecification.ToExpression(@params.SearchTerm)
-            .And(this.geometrySpecification.ToExpression(@params));
+        this.nameSpec.ToExpression(@params.SearchTerm)
+            .And(this.geometrySpec.ToExpression(@params));
 }

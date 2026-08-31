@@ -7,21 +7,21 @@ namespace Concertable.Search.Infrastructure.Queries;
 
 internal sealed class ArtistSearchQuery : IArtistSearchQuery
 {
-    private readonly ISearchSpecification<ArtistReadModel> searchSpecification;
-    private readonly ISortSpecification<ArtistReadModel> sortSpecification;
+    private readonly ISearchSpecification<ArtistReadModel> searchSpec;
+    private readonly ISortSpecification<ArtistReadModel> sortSpec;
 
     public ArtistSearchQuery(
-        ISearchSpecification<ArtistReadModel> searchSpecification,
-        ISortSpecification<ArtistReadModel> sortSpecification)
+        ISearchSpecification<ArtistReadModel> searchSpec,
+        ISortSpecification<ArtistReadModel> sortSpec)
     {
-        this.searchSpecification = searchSpecification;
-        this.sortSpecification = sortSpecification;
+        this.searchSpec = searchSpec;
+        this.sortSpec = sortSpec;
     }
 
     public IQueryable<ArtistReadModel> Apply(IQueryable<ArtistReadModel> query, SearchParams @params)
     {
         return query
-            .Where(this.searchSpecification.ToExpression(@params))
-            .ApplyOrders(this.sortSpecification.ToOrders(@params.Sort));
+            .Where(this.searchSpec.ToExpression(@params))
+            .ApplyOrders(this.sortSpec.ToOrders(@params.Sort));
     }
 }

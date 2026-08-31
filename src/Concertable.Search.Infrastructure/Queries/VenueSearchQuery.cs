@@ -7,19 +7,19 @@ namespace Concertable.Search.Infrastructure.Queries;
 
 internal sealed class VenueSearchQuery : IVenueSearchQuery
 {
-    private readonly ISearchSpecification<VenueReadModel> searchSpecification;
-    private readonly ISortSpecification<VenueReadModel> sortSpecification;
+    private readonly ISearchSpecification<VenueReadModel> searchSpec;
+    private readonly ISortSpecification<VenueReadModel> sortSpec;
 
     public VenueSearchQuery(
-        ISearchSpecification<VenueReadModel> searchSpecification,
-        ISortSpecification<VenueReadModel> sortSpecification)
+        ISearchSpecification<VenueReadModel> searchSpec,
+        ISortSpecification<VenueReadModel> sortSpec)
     {
-        this.searchSpecification = searchSpecification;
-        this.sortSpecification = sortSpecification;
+        this.searchSpec = searchSpec;
+        this.sortSpec = sortSpec;
     }
 
     public IQueryable<VenueReadModel> Apply(IQueryable<VenueReadModel> query, SearchParams @params) =>
         query
-            .Where(this.searchSpecification.ToExpression(@params))
-            .ApplyOrders(this.sortSpecification.ToOrders(@params.Sort));
+            .Where(this.searchSpec.ToExpression(@params))
+            .ApplyOrders(this.sortSpec.ToOrders(@params.Sort));
 }
