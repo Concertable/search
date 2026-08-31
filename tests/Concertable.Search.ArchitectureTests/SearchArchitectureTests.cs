@@ -1,3 +1,6 @@
+using Aspire.Hosting;
+using Aspire.Hosting.ApplicationModel;
+using Concertable.Auth.Hosting;
 using Concertable.Search.Web;
 using Concertable.Search.Workers;
 using Concertable.Testing.Architecture;
@@ -44,9 +47,24 @@ public sealed class SearchArchitectureTests
     [Fact]
     public void AppHost_ProductionGraphAndStrictValidation_AreValid()
     {
-        using var app = SearchAppHost.CreateBuilder([]).Build();
+        var validBuilder = SearchAppHost.CreateBuilder([]);
+        AssertImageEndpoint(validBuilder, AuthConstants.Resource);
+        using var app = validBuilder.Build();
         var builder = SearchAppHost.CreateBuilder([]);
         builder.Services.AddInvalidLifetimeGraph();
         Assert.ThrowsAny<Exception>(() => builder.Build());
+    }
+
+    private static void AssertImageEndpoint(
+        IDistributedApplicationBuilder builder,
+        string resourceName)
+    {
+        var resource = Assert.IsType<ServiceContainerResource>(
+            builder.Resources.Single(resource => resource.Name == resourceName));
+        var endpoint = Assert.Single(resource.Annotations.OfType<EndpointAnnotation>());
+
+        Assert.Equal("https", endpoint.Name);
+        Assert.Equal("http", endpoint.UriScheme);
+        Assert.Equal(8080, endpoint.TargetPort);
     }
 }
