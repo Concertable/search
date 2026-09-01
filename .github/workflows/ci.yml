@@ -37,6 +37,9 @@ jobs:
       - name: Build Search Workers
         run: dotnet build src/Concertable.Search.Workers/Concertable.Search.Workers.csproj --configuration Release
 
+      - name: Publish Search migration job
+        run: dotnet publish src/Concertable.Search.Migrations/Concertable.Search.Migrations.csproj --configuration Release --output artifacts/migrations
+
       - name: Pack Search Hosting
         run: dotnet pack src/Concertable.Search.Hosting/Concertable.Search.Hosting.csproj --configuration Release --output artifacts/packages
 
@@ -45,6 +48,14 @@ jobs:
         with:
           name: search-hosting-${{ github.sha }}
           path: artifacts/packages/*.nupkg
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Upload migration job candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: search-migrations-${{ github.sha }}
+          path: artifacts/migrations/**
           if-no-files-found: error
           retention-days: 7
 
