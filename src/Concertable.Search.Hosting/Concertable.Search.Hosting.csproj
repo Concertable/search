@@ -4,9 +4,16 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <IsPackable>true</IsPackable>
+    <Description>Concertable Search hosting: Aspire composition helpers and the B2B-owned event subscription topology for Search Web and Workers.</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <!-- AppHost composition is exempt from deployable-closure boundaries; see the packages skill. -->
     <EnforceServiceBoundary>false</EnforceServiceBoundary>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.Azure.ServiceBus" />
