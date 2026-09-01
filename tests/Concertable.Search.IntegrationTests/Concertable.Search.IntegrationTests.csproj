@@ -22,6 +22,7 @@
     <PackageReference Include="Concertable.Testing" />
     <ProjectReference Include="..\..\src\Concertable.Search.Application\Concertable.Search.Application.csproj" />
     <ProjectReference Include="..\..\src\Concertable.Search.Migrations\Concertable.Search.Migrations.csproj" />
+    <ProjectReference Include="..\..\src\Concertable.Search.TestKit\Concertable.Search.TestKit.csproj" />
   </ItemGroup>
 
   <ItemGroup>
