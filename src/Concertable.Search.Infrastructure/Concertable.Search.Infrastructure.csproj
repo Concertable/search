@@ -17,6 +17,10 @@
     <ProjectReference Include="..\Seed\Concertable.Search.Seed.Infrastructure\Concertable.Search.Seed.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="Concertable.Search.Migrations" />
+  </ItemGroup>
+
   <!-- Never a ProjectReference: would break Search's standalone carve. -->
   <ItemGroup>
     <PackageReference Include="Concertable.B2B.Artist.Contracts" />
