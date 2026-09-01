@@ -24,9 +24,13 @@ Search does **not** serve entity-details pages — those are the frozen public w
 | `Concertable.Search.Application` | Shared csproj | Services, `HeaderType`, keyed factories/dispatcher, DTOs, params, validators. |
 | `Concertable.Search.Domain` | Shared csproj | Read-model + rating-projection entities. Depends only on `Concertable.Kernel`. |
 | `Concertable.Search.Infrastructure` | Shared csproj | `SearchDbContext`, EF configs, migrations, event handlers, repositories, geo specs. |
+| `Concertable.Search.Migrations` | Console job | Applies Search projection and pinned messaging inbox migrations to `SearchDb`, then exits. |
 | `Concertable.Search.AppHost` | Aspire AppHost | Local-dev orchestrator only. |
 
-**Database:** `SearchDb` (SQL Server), schema `search` — table names in `Infrastructure/Schema.cs`. Workers always migrates `SearchDbContext` + the messaging `InboxDbContext` on startup (app-lock guarded); Web migrates `SearchDbContext` only when not Production.
+**Database:** `SearchDb` (SQL Server), schema `search` — table names in `Infrastructure/Schema.cs`. The
+idempotent migration job owns both `SearchDbContext` and the pinned messaging `InboxDbContext` migrations.
+The Workers host still migrates both on startup, and Web migrates `SearchDbContext` when not Production, until the
+standalone and deployment topologies invoke the job before starting either runtime.
 
 ---
 
