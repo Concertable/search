@@ -59,20 +59,21 @@ internal sealed class CommaDelimitedGenreArrayModelBinder : IModelBinder
             return Task.CompletedTask;
         }
 
-        try
-        {
-            var result = value
-                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .Select(s => int.TryParse(s, out var i) ? (Genre)i : Enum.Parse<Genre>(s))
-                .ToArray();
+        var tokens = value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var result = new Genre[tokens.Length];
 
-            bindingContext.Result = ModelBindingResult.Success(result);
-        }
-        catch (Exception)
+        for (var i = 0; i < tokens.Length; i++)
         {
-            bindingContext.ModelState.AddModelError(bindingContext.ModelName, "Invalid genre value in comma-delimited list.");
+            if (!Enum.TryParse(tokens[i], ignoreCase: true, out Genre genre) || !Enum.IsDefined(genre))
+            {
+                bindingContext.ModelState.AddModelError(bindingContext.ModelName, "Invalid genre value in comma-delimited list.");
+                return Task.CompletedTask;
+            }
+
+            result[i] = genre;
         }
 
+        bindingContext.Result = ModelBindingResult.Success(result);
         return Task.CompletedTask;
     }
 }
