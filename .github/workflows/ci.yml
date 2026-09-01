@@ -52,10 +52,16 @@ jobs:
       - name: Pack Search Hosting
         run: dotnet pack src/Concertable.Search.Hosting/Concertable.Search.Hosting.csproj --configuration Release --output artifacts/packages
 
+      - name: Pack Search TestKit
+        run: dotnet pack src/Concertable.Search.TestKit/Concertable.Search.TestKit.csproj --configuration Release --output artifacts/packages -p:MinVerVersionOverride=0.0.0-ci.${{ github.run_number }}
+
+      - name: Verify Search TestKit package consumer
+        run: dotnet build tests/PackageConsumers/Concertable.Search.TestKit.Consumer/Concertable.Search.TestKit.Consumer.csproj --configuration Release -p:TestKitPackageVersion=0.0.0-ci.${{ github.run_number }}
+
       - name: Upload package candidate
         uses: actions/upload-artifact@v4
         with:
-          name: search-hosting-${{ github.sha }}
+          name: search-packages-${{ github.sha }}
           path: artifacts/packages/*.nupkg
           if-no-files-found: error
           retention-days: 7
