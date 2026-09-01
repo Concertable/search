@@ -1,4 +1,6 @@
 using System.Net;
+using System.Text.Json;
+using Concertable.Contracts.Enums;
 using Concertable.Search.Application.DTOs;
 using Xunit.Abstractions;
 
@@ -177,6 +179,56 @@ public sealed class HeaderApiTests : IAsyncLifetime
         Assert.NotNull(result);
         Assert.Equal(expected.Count, result.TotalCount);
         Assert.All(result.Data, h => Assert.Contains(h.Name, expected));
+    }
+
+    public static IEnumerable<object[]> AllGenres() =>
+        Enum.GetValues<Genre>().Select(g => new object[] { g });
+
+    [Theory]
+    [MemberData(nameof(AllGenres))]
+    public async Task Search_ShouldReturnTheSameResults_WhateverTheCaseOfTheGenreWireValue(Genre genre)
+    {
+        var client = fixture.CreateClient();
+        var declaredName = genre.ToString();
+        var wireValue = JsonNamingPolicy.CamelCase.ConvertName(declaredName);
+
+        var fromDeclaredName = await client.GetAsync($"/api/Header?headerType=Artist&genres={declaredName}");
+        var fromWireValue = await client.GetAsync($"/api/Header?headerType=Artist&genres={wireValue}");
+
+        await fromDeclaredName.ShouldBe(HttpStatusCode.OK);
+        await fromWireValue.ShouldBe(HttpStatusCode.OK);
+        var declaredResult = await fromDeclaredName.Content.ReadAsync<PaginationResponse<ArtistHeader>>();
+        var wireResult = await fromWireValue.Content.ReadAsync<PaginationResponse<ArtistHeader>>();
+        Assert.NotNull(declaredResult);
+        Assert.NotNull(wireResult);
+        Assert.Equal(declaredResult.TotalCount, wireResult.TotalCount);
+        Assert.Equal(declaredResult.Data.Select(h => h.Name), wireResult.Data.Select(h => h.Name));
+    }
+
+    [Theory]
+    [InlineData("artist")]
+    [InlineData("Artist")]
+    [InlineData("ARTIST")]
+    public async Task Search_ShouldReturn200_WhateverTheCaseOfTheHeaderTypeWireValue(string headerType)
+    {
+        var client = fixture.CreateClient();
+
+        var response = await client.GetAsync($"/api/Header?headerType={headerType}");
+
+        await response.ShouldBe(HttpStatusCode.OK);
+    }
+
+    [Theory]
+    [InlineData("notagenre")]
+    [InlineData("9999")]
+    [InlineData("Rock,notagenre")]
+    public async Task Search_ShouldReturn400_WhenGenreIsNotADefinedValue(string genres)
+    {
+        var client = fixture.CreateClient();
+
+        var response = await client.GetAsync($"/api/Header?headerType=Artist&genres={genres}");
+
+        await response.ShouldBe(HttpStatusCode.BadRequest);
     }
 
     #endregion
