@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Concertable.Search.Migrations;
 
-public static class SearchMigrationJob
+internal static class SearchMigrationJob
 {
     public static async Task RunAsync(
         string connectionString,
