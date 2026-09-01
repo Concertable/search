@@ -6,6 +6,7 @@
   <Project Path="src/Concertable.Search.Application/Concertable.Search.Application.csproj" />
   <Project Path="src/Concertable.Search.Domain/Concertable.Search.Domain.csproj" />
   <Project Path="src/Concertable.Search.Infrastructure/Concertable.Search.Infrastructure.csproj" />
+  <Project Path="src/Concertable.Search.Migrations/Concertable.Search.Migrations.csproj" />
   <Folder Name="/Seed/">
     <Project Path="src/Seed/Concertable.Search.Seed.Infrastructure/Concertable.Search.Seed.Infrastructure.csproj" />
   </Folder>
