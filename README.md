@@ -26,13 +26,16 @@ export GITHUB_PACKAGES_TOKEN=<your read:packages PAT>
 dotnet build src/Concertable.Search.Web/Concertable.Search.Web.csproj --configuration Release
 dotnet build src/Concertable.Search.Workers/Concertable.Search.Workers.csproj --configuration Release
 dotnet publish src/Concertable.Search.Migrations/Concertable.Search.Migrations.csproj --configuration Release
+dotnet pack src/Concertable.Search.TestKit/Concertable.Search.TestKit.csproj --configuration Release --output artifacts/packages -p:MinVerVersionOverride=0.0.0-local
+dotnet build tests/PackageConsumers/Concertable.Search.TestKit.Consumer/Concertable.Search.TestKit.Consumer.csproj --configuration Release -p:TestKitPackageVersion=0.0.0-local
 dotnet test tests/Concertable.Search.UnitTests/Concertable.Search.UnitTests.csproj --configuration Release
 dotnet test tests/Concertable.Search.IntegrationTests/Concertable.Search.IntegrationTests.csproj --configuration Release
 ```
 
 The integration suite requires Docker. The repository CI supplies its `GITHUB_TOKEN` through
-`GITHUB_PACKAGES_TOKEN`, runs these same five gates, packs the unpublished Hosting candidate, and retains
-both preparation artifacts for seven days. The source-coupled AppHost,
+`GITHUB_PACKAGES_TOKEN`, runs these repository gates, packs the unpublished Hosting and TestKit candidates,
+verifies the TestKit through an installed-package consumer, and retains preparation artifacts for seven days.
+The source-coupled AppHost,
 ArchitectureTests, and inherited full-stack E2E helper are intentionally outside this preparation
 slice until their RT3 and Stage 4 seams are available.
 
