@@ -1,0 +1,9 @@
+.git
+.github
+.vs
+artifacts
+reviews
+tests
+**/bin
+**/obj
+**/*.user
