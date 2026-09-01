@@ -31,6 +31,15 @@ jobs:
         with:
           dotnet-version: 10.x
 
+      - name: Build Search Web container
+        run: docker build --target search-web --build-arg BUILD_VERSION=0.0.0-ci.${{ github.run_number }} --secret id=GITHUB_PACKAGES_TOKEN,env=GITHUB_PACKAGES_TOKEN --tag concertable-search-web:${{ github.sha }} .
+
+      - name: Build Search Workers container
+        run: docker build --target search-workers --build-arg BUILD_VERSION=0.0.0-ci.${{ github.run_number }} --secret id=GITHUB_PACKAGES_TOKEN,env=GITHUB_PACKAGES_TOKEN --tag concertable-search-workers:${{ github.sha }} .
+
+      - name: Build Search migration container
+        run: docker build --target search-migrations --build-arg BUILD_VERSION=0.0.0-ci.${{ github.run_number }} --secret id=GITHUB_PACKAGES_TOKEN,env=GITHUB_PACKAGES_TOKEN --tag concertable-search-migrations:${{ github.sha }} .
+
       - name: Build Search Web
         run: dotnet build src/Concertable.Search.Web/Concertable.Search.Web.csproj --configuration Release
 
