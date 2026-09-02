@@ -108,8 +108,14 @@ public static class Consumer
         IResourceBuilder<SqlServerDatabaseResource> searchDb,
         IResourceBuilder<AzureServiceBusResource> serviceBus)
     {
-        builder.AddSearchWeb("ghcr.io/concertable/search-web", "sha256:placeholder", auth, searchDb);
-        builder.AddSearchWorkers("ghcr.io/concertable/search-workers", "sha256:placeholder", searchDb, serviceBus);
+        var migrations = builder.AddSearchMigrations(
+            "ghcr.io/concertable/search-migrations",
+            "sha256:placeholder",
+            searchDb);
+        builder.AddSearchWeb("ghcr.io/concertable/search-web", "sha256:placeholder", auth, searchDb)
+               .WaitForCompletion(migrations);
+        builder.AddSearchWorkers("ghcr.io/concertable/search-workers", "sha256:placeholder", searchDb, serviceBus)
+               .WaitForCompletion(migrations);
     }
 }
 '@)
