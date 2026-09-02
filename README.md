@@ -23,21 +23,21 @@ them needs a GitHub [personal access token](https://github.com/settings/tokens) 
 
 ```sh
 export GITHUB_PACKAGES_TOKEN=<your read:packages PAT>
-dotnet build src/Concertable.Search.Web/Concertable.Search.Web.csproj --configuration Release
-dotnet build src/Concertable.Search.Workers/Concertable.Search.Workers.csproj --configuration Release
+dotnet restore Concertable.Search.slnx
+dotnet build Concertable.Search.slnx --configuration Release --no-restore
 dotnet publish src/Concertable.Search.Migrations/Concertable.Search.Migrations.csproj --configuration Release
+dotnet pack src/Concertable.Search.Hosting/Concertable.Search.Hosting.csproj --configuration Release --output artifacts/packages -p:MinVerVersionOverride=0.0.0-local
 dotnet pack src/Concertable.Search.TestKit/Concertable.Search.TestKit.csproj --configuration Release --output artifacts/packages -p:MinVerVersionOverride=0.0.0-local
-dotnet build tests/PackageConsumers/Concertable.Search.TestKit.Consumer/Concertable.Search.TestKit.Consumer.csproj --configuration Release -p:TestKitPackageVersion=0.0.0-local
-dotnet test tests/Concertable.Search.UnitTests/Concertable.Search.UnitTests.csproj --configuration Release
-dotnet test tests/Concertable.Search.IntegrationTests/Concertable.Search.IntegrationTests.csproj --configuration Release
+pwsh ./scripts/verify-package-candidates.ps1 -PackageDirectory artifacts/packages
+dotnet test Concertable.Search.slnx --configuration Release --no-build --no-restore -m:1
 ```
 
 The integration suite requires Docker. The repository CI supplies its `GITHUB_TOKEN` through
 `GITHUB_PACKAGES_TOKEN`, runs these repository gates, packs the unpublished Hosting and TestKit candidates,
-verifies the TestKit through an installed-package consumer, and retains preparation artifacts for seven days.
-The source-coupled AppHost,
-ArchitectureTests, and inherited full-stack E2E helper are intentionally outside this preparation
-slice until their RT3 and Stage 4 seams are available.
+verifies both through one clean installed-package consumer, builds the standalone AppHost, runs its
+architecture coverage, and retains preparation artifacts for seven days. The standalone host runs Search
+from source, consumes Auth and the B2B seed simulator as digest-pinned images, and does not provision a
+foreign data-service database. The inherited full-stack E2E helper remains system-owned and excluded.
 
 ## Building container candidates
 
