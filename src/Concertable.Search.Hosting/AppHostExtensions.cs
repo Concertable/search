@@ -9,6 +9,25 @@ public static class AppHostExtensions
 {
     extension(IDistributedApplicationBuilder builder)
     {
+        public IResourceBuilder<ServiceContainerResource> AddSearchMigrations(
+            string image,
+            string digest,
+            IResourceBuilder<SqlServerDatabaseResource> searchDb)
+        {
+            return builder.AddContainerImage(SearchConstants.MigrationsResource, image, digest)
+                          .WithReference(searchDb)
+                          .WaitFor(searchDb);
+        }
+
+        public IResourceBuilder<ProjectResource> AddSearchMigrations<TProject>(
+            IResourceBuilder<SqlServerDatabaseResource> searchDb)
+            where TProject : IProjectMetadata, new()
+        {
+            return builder.AddProject<TProject>(SearchConstants.MigrationsResource)
+                          .WithReference(searchDb)
+                          .WaitFor(searchDb);
+        }
+
         public IResourceBuilder<ServiceContainerResource> AddSearchWeb(
             string image,
             string digest,
