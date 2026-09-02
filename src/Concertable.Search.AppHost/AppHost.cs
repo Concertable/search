@@ -26,9 +26,10 @@ public static class AppHost
         var migrations = builder.AddSearchMigrations<Projects.Concertable_Search_Migrations>(searchDb);
         builder.AddSearchWeb<Projects.Concertable_Search_Web>(auth, searchDb)
                .WaitForCompletion(migrations);
-        builder.AddSearchWorkers<Projects.Concertable_Search_Workers>(searchDb, asb)
-               .WaitForCompletion(migrations);
-        builder.AddB2BSeedingSimulator(B2BSeedingSimulatorImage, B2BSeedingSimulatorDigest, asb);
+        var workers = builder.AddSearchWorkers<Projects.Concertable_Search_Workers>(searchDb, asb)
+                             .WaitForCompletion(migrations);
+        builder.AddB2BSeedingSimulator(B2BSeedingSimulatorImage, B2BSeedingSimulatorDigest, asb)
+               .WaitFor(workers);
         return builder;
     }
 }
