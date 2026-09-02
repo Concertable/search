@@ -23,8 +23,11 @@ public static class AppHost
                           .WithHttpsEndpoint(targetPort: AuthConstants.ContainerPort, name: "https");
         auth.WithSpaClients([]);
         auth.WithEnvironment("ServiceAuth__AuthClientId", "concertable-auth");
-        builder.AddSearchWeb<Projects.Concertable_Search_Web>(auth, searchDb);
-        builder.AddSearchWorkers<Projects.Concertable_Search_Workers>(searchDb, asb);
+        var migrations = builder.AddSearchMigrations<Projects.Concertable_Search_Migrations>(searchDb);
+        builder.AddSearchWeb<Projects.Concertable_Search_Web>(auth, searchDb)
+               .WaitForCompletion(migrations);
+        builder.AddSearchWorkers<Projects.Concertable_Search_Workers>(searchDb, asb)
+               .WaitForCompletion(migrations);
         builder.AddB2BSeedingSimulator(B2BSeedingSimulatorImage, B2BSeedingSimulatorDigest, asb);
         return builder;
     }
