@@ -61,6 +61,8 @@ public sealed class SeedConvergenceTests
             using var httpClient = app.CreateHttpClient(SearchConstants.WebResource);
             var search = new SearchTestClient(httpClient);
             var seed = new SeedCatalog(TimeProvider.System);
+            var observableConcert = seed.Concerts.First(concert =>
+                concert.DatePosted is not null && concert.Period.End > seed.Now);
 
             await AssertProjectionAsync(
                 search,
@@ -77,8 +79,8 @@ public sealed class SeedConvergenceTests
             await AssertProjectionAsync(
                 search,
                 SearchProjectionType.Concert,
-                seed.Concerts[0].ConcertId,
-                seed.Concerts[0].Name,
+                observableConcert.ConcertId,
+                observableConcert.Name,
                 startupTimeout.Token);
         }
         catch
