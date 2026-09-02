@@ -19,32 +19,97 @@ jobs:
   ci-complete:
     name: ci-complete
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     env:
-      GITHUB_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       TESTCONTAINERS_RYUK_DISABLED: "true"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Scan source for secrets
+        run: >-
+          docker run --rm
+          --volume '${{ github.workspace }}:/work:ro'
+          --volume '${{ runner.temp }}/trivy-cache:/root/.cache/trivy'
+          aquasec/trivy:0.74.0@sha256:62b1e65e8869bc4b4c6aa4fa2b21595256c7c2f6018a9d9ad61caf87187c1969
+          filesystem --scanners secret --exit-code 1 --no-progress /work
 
       - name: Set up .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
         with:
           dotnet-version: 10.x
 
       - name: Restore Search solution
+        env:
+          GITHUB_PACKAGES_TOKEN: ${{ github.token }}
         run: dotnet restore Concertable.Search.slnx
 
       - name: Build Search solution
         run: dotnet build Concertable.Search.slnx --configuration Release --no-restore
 
-      - name: Build Search Web container
-        run: docker build --target search-web --build-arg BUILD_VERSION=0.0.0-ci.${{ github.run_number }} --secret id=GITHUB_PACKAGES_TOKEN,env=GITHUB_PACKAGES_TOKEN --tag concertable-search-web:${{ github.sha }} .
+      - name: Build and inspect Search images without publishing
+        shell: pwsh
+        env:
+          GITHUB_PACKAGES_TOKEN: ${{ github.token }}
+        run: >-
+          ./scripts/verify-search-images.ps1
+          -WebImage 'concertable/search-web:verification-${{ github.sha }}'
+          -WorkersImage 'concertable/search-workers:verification-${{ github.sha }}'
+          -MigrationsImage 'concertable/search-migrations:verification-${{ github.sha }}'
+          -BuildVersion '0.0.0-ci.${{ github.run_number }}'
+          -KeepImages
 
-      - name: Build Search Workers container
-        run: docker build --target search-workers --build-arg BUILD_VERSION=0.0.0-ci.${{ github.run_number }} --secret id=GITHUB_PACKAGES_TOKEN,env=GITHUB_PACKAGES_TOKEN --tag concertable-search-workers:${{ github.sha }} .
+      - name: Scan Search image vulnerabilities and secrets
+        shell: pwsh
+        run: |
+          foreach ($image in @(
+            'concertable/search-web:verification-${{ github.sha }}',
+            'concertable/search-workers:verification-${{ github.sha }}',
+            'concertable/search-migrations:verification-${{ github.sha }}'
+          )) {
+            foreach ($scanner in @(
+              @{ Name = 'vulnerabilities'; Arguments = @('--scanners', 'vuln', '--severity', 'CRITICAL') },
+              @{ Name = 'secrets'; Arguments = @('--scanners', 'secret') }
+            )) {
+              $arguments = @(
+                'run', '--rm',
+                '--volume', '/var/run/docker.sock:/var/run/docker.sock',
+                '--volume', '${{ runner.temp }}/trivy-cache:/root/.cache/trivy',
+                'aquasec/trivy:0.74.0@sha256:62b1e65e8869bc4b4c6aa4fa2b21595256c7c2f6018a9d9ad61caf87187c1969',
+                'image'
+              ) + $scanner.Arguments + @('--exit-code', '1', '--no-progress', $image)
+              & docker @arguments
+              if ($LASTEXITCODE -ne 0) {
+                throw "Search image $($scanner.Name) scan failed for '$image'."
+              }
+            }
+          }
 
-      - name: Build Search migration container
-        run: docker build --target search-migrations --build-arg BUILD_VERSION=0.0.0-ci.${{ github.run_number }} --secret id=GITHUB_PACKAGES_TOKEN,env=GITHUB_PACKAGES_TOKEN --tag concertable-search-migrations:${{ github.sha }} .
+      - name: Generate and verify Search image SBOMs
+        shell: pwsh
+        run: |
+          $evidence = '${{ runner.temp }}/search-image-evidence'
+          New-Item -ItemType Directory -Path $evidence | Out-Null
+          foreach ($item in @(
+            @{ Image = 'concertable/search-web:verification-${{ github.sha }}'; File = 'search-web.cdx.json' },
+            @{ Image = 'concertable/search-workers:verification-${{ github.sha }}'; File = 'search-workers.cdx.json' },
+            @{ Image = 'concertable/search-migrations:verification-${{ github.sha }}'; File = 'search-migrations.cdx.json' }
+          )) {
+            docker run --rm `
+              --volume /var/run/docker.sock:/var/run/docker.sock `
+              --volume "${evidence}:/evidence" `
+              aquasec/trivy:0.74.0@sha256:62b1e65e8869bc4b4c6aa4fa2b21595256c7c2f6018a9d9ad61caf87187c1969 `
+              image --format cyclonedx --output "/evidence/$($item.File)" $item.Image
+            if ($LASTEXITCODE -ne 0) {
+              throw "SBOM generation failed for $($item.Image)."
+            }
+
+            $sbom = Get-Content -Raw -LiteralPath (Join-Path $evidence $item.File) | ConvertFrom-Json
+            if ($sbom.bomFormat -ne 'CycloneDX' -or @($sbom.components).Count -eq 0) {
+              throw "SBOM validation failed for $($item.Image)."
+            }
+          }
 
       - name: Publish Search migration job
         run: dotnet publish src/Concertable.Search.Migrations/Concertable.Search.Migrations.csproj --configuration Release --no-restore --output artifacts/migrations
@@ -57,13 +122,15 @@ jobs:
 
       - name: Verify package candidates from a clean consumer
         shell: pwsh
+        env:
+          GITHUB_PACKAGES_TOKEN: ${{ github.token }}
         run: ./scripts/verify-package-candidates.ps1 -PackageDirectory artifacts/packages
 
       - name: Log in to GHCR for standalone dependency images
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io --username "${{ github.actor }}" --password-stdin
 
       - name: Upload package candidate
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: search-packages-${{ github.sha }}
           path: artifacts/packages/*.nupkg
@@ -71,7 +138,7 @@ jobs:
           retention-days: 7
 
       - name: Upload migration job candidate
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: search-migrations-${{ github.sha }}
           path: artifacts/migrations/**
@@ -80,3 +147,26 @@ jobs:
 
       - name: Test Search solution
         run: dotnet test Concertable.Search.slnx --configuration Release --no-build --no-restore -m:1
+
+      - name: Clean Search image verification artifacts
+        if: always()
+        shell: pwsh
+        run: |
+          foreach ($image in @(
+            'concertable/search-web:verification-${{ github.sha }}',
+            'concertable/search-workers:verification-${{ github.sha }}',
+            'concertable/search-migrations:verification-${{ github.sha }}'
+          )) {
+            $inspection = docker image inspect $image 2>$null | ConvertFrom-Json
+            if ($LASTEXITCODE -eq 0) {
+              if ($inspection[0].Config.Labels.'org.opencontainers.image.source' -ne 'https://github.com/Concertable/search' -or
+                  $inspection[0].Config.Labels.'org.opencontainers.image.revision' -ne '${{ github.sha }}') {
+                throw "Refusing to remove image '$image' because it is not owned by this Search revision."
+              }
+              docker image rm --force $image
+              if ($LASTEXITCODE -ne 0) {
+                throw "Could not remove verification image '$image'."
+              }
+            }
+          }
+          Remove-Item -LiteralPath '${{ runner.temp }}/search-image-evidence' -Recurse -Force -ErrorAction SilentlyContinue

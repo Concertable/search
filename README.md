@@ -45,15 +45,20 @@ system-owned and excluded.
 
 ## Building container candidates
 
-The repository Dockerfile has separate non-root targets for Web, Workers, and the migration job. Package
-credentials are exposed only to the restore instruction as a BuildKit secret and are not stored in an image
-or build argument:
+The repository Dockerfile uses digest-pinned build and runtime bases and has separate non-root targets for
+Web, Workers, and the migration job. Each target records the canonical source repository, exact revision,
+and candidate version as OCI metadata. Package credentials are exposed only to the restore instruction as
+a BuildKit secret and are not stored in an image or build argument.
+
+Use the repository verifier to build and inspect all three local candidates. It refuses to overwrite existing
+tags, checks their runtime contract and metadata, checks that the package credential was not retained, runs
+runtime smoke checks, and removes only images labelled as owned by that verification run:
 
 ```sh
-docker build --target search-web --build-arg BUILD_VERSION=0.0.0-local --secret id=GITHUB_PACKAGES_TOKEN,env=GITHUB_PACKAGES_TOKEN -t concertable-search-web:local .
-docker build --target search-workers --build-arg BUILD_VERSION=0.0.0-local --secret id=GITHUB_PACKAGES_TOKEN,env=GITHUB_PACKAGES_TOKEN -t concertable-search-workers:local .
-docker build --target search-migrations --build-arg BUILD_VERSION=0.0.0-local --secret id=GITHUB_PACKAGES_TOKEN,env=GITHUB_PACKAGES_TOKEN -t concertable-search-migrations:local .
+pwsh ./scripts/verify-search-images.ps1 -BuildVersion 0.0.0-local
 ```
 
-These commands build local candidates only. Publication, canonical tags, and visibility changes remain part
-of the later approved cutover.
+CI also scans the source and local images for secrets, blocks critical image vulnerabilities, and validates a
+CycloneDX SBOM for every target. These checks build local candidates only. They do not push images, create
+canonical tags, or change package/image visibility; publication remains owned by the later organization-level
+cutover workflow.
