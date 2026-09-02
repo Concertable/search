@@ -1,6 +1,7 @@
 using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Testing;
+using Azure.Messaging.ServiceBus.Administration;
 using Concertable.Auth.Hosting;
 using Concertable.B2B.Hosting;
 using Concertable.B2B.Seed.Contracts;
@@ -85,6 +86,7 @@ public sealed class SeedConvergenceTests
             try
             {
                 await WriteDiagnosticsAsync(app);
+                await WriteServiceBusDiagnosticsAsync(app);
             }
             catch (Exception diagnosticsException)
             {
@@ -133,6 +135,62 @@ public sealed class SeedConvergenceTests
             {
                 foreach (var line in batch)
                     output.WriteLine("Resources.{0}: {1}", resourceName, line.Content);
+            }
+        }
+    }
+
+    private async Task WriteServiceBusDiagnosticsAsync(DistributedApplication app)
+    {
+        var connectionString = await app.GetConnectionStringAsync("asb").ConfigureAwait(false);
+        if (string.IsNullOrWhiteSpace(connectionString))
+        {
+            output.WriteLine("Service Bus diagnostics unavailable: connection string was not resolved.");
+            return;
+        }
+
+        var managementEndpoint = app.GetEndpoint("asb", "emulatorhealth");
+        var administrationEndpoint = new UriBuilder(managementEndpoint)
+        {
+            Scheme = "sb",
+            Path = string.Empty
+        }.Uri.GetLeftPart(UriPartial.Authority);
+        var administrationConnectionString = string.Join(
+            ';',
+            connectionString.Split(';').Select(part =>
+                part.StartsWith("Endpoint=", StringComparison.OrdinalIgnoreCase)
+                    ? $"Endpoint={administrationEndpoint}"
+                    : part));
+        using var diagnosticsTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+        var administration = new ServiceBusAdministrationClient(administrationConnectionString);
+        await foreach (var topic in administration
+                           .GetTopicsAsync(diagnosticsTimeout.Token)
+                           .ConfigureAwait(false))
+        {
+            await foreach (var subscription in administration
+                               .GetSubscriptionsAsync(topic.Name, diagnosticsTimeout.Token)
+                               .ConfigureAwait(false))
+            {
+                if (!string.Equals(
+                        subscription.SubscriptionName,
+                        SearchConstants.ServiceName,
+                        StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                var response = await administration.GetSubscriptionRuntimePropertiesAsync(
+                    topic.Name,
+                    subscription.SubscriptionName,
+                    diagnosticsTimeout.Token).ConfigureAwait(false);
+                var properties = response.Value;
+                output.WriteLine(
+                    "Service Bus {0}/{1}: active={2}, deadLetter={3}, total={4}, transferDeadLetter={5}",
+                    properties.TopicName,
+                    properties.SubscriptionName,
+                    properties.ActiveMessageCount,
+                    properties.DeadLetterMessageCount,
+                    properties.TotalMessageCount,
+                    properties.TransferDeadLetterMessageCount);
             }
         }
     }
