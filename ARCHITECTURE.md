@@ -29,8 +29,8 @@ Search does **not** serve entity-details pages — those are the frozen public w
 
 **Database:** `SearchDb` (SQL Server), schema `search` — table names in `Infrastructure/Schema.cs`. The
 idempotent migration job owns both `SearchDbContext` and the pinned messaging `InboxDbContext` migrations.
-The Workers host still migrates both on startup, and Web migrates `SearchDbContext` when not Production, until the
-standalone and deployment topologies invoke the job before starting either runtime.
+The standalone AppHost invokes that job and waits for its successful completion before starting Web or Workers.
+Runtime hosts never apply schema changes themselves; deployment composition must enforce the same ordering.
 
 ---
 

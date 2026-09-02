@@ -37,7 +37,9 @@ The integration suite requires Docker. The repository CI supplies its `GITHUB_TO
 verifies both through one clean installed-package consumer, builds the standalone AppHost, runs its
 architecture coverage, and retains preparation artifacts for seven days. The standalone host runs Search
 from source, consumes Auth and the B2B seed simulator as digest-pinned images, and does not provision a
-foreign data-service database. The inherited full-stack E2E helper remains system-owned and excluded.
+foreign data-service database. It runs the Search migration job to successful completion before starting Web
+or Workers; those runtime hosts never modify schema. The inherited full-stack E2E helper remains system-owned
+and excluded.
 
 ## Building container candidates
 
