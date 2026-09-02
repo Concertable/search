@@ -12,6 +12,7 @@
     <PackageReference Include="Aspire.Hosting.Testing" />
     <PackageReference Include="Azure.Messaging.ServiceBus" />
     <PackageReference Include="Concertable.B2B.Seed.Contracts" />
+    <PackageReference Include="Microsoft.Data.SqlClient" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio" />
