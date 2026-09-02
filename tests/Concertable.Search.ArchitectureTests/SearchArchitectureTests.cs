@@ -75,10 +75,28 @@ public sealed class SearchArchitectureTests
         AssertImage(validBuilder, B2BConstants.SeedingSimulatorResource,
             "a232e5f6a111e3c81479c53cc79d49c54a0bf18c4dcb75a2cbaa7bf3ec1a0957");
         AssertImageEndpoint(validBuilder, AuthConstants.Resource, "https");
+        var migrations = Assert.IsType<ProjectResource>(validBuilder.Resources.Single(resource =>
+            string.Equals(resource.Name, SearchConstants.MigrationsResource, StringComparison.Ordinal)));
+        Assert.NotEmpty(migrations.Annotations.OfType<EnvironmentCallbackAnnotation>());
+        AssertWaitsFor(
+            validBuilder,
+            SearchConstants.MigrationsResource,
+            SearchConstants.Database,
+            WaitType.WaitUntilHealthy);
         Assert.IsType<ProjectResource>(validBuilder.Resources.Single(resource =>
             string.Equals(resource.Name, SearchConstants.WebResource, StringComparison.Ordinal)));
         Assert.IsType<ProjectResource>(validBuilder.Resources.Single(resource =>
             string.Equals(resource.Name, SearchConstants.WorkersResource, StringComparison.Ordinal)));
+        AssertWaitsFor(
+            validBuilder,
+            SearchConstants.WebResource,
+            SearchConstants.MigrationsResource,
+            WaitType.WaitForCompletion);
+        AssertWaitsFor(
+            validBuilder,
+            SearchConstants.WorkersResource,
+            SearchConstants.MigrationsResource,
+            WaitType.WaitForCompletion);
         Assert.DoesNotContain(validBuilder.Resources,
             resource => string.Equals(resource.Name, B2BConstants.Database, StringComparison.Ordinal));
         using var app = validBuilder.Build();
@@ -114,5 +132,27 @@ public sealed class SearchArchitectureTests
 
         Assert.Equal("http", endpoint.UriScheme);
         Assert.Equal(8080, endpoint.TargetPort);
+    }
+
+    private static void AssertWaitsFor(
+        IDistributedApplicationBuilder builder,
+        string resourceName,
+        string dependencyName,
+        WaitType waitType)
+    {
+        var resource = builder.Resources.Single(candidate =>
+            string.Equals(candidate.Name, resourceName, StringComparison.Ordinal));
+        var wait = Assert.Single(
+            resource.Annotations.OfType<WaitAnnotation>(),
+            annotation => string.Equals(
+                annotation.Resource.Name,
+                dependencyName,
+                StringComparison.Ordinal));
+
+        Assert.Equal(waitType, wait.WaitType);
+        if (waitType == WaitType.WaitForCompletion)
+        {
+            Assert.Equal(0, wait.ExitCode);
+        }
     }
 }

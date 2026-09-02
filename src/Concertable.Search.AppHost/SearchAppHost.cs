@@ -21,8 +21,11 @@ public static class SearchAppHost
         var auth = builder.AddAuth(AuthImage, AuthDigest, authDb, asb)
                           .WithHttpEndpoint(targetPort: 8080, name: "https");
         auth.WithEnvironment("ServiceAuth__AuthClientId", "concertable-auth");
-        builder.AddSearchWeb<Projects.Concertable_Search_Web>(auth, searchDb);
-        builder.AddSearchWorkers<Projects.Concertable_Search_Workers>(searchDb, asb);
+        var migrations = builder.AddSearchMigrations<Projects.Concertable_Search_Migrations>(searchDb);
+        builder.AddSearchWeb<Projects.Concertable_Search_Web>(auth, searchDb)
+               .WaitForCompletion(migrations);
+        builder.AddSearchWorkers<Projects.Concertable_Search_Workers>(searchDb, asb)
+               .WaitForCompletion(migrations);
         builder.AddB2BSeedingSimulator(B2BSeedingSimulatorImage, B2BSeedingSimulatorDigest, asb);
         return builder;
     }
