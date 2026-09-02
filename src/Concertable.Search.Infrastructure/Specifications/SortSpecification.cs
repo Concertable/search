@@ -1,13 +1,17 @@
+using Concertable.Kernel;
+using Concertable.Kernel.Specifications;
+using Concertable.Search.Application.Params;
+
 namespace Concertable.Search.Infrastructure.Specifications;
 
-internal sealed class SortSpecification<T> : ISortSpecification<T>
-    where T : class, IIdEntity, IHasName
+internal sealed class SortSpecification<TEntity> : ISortSpecification<TEntity>
+    where TEntity : class, IIdEntity, IHasName
 {
-    public IQueryable<T> Apply(IQueryable<T> query, Sort? sort) =>
-        sort switch
+    public IReadOnlyList<SpecificationOrder<TEntity>> ToOrders(Sort? @params) =>
+        @params switch
         {
-            { Field: SortField.Name, Direction: SortDirection.Asc } => query.OrderBy(e => e.Name),
-            { Field: SortField.Name, Direction: SortDirection.Desc } => query.OrderByDescending(e => e.Name),
-            _ => query.OrderBy(e => e.Id)
+            { Field: SortField.Name, Direction: SortDirection.Asc } => [SpecificationOrder<TEntity>.Create(entity => entity.Name, SpecificationOrderDirection.Ascending)],
+            { Field: SortField.Name, Direction: SortDirection.Desc } => [SpecificationOrder<TEntity>.Create(entity => entity.Name, SpecificationOrderDirection.Descending)],
+            _ => [SpecificationOrder<TEntity>.Create(entity => entity.Id, SpecificationOrderDirection.Ascending)]
         };
 }
