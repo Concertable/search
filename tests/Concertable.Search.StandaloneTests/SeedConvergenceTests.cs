@@ -82,7 +82,15 @@ public sealed class SeedConvergenceTests
         }
         catch
         {
-            await WriteDiagnosticsAsync(app);
+            try
+            {
+                await WriteDiagnosticsAsync(app);
+            }
+            catch (Exception diagnosticsException)
+            {
+                Console.Error.WriteLine($"Unable to collect standalone resource diagnostics: {diagnosticsException}");
+            }
+
             throw;
         }
     }
