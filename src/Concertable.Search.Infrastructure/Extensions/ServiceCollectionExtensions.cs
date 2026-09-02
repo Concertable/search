@@ -11,6 +11,7 @@ using Concertable.Search.Infrastructure.Data;
 using Concertable.Search.Infrastructure.Handlers;
 using Concertable.Search.Infrastructure.Repositories;
 using Concertable.Search.Application.Services;
+using Concertable.Search.Infrastructure.Queries;
 using Concertable.Search.Infrastructure.Specifications;
 using Concertable.B2B.Venue.Contracts.Events;
 using FluentValidation;
@@ -42,13 +43,23 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IGeometrySpecification<VenueReadModel>, GeometrySpecification<VenueReadModel>>();
         services.AddSingleton<IGeometrySpecification<ConcertReadModel>, GeometrySpecification<ConcertReadModel>>();
 
-        services.AddSingleton<ISearchSpecification<ArtistReadModel>, SearchSpecification<ArtistReadModel>>();
-        services.AddSingleton<ISearchSpecification<VenueReadModel>, SearchSpecification<VenueReadModel>>();
-        services.AddSingleton<ISearchSpecification<ConcertReadModel>, SearchSpecification<ConcertReadModel>>();
+        services.AddSingleton<IGenreSpecification<ArtistReadModel>>(
+            new GenreSpecification<ArtistReadModel>(artist => artist.ArtistGenres.Select(item => item.Genre)));
+        services.AddSingleton<IGenreSpecification<ConcertReadModel>>(
+            new GenreSpecification<ConcertReadModel>(concert => concert.ConcertGenres.Select(item => item.Genre)));
 
-        services.AddSingleton<IArtistSearchSpecification, ArtistSearchSpecification>();
-        services.AddSingleton<IVenueSearchSpecification, VenueSearchSpecification>();
+        services.AddSingleton<INameSpecification<ArtistReadModel>, SearchTermSpecification<ArtistReadModel>>();
+        services.AddSingleton<INameSpecification<VenueReadModel>, SearchTermSpecification<VenueReadModel>>();
+        services.AddSingleton<INameSpecification<ConcertReadModel>, SearchTermSpecification<ConcertReadModel>>();
+
+        services.AddSingleton<ISearchSpecification<ArtistReadModel>, SearchSpecification<ArtistReadModel>>();
+        services.AddSingleton<ISearchSpecification<VenueReadModel>, VenueSearchSpecification>();
+        services.AddSingleton<ISearchSpecification<ConcertReadModel>, SearchSpecification<ConcertReadModel>>();
         services.AddSingleton<IConcertSearchSpecification, ConcertSearchSpecification>();
+
+        services.AddSingleton<IArtistSearchQuery, ArtistSearchQuery>();
+        services.AddSingleton<IVenueSearchQuery, VenueSearchQuery>();
+        services.AddSingleton<IConcertSearchQuery, ConcertSearchQuery>();
 
         services.AddSingleton<ISortSpecification<ArtistReadModel>, SortSpecification<ArtistReadModel>>();
         services.AddSingleton<ISortSpecification<VenueReadModel>, SortSpecification<VenueReadModel>>();

@@ -2,7 +2,7 @@ using Concertable.Kernel;
 using Concertable.Kernel.Specifications;
 using Concertable.Search.Application.Params;
 
-namespace Concertable.Search.Application.Interfaces;
+namespace Concertable.Search.Infrastructure.Specifications;
 
-internal interface IGeometrySpecification<TEntity> : ISpecification<TEntity, IGeoParams>
+internal interface IGeometrySpecification<TEntity> : IPredicateSpecification<TEntity, IGeoParams>
     where TEntity : class, IIdEntity, IHasLocation;

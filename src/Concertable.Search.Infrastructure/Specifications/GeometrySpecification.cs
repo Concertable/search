@@ -1,12 +1,15 @@
-using Microsoft.Extensions.DependencyInjection;
-using Concertable.Search.Application.Params;
+using System.Linq.Expressions;
 using Concertable.Kernel;
 using Concertable.Kernel.Geometry;
 using Concertable.Kernel.Services.Geometry;
+using Concertable.Kernel.Specifications;
+using Concertable.Search.Application.Params;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Concertable.Search.Infrastructure.Specifications;
 
-internal sealed class GeometrySpecification<TEntity> : IGeometrySpecification<TEntity>
+internal sealed class GeometrySpecification<TEntity>
+    : PredicateSpecification<TEntity, IGeoParams>, IGeometrySpecification<TEntity>
     where TEntity : class, IIdEntity, IHasLocation
 {
     private readonly IGeometryProvider geometryProvider;
@@ -17,17 +20,17 @@ internal sealed class GeometrySpecification<TEntity> : IGeometrySpecification<TE
         this.geometryProvider = geometryProvider;
     }
 
-    public IQueryable<TEntity> Apply(IQueryable<TEntity> query, IGeoParams geoParams)
+    protected override Expression<Func<TEntity, bool>> Predicate(IGeoParams @params)
     {
-        if (!geoParams.HasValidCoordinates())
-            return query;
+        if (!@params.HasValidCoordinates())
+            return _ => true;
 
-        var center = geometryProvider.CreatePoint(geoParams.Latitude, geoParams.Longitude);
+        var center = this.geometryProvider.CreatePoint(@params.Latitude, @params.Longitude);
         if (center is null)
-            return query;
+            return _ => true;
 
-        var radiusMeters = (geoParams.RadiusKm ?? 10) * 1000;
+        var radiusMeters = (@params.RadiusKm ?? 10) * 1000;
 
-        return query.Where(e => e.Location.Distance(center) <= radiusMeters);
+        return entity => entity.Location.Distance(center) <= radiusMeters;
     }
 }

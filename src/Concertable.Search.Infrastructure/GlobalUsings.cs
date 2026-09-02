@@ -8,6 +8,7 @@ global using Concertable.Search.Application.Interfaces;
 global using Concertable.Search.Application.Params;
 global using Concertable.Search.Domain.ReadModels;
 global using Concertable.Search.Infrastructure.Mappers;
+global using Concertable.Search.Infrastructure.Queries;
 global using Concertable.Kernel.Identity;
 global using Concertable.Messaging;
 global using Concertable.Messaging.Domain;
