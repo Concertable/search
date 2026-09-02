@@ -8,6 +8,7 @@ using Concertable.B2B.Seed.Contracts;
 using Concertable.Search.Hosting;
 using Concertable.Search.TestKit;
 using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Concurrent;
 using System.Globalization;
 using Xunit.Abstractions;
 
@@ -15,6 +16,8 @@ namespace Concertable.Search.StandaloneTests;
 
 public sealed class SeedConvergenceTests
 {
+    private const int MaxCapturedLogLinesPerResource = 500;
+
     private static readonly IReadOnlyList<string> resourceNames =
     [
         "concertable-search-sql-data",
@@ -42,10 +45,22 @@ public sealed class SeedConvergenceTests
             .CreateAsync<Projects.Concertable_Search_AppHost>(startupTimeout.Token);
 
         await using var app = await builder.BuildAsync(startupTimeout.Token);
-        await app.StartAsync(startupTimeout.Token);
+        var resourceLogs = resourceNames.ToDictionary(
+            resourceName => resourceName,
+            _ => new ConcurrentQueue<string>(),
+            StringComparer.Ordinal);
+        using var logCaptureCancellation = new CancellationTokenSource();
+        var logCaptureTasks = resourceNames
+            .Select(resourceName => CaptureResourceLogsAsync(
+                app.Services.GetRequiredService<ResourceLoggerService>(),
+                resourceName,
+                resourceLogs[resourceName],
+                logCaptureCancellation.Token))
+            .ToArray();
 
         try
         {
+            await app.StartAsync(startupTimeout.Token);
             await app.ResourceNotifications.WaitForResourceHealthyAsync(
                 SearchConstants.WebResource,
                 startupTimeout.Token);
@@ -85,7 +100,7 @@ public sealed class SeedConvergenceTests
         {
             try
             {
-                await WriteDiagnosticsAsync(app);
+                WriteDiagnostics(app, resourceLogs);
                 await WriteServiceBusDiagnosticsAsync(app);
             }
             catch (Exception diagnosticsException)
@@ -94,6 +109,20 @@ public sealed class SeedConvergenceTests
             }
 
             throw;
+        }
+        finally
+        {
+            logCaptureCancellation.Cancel();
+            try
+            {
+                await Task.WhenAll(logCaptureTasks)
+                    .WaitAsync(TimeSpan.FromSeconds(5))
+                    .ConfigureAwait(false);
+            }
+            catch (Exception logCaptureException)
+            {
+                Console.Error.WriteLine($"Unable to stop standalone resource log capture: {logCaptureException}");
+            }
         }
     }
 
@@ -115,10 +144,10 @@ public sealed class SeedConvergenceTests
         Assert.Equal(name, projection.Name);
     }
 
-    private async Task WriteDiagnosticsAsync(DistributedApplication app)
+    private void WriteDiagnostics(
+        DistributedApplication app,
+        IReadOnlyDictionary<string, ConcurrentQueue<string>> resourceLogs)
     {
-        var loggers = app.Services.GetRequiredService<ResourceLoggerService>();
-
         foreach (var resourceName in resourceNames)
         {
             if (app.ResourceNotifications.TryGetCurrentState(resourceName, out var resource))
@@ -131,11 +160,34 @@ public sealed class SeedConvergenceTests
                     resource.Snapshot.ExitCode?.ToString(CultureInfo.InvariantCulture) ?? "unknown");
             }
 
-            await foreach (var batch in loggers.GetAllAsync(resourceName).ConfigureAwait(false))
+            foreach (var line in resourceLogs[resourceName])
+                output.WriteLine("Resources.{0}: {1}", resourceName, line);
+        }
+    }
+
+    private static async Task CaptureResourceLogsAsync(
+        ResourceLoggerService loggers,
+        string resourceName,
+        ConcurrentQueue<string> resourceLogs,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await foreach (var batch in loggers
+                               .WatchAsync(resourceName)
+                               .WithCancellation(cancellationToken)
+                               .ConfigureAwait(false))
             {
                 foreach (var line in batch)
-                    output.WriteLine("Resources.{0}: {1}", resourceName, line.Content);
+                {
+                    resourceLogs.Enqueue(line.Content);
+                    while (resourceLogs.Count > MaxCapturedLogLinesPerResource)
+                        resourceLogs.TryDequeue(out _);
+                }
             }
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
         }
     }
 
