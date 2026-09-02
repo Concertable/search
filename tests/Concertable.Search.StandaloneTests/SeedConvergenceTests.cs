@@ -7,8 +7,7 @@ using Concertable.B2B.Hosting;
 using Concertable.B2B.Seed.Contracts;
 using Concertable.Search.Hosting;
 using Concertable.Search.TestKit;
-using Microsoft.Extensions.DependencyInjection;
-using System.Collections.Concurrent;
+using Microsoft.Data.SqlClient;
 using System.Globalization;
 using Xunit.Abstractions;
 
@@ -16,8 +15,6 @@ namespace Concertable.Search.StandaloneTests;
 
 public sealed class SeedConvergenceTests
 {
-    private const int MaxCapturedLogLinesPerResource = 500;
-
     private static readonly IReadOnlyList<string> resourceNames =
     [
         "concertable-search-sql-data",
@@ -45,18 +42,6 @@ public sealed class SeedConvergenceTests
             .CreateAsync<Projects.Concertable_Search_AppHost>(startupTimeout.Token);
 
         await using var app = await builder.BuildAsync(startupTimeout.Token);
-        var resourceLogs = resourceNames.ToDictionary(
-            resourceName => resourceName,
-            _ => new ConcurrentQueue<string>(),
-            StringComparer.Ordinal);
-        using var logCaptureCancellation = new CancellationTokenSource();
-        var logCaptureTasks = resourceNames
-            .Select(resourceName => CaptureResourceLogsAsync(
-                app.Services.GetRequiredService<ResourceLoggerService>(),
-                resourceName,
-                resourceLogs[resourceName],
-                logCaptureCancellation.Token))
-            .ToArray();
 
         try
         {
@@ -98,31 +83,21 @@ public sealed class SeedConvergenceTests
         }
         catch
         {
-            try
-            {
-                WriteDiagnostics(app, resourceLogs);
-                await WriteServiceBusDiagnosticsAsync(app);
-            }
-            catch (Exception diagnosticsException)
-            {
-                Console.Error.WriteLine($"Unable to collect standalone resource diagnostics: {diagnosticsException}");
-            }
+            await TryWriteDiagnosticsAsync(
+                "resource state",
+                () =>
+                {
+                    WriteDiagnostics(app);
+                    return Task.CompletedTask;
+                }).ConfigureAwait(false);
+            await TryWriteDiagnosticsAsync(
+                "Service Bus",
+                () => WriteServiceBusDiagnosticsAsync(app)).ConfigureAwait(false);
+            await TryWriteDiagnosticsAsync(
+                "Search database",
+                () => WriteDatabaseDiagnosticsAsync(app)).ConfigureAwait(false);
 
             throw;
-        }
-        finally
-        {
-            logCaptureCancellation.Cancel();
-            try
-            {
-                await Task.WhenAll(logCaptureTasks)
-                    .WaitAsync(TimeSpan.FromSeconds(5))
-                    .ConfigureAwait(false);
-            }
-            catch (Exception logCaptureException)
-            {
-                Console.Error.WriteLine($"Unable to stop standalone resource log capture: {logCaptureException}");
-            }
         }
     }
 
@@ -144,9 +119,7 @@ public sealed class SeedConvergenceTests
         Assert.Equal(name, projection.Name);
     }
 
-    private void WriteDiagnostics(
-        DistributedApplication app,
-        IReadOnlyDictionary<string, ConcurrentQueue<string>> resourceLogs)
+    private void WriteDiagnostics(DistributedApplication app)
     {
         foreach (var resourceName in resourceNames)
         {
@@ -160,34 +133,18 @@ public sealed class SeedConvergenceTests
                     resource.Snapshot.ExitCode?.ToString(CultureInfo.InvariantCulture) ?? "unknown");
             }
 
-            foreach (var line in resourceLogs[resourceName])
-                output.WriteLine("Resources.{0}: {1}", resourceName, line);
         }
     }
 
-    private static async Task CaptureResourceLogsAsync(
-        ResourceLoggerService loggers,
-        string resourceName,
-        ConcurrentQueue<string> resourceLogs,
-        CancellationToken cancellationToken)
+    private static async Task TryWriteDiagnosticsAsync(string name, Func<Task> writeDiagnostics)
     {
         try
         {
-            await foreach (var batch in loggers
-                               .WatchAsync(resourceName)
-                               .WithCancellation(cancellationToken)
-                               .ConfigureAwait(false))
-            {
-                foreach (var line in batch)
-                {
-                    resourceLogs.Enqueue(line.Content);
-                    while (resourceLogs.Count > MaxCapturedLogLinesPerResource)
-                        resourceLogs.TryDequeue(out _);
-                }
-            }
+            await writeDiagnostics().ConfigureAwait(false);
         }
-        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        catch (Exception diagnosticsException)
         {
+            Console.Error.WriteLine($"Unable to collect {name} diagnostics: {diagnosticsException}");
         }
     }
 
@@ -244,6 +201,40 @@ public sealed class SeedConvergenceTests
                     properties.TotalMessageCount,
                     properties.TransferDeadLetterMessageCount);
             }
+        }
+    }
+
+    private async Task WriteDatabaseDiagnosticsAsync(DistributedApplication app)
+    {
+        var connectionString = await app.GetConnectionStringAsync(SearchConstants.Database)
+            .ConfigureAwait(false);
+        if (string.IsNullOrWhiteSpace(connectionString))
+        {
+            output.WriteLine("Search database diagnostics unavailable: connection string was not resolved.");
+            return;
+        }
+
+        using var diagnosticsTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+        await using var connection = new SqlConnection(connectionString);
+        await connection.OpenAsync(diagnosticsTimeout.Token).ConfigureAwait(false);
+        await using var command = connection.CreateCommand();
+        command.CommandText = """
+            SELECT schema_name(tables.schema_id), tables.name, SUM(partitions.rows)
+            FROM sys.tables AS tables
+            JOIN sys.partitions AS partitions ON tables.object_id = partitions.object_id
+            WHERE partitions.index_id IN (0, 1)
+            GROUP BY tables.schema_id, tables.name
+            ORDER BY schema_name(tables.schema_id), tables.name;
+            """;
+        await using var reader = await command.ExecuteReaderAsync(diagnosticsTimeout.Token)
+            .ConfigureAwait(false);
+        while (await reader.ReadAsync(diagnosticsTimeout.Token).ConfigureAwait(false))
+        {
+            output.WriteLine(
+                "Search database {0}.{1}: rows={2}",
+                reader.GetString(0),
+                reader.GetString(1),
+                reader.GetInt64(2));
         }
     }
 }
