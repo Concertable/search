@@ -2,7 +2,7 @@ using Concertable.Contracts;
 
 namespace Concertable.Search.Application.Params;
 
-public sealed class SearchParams : IPageParams, IGeoParams
+public sealed class SearchParams : IPageParams, IGeoParams, IGenreParams
 {
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 10;
@@ -13,7 +13,8 @@ public sealed class SearchParams : IPageParams, IGeoParams
     public double? Latitude { get; set; }
     public double? Longitude { get; set; }
     public int? RadiusKm { get; set; }
-    public Genre[]? Genres { get; set; }
+    public Genre[] Genres { get; set; } = [];
+    IReadOnlyCollection<Genre> IGenreParams.Genres => Genres;
     public bool? ShowHistory { get; set; }
     public bool? ShowSold { get; set; }
 }
