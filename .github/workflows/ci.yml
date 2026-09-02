@@ -79,4 +79,4 @@ jobs:
           retention-days: 7
 
       - name: Test Search solution
-        run: dotnet test Concertable.Search.slnx --configuration Release --no-build --no-restore -m:1
+        run: dotnet test Concertable.Search.slnx --configuration Release --no-build --no-restore -m:1 --logger "console;verbosity=detailed"
