@@ -69,10 +69,27 @@ public sealed class SearchArchitectureTests
     {
         var validBuilder = AppHost.CreateBuilder([]);
         AssertImageEndpoint(validBuilder, AuthConstants.Resource, "https");
+        AssertContainerRuntimeArgs(validBuilder, AuthConstants.Resource, "--user", "root");
         using var app = validBuilder.Build();
         var builder = AppHost.CreateBuilder([]);
         builder.Services.AddInvalidLifetimeGraph();
         Assert.ThrowsAny<Exception>(() => builder.Build());
+    }
+
+    private static void AssertContainerRuntimeArgs(
+        IDistributedApplicationBuilder builder,
+        string resourceName,
+        params object[] expected)
+    {
+        var resource = Assert.IsType<ServiceContainerResource>(
+            builder.Resources.Single(resource => resource.Name == resourceName));
+        var args = new List<object>();
+        foreach (var annotation in resource.Annotations.OfType<ContainerRuntimeArgsCallbackAnnotation>())
+            annotation.Callback(new ContainerRuntimeArgsCallbackContext(args, CancellationToken.None))
+                .GetAwaiter()
+                .GetResult();
+
+        Assert.Equal(expected, args);
     }
 
     private static void AssertImageEndpoint(
