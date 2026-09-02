@@ -19,6 +19,7 @@ public static class AppHost
         var asb = builder.AddServiceBus();
         asb.Topology().AddSearchTopology().AddAuthTopology().RunAsEmulator();
         var auth = builder.AddAuth(AuthImage, AuthDigest, authDb, asb)
+                          .WithContainerRuntimeArgs("--user", "root")
                           .WithHttpEndpoint(targetPort: 8080, name: "https");
         auth.WithEnvironment("ServiceAuth__AuthClientId", "concertable-auth");
         builder.AddSearchWeb<Projects.Concertable_Search_Web>(auth, searchDb);
