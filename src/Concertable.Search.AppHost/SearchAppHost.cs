@@ -1,6 +1,7 @@
 using Aspire.Hosting;
 using Concertable.Auth.Hosting;
 using Concertable.B2B.Hosting;
+using Concertable.B2B.Tenant.Contracts.Events;
 using Concertable.Search.Hosting;
 
 public static class SearchAppHost
@@ -17,16 +18,21 @@ public static class SearchAppHost
         var authDb = sql.AddDatabase(AuthConstants.Database);
         var searchDb = sql.AddDatabase(SearchConstants.Database);
         var asb = builder.AddServiceBus();
-        asb.Topology().AddSearchTopology().AddAuthTopology().RunAsEmulator();
+        asb.Topology()
+           .AddSearchTopology()
+           .AddAuthTopology()
+           .Publish<PayoutOwnerRegisteredEvent>()
+           .RunAsEmulator();
         var auth = builder.AddAuth(AuthImage, AuthDigest, authDb, asb)
                           .WithHttpEndpoint(targetPort: 8080, name: "https");
         auth.WithEnvironment("ServiceAuth__AuthClientId", "concertable-auth");
         var migrations = builder.AddSearchMigrations<Projects.Concertable_Search_Migrations>(searchDb);
         builder.AddSearchWeb<Projects.Concertable_Search_Web>(auth, searchDb)
                .WaitForCompletion(migrations);
-        builder.AddSearchWorkers<Projects.Concertable_Search_Workers>(searchDb, asb)
-               .WaitForCompletion(migrations);
-        builder.AddB2BSeedingSimulator(B2BSeedingSimulatorImage, B2BSeedingSimulatorDigest, asb);
+        var workers = builder.AddSearchWorkers<Projects.Concertable_Search_Workers>(searchDb, asb)
+                             .WaitForCompletion(migrations);
+        builder.AddB2BSeedingSimulator(B2BSeedingSimulatorImage, B2BSeedingSimulatorDigest, asb)
+               .WaitFor(workers);
         return builder;
     }
 }
