@@ -11,28 +11,20 @@ namespace Concertable.Search.Infrastructure.Repositories;
 internal sealed class VenueHeaderRepository : IVenueHeaderRepository
 {
     private readonly ISearchDbContext context;
-    private readonly IVenueSearchSpecification searchSpecification;
-    private readonly IGeometrySpecification<VenueReadModel> geometrySpecification;
-    private readonly ISortSpecification<VenueReadModel> sortSpecification;
+    private readonly IVenueSearchQuery searchQuery;
 
     public VenueHeaderRepository(
         ISearchDbContext context,
-        IVenueSearchSpecification searchSpecification,
-        IGeometrySpecification<VenueReadModel> geometrySpecification,
-        ISortSpecification<VenueReadModel> sortSpecification)
+        IVenueSearchQuery searchQuery)
     {
         this.context = context;
-        this.searchSpecification = searchSpecification;
-        this.geometrySpecification = geometrySpecification;
-        this.sortSpecification = sortSpecification;
+        this.searchQuery = searchQuery;
     }
 
     public async Task<IPagination<VenueHeader>> SearchAsync(SearchParams searchParams)
     {
-        var query = searchSpecification.Apply(context.Venues.AsNoTracking(), searchParams);
-        query = geometrySpecification.Apply(query, searchParams);
-        query = sortSpecification.Apply(query, searchParams.Sort);
-        return await query
+        return await this.searchQuery
+            .Apply(this.context.Venues.AsNoTracking(), searchParams)
             .ToHeaderDtos(context.VenueRatingProjections.AsNoTracking())
             .ToPaginationAsync(searchParams);
     }

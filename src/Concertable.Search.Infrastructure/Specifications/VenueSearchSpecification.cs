@@ -1,18 +1,24 @@
-﻿using Concertable.Search.Application.Interfaces;
+using System.Linq.Expressions;
+using Concertable.Kernel.Expressions;
 using Concertable.Search.Application.Params;
 using Concertable.Search.Domain.ReadModels;
 
 namespace Concertable.Search.Infrastructure.Specifications;
 
-internal sealed class VenueSearchSpecification : IVenueSearchSpecification
+internal sealed class VenueSearchSpecification : ISearchSpecification<VenueReadModel>
 {
-    private readonly ISearchSpecification<VenueReadModel> searchSpecification;
+    private readonly INameSpecification<VenueReadModel> nameSpec;
+    private readonly IGeometrySpecification<VenueReadModel> geometrySpec;
 
-    public VenueSearchSpecification(ISearchSpecification<VenueReadModel> searchSpecification)
+    public VenueSearchSpecification(
+        INameSpecification<VenueReadModel> nameSpec,
+        IGeometrySpecification<VenueReadModel> geometrySpec)
     {
-        this.searchSpecification = searchSpecification;
+        this.nameSpec = nameSpec;
+        this.geometrySpec = geometrySpec;
     }
 
-    public IQueryable<VenueReadModel> Apply(IQueryable<VenueReadModel> query, SearchParams searchParams) =>
-        searchSpecification.Apply(query, searchParams.SearchTerm);
+    public Expression<Func<VenueReadModel, bool>> ToExpression(SearchParams @params) =>
+        this.nameSpec.ToExpression(@params.SearchTerm)
+            .And(this.geometrySpec.ToExpression(@params));
 }
