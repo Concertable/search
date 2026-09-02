@@ -17,6 +17,7 @@
     <Project Path="tests/Concertable.Search.ArchitectureTests/Concertable.Search.ArchitectureTests.csproj" />
     <Project Path="tests/Concertable.Search.StartupTests/Concertable.Search.StartupTests.csproj" />
     <Project Path="tests/Concertable.Search.IntegrationTests.Fixtures/Concertable.Search.IntegrationTests.Fixtures.csproj" />
+    <Project Path="tests/Concertable.Search.StandaloneTests/Concertable.Search.StandaloneTests.csproj" />
     <Project Path="tests/Concertable.Search.UnitTests/Concertable.Search.UnitTests.csproj" />
   </Folder>
 </Solution>
