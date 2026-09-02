@@ -62,3 +62,18 @@ CI also scans the source and local images for secrets, blocks critical image vul
 CycloneDX SBOM for every target. These checks build local candidates only. They do not push images, create
 canonical tags, or change package/image visibility; publication remains owned by the later organization-level
 cutover workflow.
+
+## Verifying one release candidate
+
+The combined verifier proves that the Hosting and TestKit packages and all three images come from one clean
+Search revision and share one MinVer-derived version. It exercises the clean package consumer and image
+contracts, scans saved image archives, creates checksummed scan/SBOM evidence, and validates a complete release
+manifest before removing its owned temporary directory, images, and Docker cache volume:
+
+```sh
+pwsh ./scripts/verify-search-release-candidate.ps1
+```
+
+Pass `-KeepArtifacts -OutputPath <path-outside-the-repository>` to inspect the verified bundle locally. The
+bundle records intended repositories and tags but contains no registry or NuGet publisher; verification cannot
+push it. CI runs this combined rehearsal in addition to the normal build/test gate.
