@@ -59,6 +59,9 @@ jobs:
         shell: pwsh
         run: ./scripts/verify-package-candidates.ps1 -PackageDirectory artifacts/packages
 
+      - name: Log in to GHCR for standalone dependency images
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io --username "${{ github.actor }}" --password-stdin
+
       - name: Upload package candidate
         uses: actions/upload-artifact@v4
         with:
