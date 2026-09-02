@@ -97,6 +97,11 @@ public sealed class SearchArchitectureTests
             SearchConstants.WorkersResource,
             SearchConstants.MigrationsResource,
             WaitType.WaitForCompletion);
+        AssertWaitsFor(
+            validBuilder,
+            B2BConstants.SeedingSimulatorResource,
+            SearchConstants.WorkersResource,
+            WaitType.WaitUntilHealthy);
         Assert.DoesNotContain(validBuilder.Resources,
             resource => string.Equals(resource.Name, B2BConstants.Database, StringComparison.Ordinal));
         using var app = validBuilder.Build();
