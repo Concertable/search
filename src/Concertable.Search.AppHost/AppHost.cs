@@ -1,6 +1,7 @@
 using Aspire.Hosting;
 using Concertable.Auth.Hosting;
 using Concertable.B2B.Hosting;
+using Concertable.B2B.Tenant.Contracts.Events;
 using Concertable.Search.Hosting;
 
 public static class AppHost
@@ -17,7 +18,11 @@ public static class AppHost
         var authDb = sql.AddDatabase(AuthConstants.Database);
         var searchDb = sql.AddDatabase(SearchConstants.Database);
         var asb = builder.AddServiceBus();
-        asb.Topology().AddSearchTopology().AddAuthTopology().RunAsEmulator();
+        asb.Topology()
+           .AddSearchTopology()
+           .AddAuthTopology()
+           .Publish<PayoutOwnerRegisteredEvent>()
+           .RunAsEmulator();
         var auth = builder.AddAuth(AuthImage, AuthDigest, authDb, asb)
                           .WithContainerRuntimeArgs("--user", "root")
                           .WithHttpsEndpoint(targetPort: AuthConstants.ContainerPort, name: "https");
