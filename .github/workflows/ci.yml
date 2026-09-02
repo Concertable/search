@@ -31,6 +31,12 @@ jobs:
         with:
           dotnet-version: 10.x
 
+      - name: Restore Search solution
+        run: dotnet restore Concertable.Search.slnx
+
+      - name: Build Search solution
+        run: dotnet build Concertable.Search.slnx --configuration Release --no-restore
+
       - name: Build Search Web container
         run: docker build --target search-web --build-arg BUILD_VERSION=0.0.0-ci.${{ github.run_number }} --secret id=GITHUB_PACKAGES_TOKEN,env=GITHUB_PACKAGES_TOKEN --tag concertable-search-web:${{ github.sha }} .
 
@@ -40,23 +46,18 @@ jobs:
       - name: Build Search migration container
         run: docker build --target search-migrations --build-arg BUILD_VERSION=0.0.0-ci.${{ github.run_number }} --secret id=GITHUB_PACKAGES_TOKEN,env=GITHUB_PACKAGES_TOKEN --tag concertable-search-migrations:${{ github.sha }} .
 
-      - name: Build Search Web
-        run: dotnet build src/Concertable.Search.Web/Concertable.Search.Web.csproj --configuration Release
-
-      - name: Build Search Workers
-        run: dotnet build src/Concertable.Search.Workers/Concertable.Search.Workers.csproj --configuration Release
-
       - name: Publish Search migration job
-        run: dotnet publish src/Concertable.Search.Migrations/Concertable.Search.Migrations.csproj --configuration Release --output artifacts/migrations
+        run: dotnet publish src/Concertable.Search.Migrations/Concertable.Search.Migrations.csproj --configuration Release --no-restore --output artifacts/migrations
 
       - name: Pack Search Hosting
-        run: dotnet pack src/Concertable.Search.Hosting/Concertable.Search.Hosting.csproj --configuration Release --output artifacts/packages
+        run: dotnet pack src/Concertable.Search.Hosting/Concertable.Search.Hosting.csproj --configuration Release --output artifacts/packages -p:MinVerVersionOverride=0.0.0-ci.${{ github.run_number }}
 
       - name: Pack Search TestKit
         run: dotnet pack src/Concertable.Search.TestKit/Concertable.Search.TestKit.csproj --configuration Release --output artifacts/packages -p:MinVerVersionOverride=0.0.0-ci.${{ github.run_number }}
 
-      - name: Verify Search TestKit package consumer
-        run: dotnet build tests/PackageConsumers/Concertable.Search.TestKit.Consumer/Concertable.Search.TestKit.Consumer.csproj --configuration Release -p:TestKitPackageVersion=0.0.0-ci.${{ github.run_number }}
+      - name: Verify package candidates from a clean consumer
+        shell: pwsh
+        run: ./scripts/verify-package-candidates.ps1 -PackageDirectory artifacts/packages
 
       - name: Upload package candidate
         uses: actions/upload-artifact@v4
@@ -74,8 +75,5 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-      - name: Run unit tests
-        run: dotnet test tests/Concertable.Search.UnitTests/Concertable.Search.UnitTests.csproj --configuration Release
-
-      - name: Run integration tests
-        run: dotnet test tests/Concertable.Search.IntegrationTests/Concertable.Search.IntegrationTests.csproj --configuration Release
+      - name: Test Search solution
+        run: dotnet test Concertable.Search.slnx --configuration Release --no-build --no-restore -m:1
