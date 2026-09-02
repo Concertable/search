@@ -145,6 +145,15 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+      - name: Verify combined Search release candidate without publishing
+        shell: pwsh
+        env:
+          GITHUB_PACKAGES_TOKEN: ${{ github.token }}
+        run: >-
+          ./scripts/verify-search-release-candidate.ps1
+          -Configuration Release
+          -OutputPath '${{ runner.temp }}/search-release-candidate'
+
       - name: Test Search solution
         run: dotnet test Concertable.Search.slnx --configuration Release --no-build --no-restore -m:1
 
