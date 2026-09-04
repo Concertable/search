@@ -4,9 +4,9 @@ using Concertable.Contracts;
 using Concertable.Search.Application;
 using Concertable.Search.Infrastructure.Repositories;
 
-namespace Concertable.Search.UnitTests.Architecture;
+namespace Concertable.Search.ArchitectureTests;
 
-public sealed class ContractArchitectureTests
+public sealed class ContractShapeTests
 {
     [Fact]
     public void SearchOperationMethods_CollectionPayloadsUseReadOnlyLists()
