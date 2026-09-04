@@ -8,7 +8,8 @@ function Resolve-OwnerPath {
     $rootPath = [IO.Path]::GetFullPath($Root)
     $path = [IO.Path]::GetFullPath((Join-Path $rootPath $RelativePath))
     $prefix = $rootPath.TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
-    if (-not $path.StartsWith($prefix, [StringComparison]::OrdinalIgnoreCase)) {
+    $comparison = if ([IO.Path]::DirectorySeparatorChar -eq '\') { [StringComparison]::OrdinalIgnoreCase } else { [StringComparison]::Ordinal }
+    if (-not $path.StartsWith($prefix, $comparison)) {
         throw "Path must stay inside owner root: $RelativePath"
     }
     $cursor = $path
@@ -88,9 +89,9 @@ function Invoke-OwnerMigrations {
             if (-not $PSCmdlet.ShouldProcess($operation.Directory, "Re-scaffold $($migration.Context) InitialCreate")) { continue }
             $directory = $operation.Directory
             # Keep C# backups outside the project so the EF build cannot compile duplicate snapshots.
-            $temporaryRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath()).TrimEnd([IO.Path]::DirectorySeparatorChar)
-            $backup = [IO.Path]::GetFullPath((Join-Path $temporaryRoot ("concertable-migrations-" + [guid]::NewGuid().ToString('N'))))
-            if ((Split-Path $backup -Parent) -ne $temporaryRoot) { throw 'Invalid migration backup path.' }
+            # A direct child of the owner root shares the checkout volume even when OS temp does not.
+            $backup = Resolve-OwnerPath $Root (".migration-backup-" + [guid]::NewGuid().ToString('N'))
+            if ([IO.Path]::GetPathRoot($backup) -ne [IO.Path]::GetPathRoot($directory)) { throw 'Migration backup must share the project volume.' }
             $hasBackup = Test-Path -LiteralPath $directory
             if ($hasBackup) { Move-Item -LiteralPath $directory -Destination $backup }
             try {
