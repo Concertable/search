@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net10.0</TargetFramework><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable><IsPackable>false</IsPackable><IsTestProject>true</IsTestProject></PropertyGroup>
+  <ItemGroup><FrameworkReference Include="Microsoft.AspNetCore.App" /></ItemGroup>
+  <ItemGroup><PackageReference Include="coverlet.collector" /><PackageReference Include="Microsoft.NET.Test.Sdk" /><PackageReference Include="xunit" /><PackageReference Include="xunit.runner.visualstudio" /></ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Concertable.Search.Web\Concertable.Search.Web.csproj" />
+    <ProjectReference Include="..\..\src\Concertable.Search.Workers\Concertable.Search.Workers.csproj" />
+    <ProjectReference Include="..\..\src\Concertable.Search.AppHost\Concertable.Search.AppHost.csproj" />
+    <PackageReference Include="Concertable.Testing.Architecture" />
+  </ItemGroup>
+</Project>
