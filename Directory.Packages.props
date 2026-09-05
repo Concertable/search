@@ -34,6 +34,8 @@
   <ItemGroup>
     <PackageVersion Include="Concertable.AppHost.Shared" Version="$(ConcertablePlatformVersion)" />
     <PackageVersion Include="Concertable.Auth.Hosting" Version="$(ConcertablePlatformVersion)" />
+    <PackageVersion Include="Concertable.B2B.Hosting" Version="$(ConcertablePlatformVersion)" />
+    <PackageVersion Include="Concertable.Search.Hosting" Version="$(ConcertablePlatformVersion)" />
     <PackageVersion Include="Concertable.B2B.Artist.Contracts" Version="$(ConcertablePlatformVersion)" />
     <PackageVersion Include="Concertable.B2B.Venue.Contracts" Version="$(ConcertablePlatformVersion)" />
     <PackageVersion Include="Concertable.B2B.Concert.Contracts" Version="$(ConcertablePlatformVersion)" />
