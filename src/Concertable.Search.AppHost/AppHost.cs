@@ -21,6 +21,7 @@ public static class AppHost
         var auth = builder.AddAuth(AuthImage, AuthDigest, authDb, asb)
                           .WithContainerRuntimeArgs("--user", "root")
                           .WithHttpsEndpoint(targetPort: AuthConstants.ContainerPort, name: "https");
+        auth.WithSpaClients([]);
         auth.WithEnvironment("ServiceAuth__AuthClientId", "concertable-auth");
         builder.AddSearchWeb<Projects.Concertable_Search_Web>(auth, searchDb);
         builder.AddSearchWorkers<Projects.Concertable_Search_Workers>(searchDb, asb);
