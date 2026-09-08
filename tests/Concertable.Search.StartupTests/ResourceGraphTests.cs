@@ -1,72 +1,16 @@
 using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Concertable.Auth.Hosting;
-using Concertable.Search.Web;
-using Concertable.Search.Workers;
 using Concertable.Testing.Architecture;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Options;
 using Xunit;
 
-namespace Concertable.Search.ArchitectureTests;
+namespace Concertable.Search.StartupTests;
 
-public sealed class SearchArchitectureTests
+public sealed class ResourceGraphTests
 {
     [Fact]
-    public void Web_ProductionGraphAndStrictValidation_AreValid()
-    {
-        var builder = WebApplication.CreateBuilder(CompositionTestArguments.Create());
-        builder.AddSearchWebHost();
-        using var app = builder.Build();
-        builder.Services.ValidateComposition(app.Services, new CompositionValidationOptions
-        {
-            RootAssemblies = [typeof(Concertable.Search.Web.HostExtensions).Assembly]
-        });
-        var jwtOptions = app.Services.GetRequiredService<IOptionsMonitor<JwtBearerOptions>>()
-            .Get(JwtBearerDefaults.AuthenticationScheme);
-        Assert.False(jwtOptions.RequireHttpsMetadata);
-        var invalidBuilder = WebApplication.CreateBuilder(CompositionTestArguments.Create());
-        invalidBuilder.AddSearchWebHost();
-        invalidBuilder.Services.AddInvalidLifetimeGraph();
-        Assert.ThrowsAny<Exception>(() => invalidBuilder.Build());
-    }
-
-    [Fact]
-    public void Web_ProductionEnvironment_RequiresHttpsMetadata()
-    {
-        var arguments = CompositionTestArguments.Create();
-        arguments[0] = "--environment=Production";
-        var builder = WebApplication.CreateBuilder(arguments);
-        builder.AddSearchWebHost();
-        using var app = builder.Build();
-        var jwtOptions = app.Services.GetRequiredService<IOptionsMonitor<JwtBearerOptions>>()
-            .Get(JwtBearerDefaults.AuthenticationScheme);
-
-        Assert.True(jwtOptions.RequireHttpsMetadata);
-    }
-
-    [Fact]
-    public void Workers_ProductionGraphAndStrictValidation_AreValid()
-    {
-        var builder = Host.CreateApplicationBuilder(CompositionTestArguments.Create());
-        builder.AddSearchWorkerHost();
-        using var app = builder.Build();
-        builder.Services.ValidateComposition(app.Services, new CompositionValidationOptions
-        {
-            RootAssemblies = [typeof(Concertable.Search.Workers.HostExtensions).Assembly]
-        });
-        var invalidBuilder = Host.CreateApplicationBuilder(CompositionTestArguments.Create());
-        invalidBuilder.AddSearchWorkerHost();
-        invalidBuilder.Services.AddInvalidLifetimeGraph();
-        Assert.ThrowsAny<Exception>(() => invalidBuilder.Build());
-    }
-
-    [Fact]
-    public async Task AppHost_ProductionGraphAndStrictValidation_AreValid()
+    public async Task ProductionGraphAndStrictValidation_AreValid()
     {
         var validBuilder = AppHost.CreateBuilder([]);
         AssertImageEndpoint(validBuilder, AuthConstants.Resource, "https", scheme: "https");
@@ -134,7 +78,7 @@ public sealed class SearchArchitectureTests
         IDistributedApplicationBuilder builder,
         string resourceName,
         string endpointName,
-        string scheme = "http")
+        string scheme)
     {
         var resource = Assert.IsType<ServiceContainerResource>(
             builder.Resources.Single(resource => resource.Name == resourceName));
