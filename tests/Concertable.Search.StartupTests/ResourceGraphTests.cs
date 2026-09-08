@@ -2,6 +2,7 @@ using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Concertable.Auth.Hosting;
 using Concertable.Testing.Architecture;
+using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
 namespace Concertable.Search.StartupTests;
@@ -9,16 +10,39 @@ namespace Concertable.Search.StartupTests;
 public sealed class ResourceGraphTests
 {
     [Fact]
-    public void ProductionGraphAndStrictValidation_AreValid()
+    public async Task ProductionGraphAndStrictValidation_AreValid()
     {
         var validBuilder = AppHost.CreateBuilder([]);
         AssertImageEndpoint(validBuilder, AuthConstants.Resource, "https", scheme: "https");
         AssertContainerRuntimeArgs(validBuilder, AuthConstants.Resource, "--user", "root");
         AssertUsesDeveloperCertificate(validBuilder, AuthConstants.Resource);
+        await AssertNoSpaClientsAsync(validBuilder);
         using var app = validBuilder.Build();
         var builder = AppHost.CreateBuilder([]);
         builder.Services.AddInvalidLifetimeGraph();
         Assert.ThrowsAny<Exception>(() => builder.Build());
+    }
+
+    private static async Task AssertNoSpaClientsAsync(IDistributedApplicationBuilder builder)
+    {
+        var auth = Assert.IsAssignableFrom<IResourceWithEnvironment>(
+            builder.Resources.Single(resource => resource.Name == AuthConstants.Resource));
+        var configuration = await ExecutionConfigurationBuilder.Create(auth)
+            .WithEnvironmentVariablesConfig()
+            .BuildAsync(
+                new DistributedApplicationExecutionContext(DistributedApplicationOperation.Publish),
+                NullLogger.Instance,
+                CancellationToken.None);
+        var environment = configuration.EnvironmentVariables.ToDictionary();
+
+        Assert.Equal("true", environment["Auth__SpaClients__RestrictToEnabledClients"]);
+        Assert.DoesNotContain(
+            environment.Keys,
+            key => key.StartsWith("Auth__SpaClients__EnabledClients__", StringComparison.Ordinal));
+        Assert.DoesNotContain(
+            environment.Keys,
+            key => key.StartsWith("Auth__SpaClients__", StringComparison.Ordinal)
+                && key != "Auth__SpaClients__RestrictToEnabledClients");
     }
 
     private static void AssertContainerRuntimeArgs(
