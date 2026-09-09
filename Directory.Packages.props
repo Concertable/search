@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <ConcertableDotNetPlatformVersion>0.1.0-alpha.0.1361</ConcertableDotNetPlatformVersion>
+    <ConcertableDotNetPlatformVersion>0.1.0-alpha.0.1364</ConcertableDotNetPlatformVersion>
   </PropertyGroup>
 
   <ItemGroup>
