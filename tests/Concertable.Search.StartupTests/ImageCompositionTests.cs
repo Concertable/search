@@ -21,7 +21,7 @@ public sealed class ImageCompositionTests
         var builder = DistributedApplication.CreateBuilder();
         var sql = builder.AddSqlServer("sql");
         var auth = builder.AddContainerImage(AuthConstants.Resource, "ghcr.io/concertable/auth", Digest)
-                          .WithHttpsEndpoint(targetPort: AuthConstants.ContainerPort, name: "https");
+                          .WithHttpEndpoint(targetPort: AuthConstants.ContainerPort, name: "https");
 
         var web = builder.AddSearchWeb(
             "ghcr.io/concertable/search-web",
