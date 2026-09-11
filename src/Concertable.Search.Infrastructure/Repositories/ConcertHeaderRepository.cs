@@ -6,6 +6,7 @@ using Concertable.Search.Domain.ReadModels;
 using Concertable.Search.Infrastructure.Data;
 using Concertable.Search.Infrastructure.Extensions;
 using Concertable.Search.Infrastructure.Mappers;
+using Concertable.Search.Infrastructure.Specifications;
 using Microsoft.EntityFrameworkCore;
 
 namespace Concertable.Search.Infrastructure.Repositories;
@@ -13,31 +14,26 @@ namespace Concertable.Search.Infrastructure.Repositories;
 internal sealed class ConcertHeaderRepository : IConcertHeaderRepository
 {
     private readonly ISearchDbContext context;
-    private readonly IConcertSearchSpecification searchSpecification;
-    private readonly IGeometrySpecification<ConcertReadModel> geometrySpecification;
-    private readonly ISortSpecification<ConcertReadModel> sortSpecification;
+    private readonly IConcertSearchQuery searchQuery;
+    private readonly IGeometrySpecification<ConcertReadModel> geometrySpec;
     private readonly TimeProvider timeProvider;
 
     public ConcertHeaderRepository(
         ISearchDbContext context,
-        IConcertSearchSpecification searchSpecification,
-        IGeometrySpecification<ConcertReadModel> geometrySpecification,
-        ISortSpecification<ConcertReadModel> sortSpecification,
+        IConcertSearchQuery searchQuery,
+        IGeometrySpecification<ConcertReadModel> geometrySpec,
         TimeProvider timeProvider)
     {
         this.context = context;
-        this.searchSpecification = searchSpecification;
-        this.geometrySpecification = geometrySpecification;
-        this.sortSpecification = sortSpecification;
+        this.searchQuery = searchQuery;
+        this.geometrySpec = geometrySpec;
         this.timeProvider = timeProvider;
     }
 
     public async Task<IPagination<ConcertHeader>> SearchAsync(SearchParams searchParams)
     {
-        var query = searchSpecification.Apply(context.Concerts, searchParams);
-        query = geometrySpecification.Apply(query, searchParams);
-        query = sortSpecification.Apply(query, searchParams.Sort);
-        return await query
+        return await this.searchQuery
+            .Apply(this.context.Concerts, searchParams)
             .ToHeaderDtos(context.Artists, context.Venues, context.ConcertRatingProjections)
             .ToPaginationAsync(searchParams);
     }
@@ -71,7 +67,7 @@ internal sealed class ConcertHeaderRepository : IConcertHeaderRepository
         if (concertParams.Genres.Any())
             query = query.Where(c => c.ConcertGenres.Any(eg => concertParams.Genres.Contains(eg.Genre)));
 
-        query = geometrySpecification.Apply(query, concertParams);
+        query = query.Where(this.geometrySpec.ToExpression(concertParams));
 
         query = concertParams.OrderByRecent
             ? query.OrderByDescending(c => c.DatePosted)

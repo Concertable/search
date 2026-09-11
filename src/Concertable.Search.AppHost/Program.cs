@@ -1,1 +1,1 @@
-SearchAppHost.CreateBuilder(args).Build().Run();
+AppHost.CreateBuilder(args).Build().Run();
