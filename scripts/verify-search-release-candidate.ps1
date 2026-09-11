@@ -62,10 +62,9 @@ $webImage = "concertable/search-web:release-candidate-$releaseId"
 $workersImage = "concertable/search-workers:release-candidate-$releaseId"
 $migrationsImage = "concertable/search-migrations:release-candidate-$releaseId"
 $candidateImages = @($webImage, $workersImage, $migrationsImage)
-$expectedPackageIds = @('Concertable.Search.Hosting', 'Concertable.Search.TestKit')
+$expectedPackageIds = @('Concertable.Search.Hosting')
 $packageProjects = @(
-    (Join-Path $repositoryRoot 'src/Concertable.Search.Hosting/Concertable.Search.Hosting.csproj'),
-    (Join-Path $repositoryRoot 'src/Concertable.Search.TestKit/Concertable.Search.TestKit.csproj')
+    (Join-Path $repositoryRoot 'src/Concertable.Search.Hosting/Concertable.Search.Hosting.csproj')
 )
 $packageToken = $env:GITHUB_PACKAGES_TOKEN
 Remove-Item Env:GITHUB_PACKAGES_TOKEN -ErrorAction SilentlyContinue
@@ -433,7 +432,7 @@ try {
     $verifiedManifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
     if ($verifiedManifest.sourceRevision -ne $revision -or
         $verifiedManifest.version -ne $releaseVersion -or
-        @($verifiedManifest.packages).Count -ne 2 -or
+        @($verifiedManifest.packages).Count -ne 1 -or
         @($verifiedManifest.images).Count -ne 3) {
         throw 'Search release-candidate manifest validation failed.'
     }
@@ -457,7 +456,7 @@ try {
     }
 
     $completed = $true
-    Write-Host "Verified Search release candidate $releaseVersion for revision ${revision}: 2 packages, 3 images, manifest and evidence complete."
+    Write-Host "Verified Search release candidate $releaseVersion for revision ${revision}: 1 package, 3 images, manifest and evidence complete."
     if ($KeepArtifacts) {
         Write-Host "Retained release-candidate artifacts at '$releaseRoot'."
     }
