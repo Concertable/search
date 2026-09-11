@@ -12,7 +12,7 @@ permissions:
   packages: read
 
 env:
-  GITHUB_PACKAGES_TOKEN: ${{ secrets.CONCERTABLE_PACKAGES_TOKEN || secrets.GITHUB_TOKEN }}
+  GITHUB_PACKAGES_TOKEN: ${{ secrets.CONCERTABLE_PACKAGES_READ || secrets.GITHUB_TOKEN }}
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
