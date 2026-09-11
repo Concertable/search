@@ -118,9 +118,6 @@ jobs:
       - name: Pack Search Hosting
         run: dotnet pack src/Concertable.Search.Hosting/Concertable.Search.Hosting.csproj --configuration Release --output artifacts/packages -p:MinVerVersionOverride=0.0.0-ci.${{ github.run_number }}
 
-      - name: Pack Search TestKit
-        run: dotnet pack src/Concertable.Search.TestKit/Concertable.Search.TestKit.csproj --configuration Release --output artifacts/packages -p:MinVerVersionOverride=0.0.0-ci.${{ github.run_number }}
-
       - name: Verify package candidates from a clean consumer
         shell: pwsh
         run: ./scripts/verify-package-candidates.ps1 -PackageDirectory artifacts/packages

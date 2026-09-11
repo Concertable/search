@@ -8,7 +8,6 @@ $ErrorActionPreference = 'Stop'
 
 $expectedPackageIds = @(
     'Concertable.Search.Hosting'
-    'Concertable.Search.TestKit'
 )
 
 $resolvedPackageDirectory = (Resolve-Path -LiteralPath $PackageDirectory).Path
@@ -84,7 +83,6 @@ try {
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Concertable.Search.Hosting" Version="$escapedVersion" />
-    <PackageReference Include="Concertable.Search.TestKit" Version="$escapedVersion" />
   </ItemGroup>
 </Project>
 "@)
@@ -94,14 +92,11 @@ using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Azure;
 using Concertable.Search.Hosting;
-using Concertable.Search.TestKit;
 
 namespace Concertable.Search.PackageConsumer;
 
 public static class Consumer
 {
-    public static SearchTestClient CreateClient(HttpClient httpClient) => new(httpClient);
-
     public static void AddContainerResources(
         IDistributedApplicationBuilder builder,
         IResourceBuilder<IResourceWithServiceDiscovery> auth,
@@ -132,7 +127,6 @@ public static class Consumer
   <packageSourceMapping>
     <packageSource key="search-candidates">
       <package pattern="Concertable.Search.Hosting" />
-      <package pattern="Concertable.Search.TestKit" />
     </packageSource>
     <packageSource key="nuget.org"><package pattern="*" /></packageSource>
     <packageSource key="github"><package pattern="Concertable.*" /></packageSource>
