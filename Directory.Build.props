@@ -19,8 +19,9 @@
   </PropertyGroup>
 
   <!-- Package publishing. Projects opt in with <IsPackable>true</IsPackable>; everything
-       else stays unpackable so a solution-wide `dotnet pack` produces only intended packages.
-       Version is MinVer-derived from this repository's own history. -->
+       else stays unpackable so a solution-wide `dotnet pack` produces only the intended
+       packages. Version is MinVer-derived (GlobalPackageReference in
+       Directory.Packages.props); untagged builds -> 0.1.0-alpha.N. -->
   <PropertyGroup>
     <IsPackable Condition="'$(IsPackable)' == ''">false</IsPackable>
     <Authors>Concertable</Authors>
@@ -40,7 +41,7 @@
 
   <!-- Banned-API list for Microsoft.CodeAnalysis.BannedApiAnalyzers (shared across services). -->
   <ItemGroup>
-    <AdditionalFiles Include="$(MSBuildThisFileDirectory)../BannedSymbols.txt" Condition="Exists('$(MSBuildThisFileDirectory)../BannedSymbols.txt')" />
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)BannedSymbols.txt" Condition="Exists('$(MSBuildThisFileDirectory)BannedSymbols.txt')" />
   </ItemGroup>
 
 </Project>

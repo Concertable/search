@@ -1,4 +1,4 @@
-﻿using Concertable.Kernel;
+using Concertable.Kernel;
 using Concertable.Kernel.Geometry;
 using Concertable.Search.Application.Params;
 using Concertable.Search.Infrastructure.Specifications;
@@ -10,10 +10,10 @@ namespace Concertable.Search.UnitTests.Specifications;
 
 public sealed class GeometrySpecificationTests
 {
-    private static readonly TestGeoParams LondonParams = new(51.5074, -0.1278);
-    private static readonly TestGeoParams ManchesterParams = new(53.4808, -2.2426);
+    private static readonly TestGeoParams londonParams = new(51.5074, -0.1278);
+    private static readonly TestGeoParams manchesterParams = new(53.4808, -2.2426);
 
-    private readonly GeometrySpecification<TestEntity> sut;
+    private readonly GeometrySpecification<TestEntity> specification;
     private readonly Mock<IGeometryProvider> geometryProvider;
     private readonly Point londonPoint;
     private readonly Point manchesterPoint;
@@ -22,92 +22,98 @@ public sealed class GeometrySpecificationTests
     {
         var geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory(srid: 3857);
 
-        londonPoint = geometryFactory.CreatePoint(new Coordinate(-14226, 6711542));
-        manchesterPoint = geometryFactory.CreatePoint(new Coordinate(-249645, 7072432));
-
-        geometryProvider = new Mock<IGeometryProvider>();
-        geometryProvider.Setup(p => p.CreatePoint(LondonParams.Latitude, LondonParams.Longitude)).Returns(londonPoint);
-        geometryProvider.Setup(p => p.CreatePoint(ManchesterParams.Latitude, ManchesterParams.Longitude)).Returns(manchesterPoint);
-
-        sut = new GeometrySpecification<TestEntity>(geometryProvider.Object);
-    }
-
-    private TestEntity London => new() { Location = londonPoint };
-    private TestEntity Manchester => new() { Location = manchesterPoint };
-
-    [Fact]
-    public void Apply_ShouldReturnUnmodifiedQuery_WhenCoordinatesAreInvalid()
-    {
-        var query = new[] { London }.AsQueryable();
-
-        var result = sut.Apply(query, new TestGeoParams(null, null, null));
-
-        Assert.Equal(query, result);
-        geometryProvider.VerifyNoOtherCalls();
+        this.londonPoint = geometryFactory.CreatePoint(new Coordinate(-14226, 6711542));
+        this.manchesterPoint = geometryFactory.CreatePoint(new Coordinate(-249645, 7072432));
+        this.geometryProvider = new Mock<IGeometryProvider>();
+        this.geometryProvider
+            .Setup(provider => provider.CreatePoint(londonParams.Latitude, londonParams.Longitude))
+            .Returns(this.londonPoint);
+        this.geometryProvider
+            .Setup(provider => provider.CreatePoint(manchesterParams.Latitude, manchesterParams.Longitude))
+            .Returns(this.manchesterPoint);
+        this.specification = new GeometrySpecification<TestEntity>(this.geometryProvider.Object);
     }
 
     [Fact]
-    public void Apply_ShouldReturnUnmodifiedQuery_WhenLatitudeIsMissing()
+    public void ToExpression_InvalidCoordinates_MatchesAllEntities()
     {
-        var query = new[] { London }.AsQueryable();
+        var result = new[] { this.London }
+            .AsQueryable()
+            .Where(this.specification.ToExpression(new TestGeoParams(null, null, null)));
 
-        var result = sut.Apply(query, LondonParams with { Latitude = null });
-
-        Assert.Equal(query, result);
-        geometryProvider.VerifyNoOtherCalls();
+        Assert.Single(result);
+        this.geometryProvider.VerifyNoOtherCalls();
     }
 
     [Fact]
-    public void Apply_ShouldReturnUnmodifiedQuery_WhenLongitudeIsMissing()
+    public void ToExpression_MissingLatitude_MatchesAllEntities()
     {
-        var query = new[] { London }.AsQueryable();
+        var result = new[] { this.London }
+            .AsQueryable()
+            .Where(this.specification.ToExpression(londonParams with { Latitude = null }));
 
-        var result = sut.Apply(query, LondonParams with { Longitude = null });
-
-        Assert.Equal(query, result);
-        geometryProvider.VerifyNoOtherCalls();
+        Assert.Single(result);
+        this.geometryProvider.VerifyNoOtherCalls();
     }
 
     [Fact]
-    public void Apply_ShouldReturnUnmodifiedQuery_WhenProviderReturnsNull()
+    public void ToExpression_MissingLongitude_MatchesAllEntities()
     {
-        geometryProvider.Setup(p => p.CreatePoint(It.IsAny<double?>(), It.IsAny<double?>())).Returns((Point?)null);
-        var query = new[] { London }.AsQueryable();
+        var result = new[] { this.London }
+            .AsQueryable()
+            .Where(this.specification.ToExpression(londonParams with { Longitude = null }));
 
-        var result = sut.Apply(query, LondonParams with { RadiusKm = 10 });
-
-        Assert.Equal(query, result);
+        Assert.Single(result);
+        this.geometryProvider.VerifyNoOtherCalls();
     }
 
     [Fact]
-    public void Apply_ShouldIncludeEntity_WhenWithinRadius()
+    public void ToExpression_UnavailablePoint_MatchesAllEntities()
     {
-        var query = new[] { London }.AsQueryable();
+        this.geometryProvider
+            .Setup(provider => provider.CreatePoint(It.IsAny<double?>(), It.IsAny<double?>()))
+            .Returns((Point?)null);
 
-        var result = sut.Apply(query, LondonParams with { RadiusKm = 10 });
+        var result = new[] { this.London }
+            .AsQueryable()
+            .Where(this.specification.ToExpression(londonParams with { RadiusKm = 10 }));
 
         Assert.Single(result);
     }
 
     [Fact]
-    public void Apply_ShouldExcludeEntity_WhenOutsideRadius()
+    public void ToExpression_EntityWithinRadius_IncludesEntity()
     {
-        var query = new[] { Manchester }.AsQueryable();
+        var result = new[] { this.London }
+            .AsQueryable()
+            .Where(this.specification.ToExpression(londonParams with { RadiusKm = 10 }));
 
-        var result = sut.Apply(query, LondonParams with { RadiusKm = 10 });
+        Assert.Single(result);
+    }
+
+    [Fact]
+    public void ToExpression_EntityOutsideRadius_ExcludesEntity()
+    {
+        var result = new[] { this.Manchester }
+            .AsQueryable()
+            .Where(this.specification.ToExpression(londonParams with { RadiusKm = 10 }));
 
         Assert.Empty(result);
     }
 
     [Fact]
-    public void Apply_ShouldDefaultToTenKmRadius_WhenRadiusKmIsNull()
+    public void ToExpression_MissingRadius_UsesTenKilometres()
     {
-        var query = new[] { London, Manchester }.AsQueryable();
-
-        var result = sut.Apply(query, LondonParams);
+        var result = new[] { this.London, this.Manchester }
+            .AsQueryable()
+            .Where(this.specification.ToExpression(londonParams));
 
         Assert.Single(result);
     }
+
+    private TestEntity London => new() { Location = this.londonPoint };
+
+    private TestEntity Manchester => new() { Location = this.manchesterPoint };
 
     private sealed class TestEntity : IIdEntity, IHasLocation
     {

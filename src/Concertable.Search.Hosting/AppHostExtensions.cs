@@ -35,6 +35,7 @@ public static class AppHostExtensions
             IResourceBuilder<SqlServerDatabaseResource> searchDb)
         {
             return builder.AddContainerImage(SearchConstants.WebResource, image, digest)
+                          .WithHttpEndpoint(targetPort: SearchConstants.ContainerPort, name: "https")
                           .WithReference(auth)
                           .WaitFor(auth)
                           .WithReference(searchDb)

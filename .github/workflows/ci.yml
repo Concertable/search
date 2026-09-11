@@ -11,6 +11,9 @@ permissions:
   contents: read
   packages: read
 
+env:
+  GITHUB_PACKAGES_TOKEN: ${{ secrets.CONCERTABLE_PACKAGES_READ || secrets.GITHUB_TOKEN }}
+
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -41,8 +44,6 @@ jobs:
           dotnet-version: 10.x
 
       - name: Restore Search solution
-        env:
-          GITHUB_PACKAGES_TOKEN: ${{ github.token }}
         run: dotnet restore Concertable.Search.slnx
 
       - name: Build Search solution
@@ -50,8 +51,6 @@ jobs:
 
       - name: Build and inspect Search images without publishing
         shell: pwsh
-        env:
-          GITHUB_PACKAGES_TOKEN: ${{ github.token }}
         run: >-
           ./scripts/verify-search-images.ps1
           -WebImage 'concertable/search-web:verification-${{ github.sha }}'
@@ -122,8 +121,6 @@ jobs:
 
       - name: Verify package candidates from a clean consumer
         shell: pwsh
-        env:
-          GITHUB_PACKAGES_TOKEN: ${{ github.token }}
         run: ./scripts/verify-package-candidates.ps1 -PackageDirectory artifacts/packages
 
       - name: Log in to GHCR for standalone dependency images
@@ -147,8 +144,6 @@ jobs:
 
       - name: Verify combined Search release candidate without publishing
         shell: pwsh
-        env:
-          GITHUB_PACKAGES_TOKEN: ${{ github.token }}
         run: >-
           ./scripts/verify-search-release-candidate.ps1
           -Configuration Release
