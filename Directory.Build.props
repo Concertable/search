@@ -31,7 +31,8 @@
     <RepositoryType>git</RepositoryType>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <MinVerTagPrefix>v</MinVerTagPrefix>
-    <MinVerMinimumMajorMinor>0.1</MinVerMinimumMajorMinor>
+    <!-- Search's retained package high-water mark is 0.1.0-alpha.0.1393. Start the independent train above it. -->
+    <MinVerMinimumMajorMinor>0.2</MinVerMinimumMajorMinor>
   </PropertyGroup>
 
   <!-- Registry lives here, not in publish-images.yml: a carve takes only the service folder. -->
