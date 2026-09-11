@@ -1,0 +1,105 @@
+name: Publish
+
+# The canonical Search release. CI proves a release candidate on every pull request without
+# publishing; this workflow publishes one, and nothing triggers it on its own — a v* tag is the
+# release act, and MinVer reads that same tag for the version.
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Type "publish" to release the packages and images built from this ref.
+        required: true
+        default: ''
+
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    name: Publish Search packages and images
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Require an explicit confirmation for a manual run
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.confirm != 'publish'
+        run: |
+          echo '::error::Manual publication requires the confirm input to be exactly "publish".'
+          exit 1
+
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        with:
+          dotnet-version: 10.x
+
+      - name: Build and verify the release candidate
+        shell: pwsh
+        env:
+          GITHUB_PACKAGES_TOKEN: ${{ secrets.CONCERTABLE_PACKAGES_READ }}
+        run: >-
+          ./scripts/verify-search-release-candidate.ps1
+          -Configuration Release
+          -OutputPath '${{ runner.temp }}/search-release'
+          -KeepArtifacts
+
+      - name: Log in to the container registry
+        env:
+          REGISTRY_TOKEN: ${{ secrets.CONCERTABLE_PACKAGES_WRITE }}
+        run: echo "$REGISTRY_TOKEN" | docker login ghcr.io --username '${{ github.actor }}' --password-stdin
+
+      - name: Publish images
+        shell: pwsh
+        run: |
+          $release = '${{ runner.temp }}/search-release'
+          $manifest = Get-Content -Raw -LiteralPath (Join-Path $release 'release-manifest.json') | ConvertFrom-Json
+          foreach ($image in $manifest.images) {
+            $archive = Join-Path $release $image.archive.path
+            docker image load --input $archive
+            if ($LASTEXITCODE -ne 0) { throw "Could not load '$archive'." }
+            foreach ($tag in $image.intendedTags) {
+              $reference = "$($image.repository):$tag"
+              docker image tag $image.localImageId $reference
+              if ($LASTEXITCODE -ne 0) { throw "Could not tag '$reference'." }
+              docker image push $reference
+              if ($LASTEXITCODE -ne 0) { throw "Could not push '$reference'." }
+            }
+          }
+
+      - name: Publish packages
+        shell: pwsh
+        run: |
+          $release = '${{ runner.temp }}/search-release'
+          $manifest = Get-Content -Raw -LiteralPath (Join-Path $release 'release-manifest.json') | ConvertFrom-Json
+          foreach ($package in $manifest.packages) {
+            dotnet nuget push (Join-Path $release $package.artifact.path) `
+              --source 'https://nuget.pkg.github.com/Concertable/index.json' `
+              --api-key '${{ secrets.CONCERTABLE_PACKAGES_WRITE }}' `
+              --skip-duplicate
+            if ($LASTEXITCODE -ne 0) { throw "Could not push '$($package.id)'." }
+          }
+
+      - name: Retain the release manifest and evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: search-release-evidence
+          path: |
+            ${{ runner.temp }}/search-release/release-manifest.json
+            ${{ runner.temp }}/search-release/evidence
+          if-no-files-found: error
+
+      - name: Log out of the container registry
+        if: always()
+        run: docker logout ghcr.io
