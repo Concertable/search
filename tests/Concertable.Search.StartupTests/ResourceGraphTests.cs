@@ -1,6 +1,8 @@
 using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Concertable.Auth.Hosting;
+using Concertable.B2B.Hosting;
+using Concertable.Search.Hosting;
 using Concertable.Testing.Architecture;
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
@@ -17,10 +19,40 @@ public sealed class ResourceGraphTests
         AssertContainerRuntimeArgs(validBuilder, AuthConstants.Resource, "--user", "root");
         AssertUsesDeveloperCertificate(validBuilder, AuthConstants.Resource);
         await AssertNoSpaClientsAsync(validBuilder);
+        var migrations = Assert.IsType<ProjectResource>(validBuilder.Resources.Single(resource =>
+            resource.Name == SearchConstants.MigrationsResource));
+        Assert.NotEmpty(migrations.Annotations.OfType<EnvironmentCallbackAnnotation>());
+        AssertWaitsFor(validBuilder, SearchConstants.MigrationsResource, SearchConstants.Database, WaitType.WaitUntilHealthy);
+        Assert.IsType<ProjectResource>(validBuilder.Resources.Single(resource =>
+            resource.Name == SearchConstants.WebResource));
+        Assert.IsType<ProjectResource>(validBuilder.Resources.Single(resource =>
+            resource.Name == SearchConstants.WorkersResource));
+        AssertWaitsFor(validBuilder, SearchConstants.WebResource, SearchConstants.MigrationsResource, WaitType.WaitForCompletion);
+        AssertWaitsFor(validBuilder, SearchConstants.WorkersResource, SearchConstants.MigrationsResource, WaitType.WaitForCompletion);
+        AssertWaitsFor(validBuilder, B2BConstants.SeedingSimulatorResource, SearchConstants.WorkersResource, WaitType.WaitUntilHealthy);
+        Assert.DoesNotContain(validBuilder.Resources, resource => resource.Name == B2BConstants.Database);
         using var app = validBuilder.Build();
         var builder = AppHost.CreateBuilder([]);
         builder.Services.AddInvalidLifetimeGraph();
         Assert.ThrowsAny<Exception>(() => builder.Build());
+    }
+
+    private static void AssertWaitsFor(
+        IDistributedApplicationBuilder builder,
+        string resourceName,
+        string dependencyName,
+        WaitType waitType)
+    {
+        var resource = builder.Resources.Single(candidate => candidate.Name == resourceName);
+        var wait = Assert.Single(
+            resource.Annotations.OfType<WaitAnnotation>(),
+            annotation => annotation.Resource.Name == dependencyName);
+
+        Assert.Equal(waitType, wait.WaitType);
+        if (waitType == WaitType.WaitForCompletion)
+        {
+            Assert.Equal(0, wait.ExitCode);
+        }
     }
 
     private static async Task AssertNoSpaClientsAsync(IDistributedApplicationBuilder builder)
