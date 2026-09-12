@@ -26,6 +26,7 @@
 
   <!-- Never a ProjectReference: would break Search's standalone carve. -->
   <ItemGroup>
+    <PackageReference Include="Concertable.Auth.Contracts" />
     <PackageReference Include="Concertable.ServiceDefaults" />
     <PackageReference Include="Concertable.Shared.Api" />
   </ItemGroup>

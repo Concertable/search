@@ -2,7 +2,10 @@
 
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <ConcertableDotNetPlatformVersion>0.1.0-alpha.0.1370</ConcertableDotNetPlatformVersion>
+    <ConcertableDotNetPlatformVersion>0.2.0-alpha.0.5</ConcertableDotNetPlatformVersion>
+    <ConcertableAuthVersion>0.1.0-alpha.0.1383</ConcertableAuthVersion>
+    <ConcertableB2BContractsVersion>0.1.0-alpha.0.1381</ConcertableB2BContractsVersion>
+    <ConcertableSearchVersion>0.1.0-alpha.0.1381</ConcertableSearchVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -31,19 +34,20 @@
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.0.2" />
   </ItemGroup>
 
-  <!-- Shared platform + cross-service contracts from the org feed, pinned lockstep via
-       ConcertableDotNetPlatformVersion above. Bump only to a version already published to the feed,
-       else restore fails NU1101. -->
+  <!-- Shared platform + cross-service contracts from the org feed. Each train moves on its own
+       cadence, so they carry separate variables rather than one lockstep pin. Bump only to a version
+       already published to the feed, else restore fails NU1101. -->
   <ItemGroup>
     <PackageVersion Include="Concertable.AppHost.Shared" Version="$(ConcertableDotNetPlatformVersion)" />
-    <PackageVersion Include="Concertable.Auth.Hosting" Version="$(ConcertableDotNetPlatformVersion)" />
-    <PackageVersion Include="Concertable.B2B.Hosting" Version="$(ConcertableDotNetPlatformVersion)" />
-    <PackageVersion Include="Concertable.Search.Hosting" Version="$(ConcertableDotNetPlatformVersion)" />
-    <PackageVersion Include="Concertable.B2B.Tenant.Contracts" Version="$(ConcertableDotNetPlatformVersion)" />
-    <PackageVersion Include="Concertable.B2B.Artist.Contracts" Version="$(ConcertableDotNetPlatformVersion)" />
-    <PackageVersion Include="Concertable.B2B.Venue.Contracts" Version="$(ConcertableDotNetPlatformVersion)" />
-    <PackageVersion Include="Concertable.B2B.Concert.Contracts" Version="$(ConcertableDotNetPlatformVersion)" />
-    <PackageVersion Include="Concertable.B2B.Seed.Contracts" Version="$(ConcertableDotNetPlatformVersion)" />
+    <PackageVersion Include="Concertable.Auth.Contracts" Version="$(ConcertableAuthVersion)" />
+    <PackageVersion Include="Concertable.Auth.Hosting" Version="$(ConcertableAuthVersion)" />
+    <PackageVersion Include="Concertable.B2B.Hosting" Version="$(ConcertableB2BContractsVersion)" />
+    <PackageVersion Include="Concertable.Search.Hosting" Version="$(ConcertableSearchVersion)" />
+    <PackageVersion Include="Concertable.B2B.Tenant.Contracts" Version="$(ConcertableB2BContractsVersion)" />
+    <PackageVersion Include="Concertable.B2B.Artist.Contracts" Version="$(ConcertableB2BContractsVersion)" />
+    <PackageVersion Include="Concertable.B2B.Venue.Contracts" Version="$(ConcertableB2BContractsVersion)" />
+    <PackageVersion Include="Concertable.B2B.Concert.Contracts" Version="$(ConcertableB2BContractsVersion)" />
+    <PackageVersion Include="Concertable.B2B.Seed.Contracts" Version="$(ConcertableB2BContractsVersion)" />
     <PackageVersion Include="Concertable.Kernel" Version="$(ConcertableDotNetPlatformVersion)" />
     <PackageVersion Include="Concertable.DataAccess.Infrastructure" Version="$(ConcertableDotNetPlatformVersion)" />
     <PackageVersion Include="Concertable.Messaging.Contracts" Version="$(ConcertableDotNetPlatformVersion)" />

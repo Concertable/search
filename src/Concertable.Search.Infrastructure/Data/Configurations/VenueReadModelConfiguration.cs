@@ -1,4 +1,5 @@
-﻿using Concertable.Kernel;
+﻿using Concertable.DataAccess.Infrastructure.Extensions;
+using Concertable.Kernel;
 using Concertable.Search.Domain.ReadModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -13,7 +14,7 @@ internal sealed class VenueReadModelConfiguration : IEntityTypeConfiguration<Ven
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).ValueGeneratedNever();
         builder.Property(x => x.Name).IsRequired();
-        builder.Property(x => x.Location).HasColumnType("geography").IsRequired();
+        builder.Property(x => x.Location).HasGeographyColumn().IsRequired();
         builder.OwnsAddress(x => x.Address);
     }
 }
