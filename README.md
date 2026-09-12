@@ -27,14 +27,13 @@ dotnet restore Concertable.Search.slnx
 dotnet build Concertable.Search.slnx --configuration Release --no-restore
 dotnet publish src/Concertable.Search.Migrations/Concertable.Search.Migrations.csproj --configuration Release
 dotnet pack src/Concertable.Search.Hosting/Concertable.Search.Hosting.csproj --configuration Release --output artifacts/packages -p:MinVerVersionOverride=0.0.0-local
-dotnet pack src/Concertable.Search.TestKit/Concertable.Search.TestKit.csproj --configuration Release --output artifacts/packages -p:MinVerVersionOverride=0.0.0-local
 pwsh ./scripts/verify-package-candidates.ps1 -PackageDirectory artifacts/packages
 dotnet test Concertable.Search.slnx --configuration Release --no-build --no-restore -m:1
 ```
 
 The integration suite requires Docker. The repository CI supplies its `GITHUB_TOKEN` through
-`GITHUB_PACKAGES_TOKEN`, runs these repository gates, packs the unpublished Hosting and TestKit candidates,
-verifies both through one clean installed-package consumer, builds the standalone AppHost, runs its
+`GITHUB_PACKAGES_TOKEN`, runs these repository gates, packs the unpublished Hosting candidate,
+verifies it through one clean installed-package consumer, builds the standalone AppHost, runs its
 architecture coverage, and retains preparation artifacts for seven days. The standalone host runs Search
 from source, consumes Auth and the B2B seed simulator as digest-pinned images, and does not provision a
 foreign data-service database. It runs the Search migration job to successful completion before starting Web
@@ -65,7 +64,7 @@ cutover workflow.
 
 ## Verifying one release candidate
 
-The combined verifier proves that the Hosting and TestKit packages and all three images come from one clean
+The combined verifier proves that the Hosting package and all three images come from one clean
 Search revision and share one MinVer-derived version. It exercises the clean package consumer and image
 contracts, scans saved image archives, creates checksummed scan/SBOM evidence, and validates a complete release
 manifest before removing its owned temporary directory, images, and Docker cache volume:
