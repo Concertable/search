@@ -351,7 +351,7 @@ try {
     New-TrivyCacheVolume
     $trivyCacheVolumeCreated = $true
     Invoke-Trivy -Arguments @(
-        'filesystem', '--scanners', 'secret', '--exit-code', '1', '--format', 'json',
+        'filesystem', '--scanners', 'secret', '--exit-code', '1', '--format', 'json', '--timeout', '30m',
         '--output', '/evidence/source-secrets.json', '--no-progress',
         '--skip-dirs', '/work/.git',
         '--skip-dirs', '/work/.vs',
@@ -379,15 +379,15 @@ try {
         }
 
         Invoke-Trivy -Arguments @(
-            'image', '--scanners', 'vuln', '--severity', 'CRITICAL', '--exit-code', '1', '--format', 'json',
+            'image', '--scanners', 'vuln', '--severity', 'CRITICAL', '--exit-code', '1', '--format', 'json', '--timeout', '30m',
             '--output', "/evidence/$($item.File)-vulnerabilities.json", '--no-progress', '--input', "/images/$($item.File).tar"
         )
         Invoke-Trivy -Arguments @(
-            'image', '--scanners', 'secret', '--exit-code', '1', '--format', 'json',
+            'image', '--scanners', 'secret', '--exit-code', '1', '--format', 'json', '--timeout', '30m',
             '--output', "/evidence/$($item.File)-secrets.json", '--no-progress', '--input', "/images/$($item.File).tar"
         )
         Invoke-Trivy -Arguments @(
-            'image', '--format', 'cyclonedx', '--output', "/evidence/$($item.File).cdx.json",
+            'image', '--format', 'cyclonedx', '--timeout', '30m', '--output', "/evidence/$($item.File).cdx.json",
             '--no-progress', '--input', "/images/$($item.File).tar"
         )
 
