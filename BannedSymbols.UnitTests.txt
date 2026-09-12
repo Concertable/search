@@ -1,0 +1,10 @@
+T:Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1;A test that boots the application is an integration test, not a unit test. Move it to this service's *.IntegrationTests project, which owns the fixture that boots the real Program against a containerized database. Skill: integration-testing.
+T:Microsoft.AspNetCore.TestHost.TestServer;A test that boots a server is an integration test, not a unit test. Move it to this service's *.IntegrationTests project. Skill: integration-testing.
+M:Microsoft.AspNetCore.Builder.WebApplication.CreateBuilder;Building a WebApplication in a unit test makes it an integration test. Unit tests construct the system under test directly in the test constructor. Skills: unit-testing, integration-testing.
+M:Microsoft.AspNetCore.Builder.WebApplication.Create;Building a WebApplication in a unit test makes it an integration test. Unit tests construct the system under test directly in the test constructor. Skills: unit-testing, integration-testing.
+T:Aspire.Hosting.Testing.DistributedApplicationTestingBuilder;Starting the distributed application makes this an E2E test, not a unit test. It belongs in this service's *.E2ETests project. Skill: e2e-scenarios.
+T:Respawn.Respawner;Resetting a database between tests makes this an integration test, not a unit test. Move it to this service's *.IntegrationTests project, which owns the fixture that does this once. Skill: integration-testing.
+T:Testcontainers.MsSql.MsSqlBuilder;Starting a database container makes this an integration test, not a unit test. Move it to this service's *.IntegrationTests project. Skill: integration-testing.
+T:Microsoft.Playwright.IPlaywright;Driving a browser makes this a UI E2E test, not a unit test. It belongs in the *.E2ETests.Ui project. Skill: e2e-scenarios.
+T:Microsoft.Playwright.Playwright;Driving a browser makes this a UI E2E test, not a unit test. It belongs in the *.E2ETests.Ui project. Skill: e2e-scenarios.
+T:Reqnroll.BindingAttribute;A Gherkin step binding belongs to an E2E suite, not a unit test. Move it to the matching *.E2ETests project. Skill: e2e-scenarios.

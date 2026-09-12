@@ -1,0 +1,51 @@
+<Project>
+
+  <!-- Test-tier gate. Shared by every service the same way api/BannedSymbols.txt is: one file, imported
+       once per Directory.Build.targets. Lives in .targets and not .props because props are imported
+       before the csproj body, where $(IsTestProject) is not yet set.
+
+       The project NAME is the single declaration of tier, so no separate property can disagree with it.
+       Every EndsWith is tested before the single Contains, or Concertable.Payment.E2ETests.Helpers.UnitTests -
+       a unit-test project for an E2E helper library - would resolve as E2E. -->
+  <PropertyGroup Condition="'$(IsTestProject)' == 'true'">
+    <ConcertableTestTier Condition="$(MSBuildProjectName.EndsWith('.UnitTests'))">Unit</ConcertableTestTier>
+    <ConcertableTestTier Condition="'$(ConcertableTestTier)' == '' And $(MSBuildProjectName.EndsWith('.IntegrationTests'))">Integration</ConcertableTestTier>
+    <ConcertableTestTier Condition="'$(ConcertableTestTier)' == '' And $(MSBuildProjectName.EndsWith('.ArchitectureTests'))">Architecture</ConcertableTestTier>
+    <ConcertableTestTier Condition="'$(ConcertableTestTier)' == '' And $(MSBuildProjectName.EndsWith('.StartupTests'))">Startup</ConcertableTestTier>
+    <ConcertableTestTier Condition="'$(ConcertableTestTier)' == '' And $(MSBuildProjectName.Contains('.E2ETests'))">E2E</ConcertableTestTier>
+  </PropertyGroup>
+
+  <!-- Source-level fingerprints a PackageReference check cannot see, because the symbol can arrive
+       through a transitive reference - which is the usual shape here, a unit project referencing a
+       *.Fixtures or *.Helpers library. Unit tier only, which is why the shared list cannot hold it.
+       RS0030 fires on a symbol being USED, so a project may still reference the package. -->
+  <ItemGroup Condition="'$(ConcertableTestTier)' == 'Unit'">
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)BannedSymbols.UnitTests.txt"
+                     Condition="Exists('$(MSBuildThisFileDirectory)BannedSymbols.UnitTests.txt')" />
+  </ItemGroup>
+
+  <Target Name="ValidateTestConventions" BeforeTargets="BeforeBuild" Condition="'$(IsTestProject)' == 'true'">
+
+    <Error Condition="'$(ConcertableTestTier)' == ''"
+           Text="Test-tier violation: '$(MSBuildProjectName)' declares &lt;IsTestProject&gt;true&lt;/IsTestProject&gt; but its name states no tier. Rename it to end in .UnitTests, .IntegrationTests, .ArchitectureTests or .StartupTests, or to contain .E2ETests. Answer the question the name is asking: a test needing a host, HTTP or a database is an integration test, not a unit test; a test asking whether a host would refuse to boot on the configuration its app model supplies is a startup test; a test asserting code structure is an architecture test. A support library that is not itself a test suite sets &lt;IsTestProject&gt;false&lt;/IsTestProject&gt; (see the *.Fixtures and *.Helpers projects). Skills: dotnet-standards:unit-testing, dotnet:unit-testing, dotnet-standards:integration-testing." />
+
+    <ItemGroup>
+      <_ConcertableHostPackage Include="@(PackageReference)"
+          Condition="'%(Identity)' == 'Microsoft.AspNetCore.Mvc.Testing'
+                  Or '%(Identity)' == 'Microsoft.AspNetCore.TestHost'
+                  Or '%(Identity)' == 'Respawn'
+                  Or $([System.String]::Copy('%(Identity)').StartsWith('Testcontainers'))
+                  Or $([System.String]::Copy('%(Identity)').StartsWith('Microsoft.Playwright'))
+                  Or $([System.String]::Copy('%(Identity)').StartsWith('Reqnroll'))" />
+      <_ConcertableShouldlyPackage Include="@(PackageReference)" Condition="'%(Identity)' == 'Shouldly'" />
+    </ItemGroup>
+
+    <Error Condition="'$(ConcertableTestTier)' == 'Unit' And '@(_ConcertableHostPackage)' != ''"
+           Text="Test-tier violation: '$(MSBuildProjectName)' is a unit-test project but references @(_ConcertableHostPackage->'%(Identity)', ', '). A test that boots a host, drives HTTP, starts a container or a browser is an integration or E2E test. Move it to the matching project for this service, or rename this one. Skills: dotnet-standards:unit-testing, dotnet:unit-testing, dotnet-standards:integration-testing." />
+
+    <Error Condition="'$(ConcertableTestTier)' == 'Unit' And '@(_ConcertableShouldlyPackage)' != ''"
+           Text="Test-tier violation: '$(MSBuildProjectName)' is a unit-test project referencing Shouldly. One assertion library per tier - the unit tier uses xUnit assertions. Skills: dotnet-standards:unit-testing, dotnet:unit-testing." />
+
+  </Target>
+
+</Project>
