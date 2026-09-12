@@ -224,13 +224,29 @@ function Invoke-Trivy {
         throw "Trivy exited $trivyExit for '$ReportName'; its report is not trusted."
     }
 
-    return (Get-Content -Raw -LiteralPath $reportPath | ConvertFrom-Json)
+    # A present-but-empty report is exactly as uninformative as an absent one, and it is what a
+    # scanner killed mid-write leaves behind. ConvertFrom-Json yields $null for both an empty file
+    # and a literal null, so catch it here rather than letting it reach the gate as a binding error.
+    $report = Get-Content -Raw -LiteralPath $reportPath | ConvertFrom-Json
+    if ($null -eq $report) {
+        throw ("Trivy wrote an empty or unparseable report for '$ReportName' (exit $trivyExit). " +
+               'This is a scan failure, not a finding -- the gate could not look.')
+    }
+
+    return $report
 }
 
 # Set-StrictMode is on, and a clean scan omits every level rather than emitting an empty one --
 # Results is absent just as Secrets and Vulnerabilities are. Existence-check each hop.
 function Get-TrivyFindings {
-    param([Parameter(Mandatory)] $Report, [Parameter(Mandatory)][string] $Property)
+    # $Report is deliberately NOT Mandatory: Mandatory rejects $null at binding, so the one
+    # input this function exists to survive would die before its first line, with a binding
+    # error rather than a diagnosis. Guarded explicitly below instead.
+    param($Report, [Parameter(Mandatory)][string] $Property)
+
+    if ($null -eq $Report) {
+        throw 'Get-TrivyFindings received a null report; the gate cannot conclude anything from it.'
+    }
 
     # Every `return @()` here unrolls to $null on the way out, which is why callers wrap in @().
     if (-not ($Report.PSObject.Properties.Name -contains 'Results')) { return @() }
