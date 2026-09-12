@@ -5,7 +5,7 @@ using Concertable.B2B.Seed.Contracts;
 using Concertable.Search.Hosting;
 using Concertable.Search.TestKit;
 
-namespace Concertable.Search.StandaloneTests;
+namespace Concertable.Search.E2ETests;
 
 public sealed class SeedConvergenceTests
 {
