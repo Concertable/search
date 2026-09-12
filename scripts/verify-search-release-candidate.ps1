@@ -57,7 +57,7 @@ $packageRoot = Join-Path $releaseRoot 'packages'
 $imageRoot = Join-Path $releaseRoot 'images'
 $evidenceRoot = Join-Path $releaseRoot 'evidence'
 $manifestPath = Join-Path $releaseRoot 'release-manifest.json'
-$trivyCacheVolume = "concertable-search-trivy-cache-$releaseId"
+$trivyCacheDirectory = Join-Path $repositoryRoot 'artifacts/.trivy-cache'
 $webImage = "concertable/search-web:release-candidate-$releaseId"
 $workersImage = "concertable/search-workers:release-candidate-$releaseId"
 $migrationsImage = "concertable/search-migrations:release-candidate-$releaseId"
@@ -68,7 +68,6 @@ $packageProjects = @(
 )
 $packageToken = $env:GITHUB_PACKAGES_TOKEN
 Remove-Item Env:GITHUB_PACKAGES_TOKEN -ErrorAction SilentlyContinue
-$trivyCacheVolumeCreated = $false
 $releaseRootCreated = $false
 $completed = $false
 $releaseVersion = ''
@@ -192,49 +191,57 @@ function Get-ImageInspection {
     return ($json | ConvertFrom-Json)[0]
 }
 
+function Initialize-TrivyCache {
+    if (-not (Test-Path -LiteralPath $trivyCacheDirectory)) {
+        New-Item -ItemType Directory -Path $trivyCacheDirectory -Force | Out-Null
+    }
+}
+
+# Never passes --exit-code. Trivy exits 1 both for "findings" and for a fatal error, so the exit
+# code alone cannot tell a real finding from a scan that never ran. The report file can: the fatal
+# path never writes one. Returns the exit code and lets Assert-TrivyReport decide.
 function Invoke-Trivy {
-    param([Parameter(Mandatory)][string[]] $Arguments)
+    param(
+        [Parameter(Mandatory)][string[]] $Arguments,
+        [Parameter(Mandatory)][string] $ReportName)
 
     & docker run --rm `
         --volume "${repositoryRoot}:/work:ro" `
         --volume "${imageRoot}:/images:ro" `
         --volume "${evidenceRoot}:/evidence" `
-        --volume "${trivyCacheVolume}:/root/.cache/trivy" `
+        --volume "${trivyCacheDirectory}:/root/.cache/trivy" `
         $trivyImage `
         @Arguments
-    if ($LASTEXITCODE -ne 0) {
-        throw "Trivy failed with exit code $LASTEXITCODE for arguments '$($Arguments -join ' ')'."
+    $trivyExit = $LASTEXITCODE
+
+    $reportPath = Join-Path $evidenceRoot $ReportName
+    if (-not (Test-Path -LiteralPath $reportPath -PathType Leaf)) {
+        throw ("Trivy could not complete '$ReportName' (exit $trivyExit) and wrote no report. " +
+               'This is a scan failure, not a finding -- the gate could not look. ' +
+               'Check stderr above for a timeout or a cache problem.')
     }
+    if ($trivyExit -ne 0) {
+        throw "Trivy exited $trivyExit for '$ReportName'; its report is not trusted."
+    }
+
+    return (Get-Content -Raw -LiteralPath $reportPath | ConvertFrom-Json)
 }
 
-function New-TrivyCacheVolume {
-    $createdVolume = (& docker volume create `
-        --label "com.concertable.search.release-candidate=$releaseId" `
-        $trivyCacheVolume).Trim()
-    if ($LASTEXITCODE -ne 0 -or $createdVolume -ne $trivyCacheVolume) {
-        throw "Could not create owned Trivy cache volume '$trivyCacheVolume'."
-    }
-}
+# Set-StrictMode is on, and a clean scan omits every level rather than emitting an empty one --
+# Results is absent just as Secrets and Vulnerabilities are. Existence-check each hop.
+function Get-TrivyFindings {
+    param([Parameter(Mandatory)] $Report, [Parameter(Mandatory)][string] $Property)
 
-function Remove-TrivyCacheVolume {
-    $inspectionJson = & docker volume inspect $trivyCacheVolume 2>$null
-    if ($LASTEXITCODE -ne 0) {
-        $matchingVolumes = @(& docker volume ls --quiet --filter "name=$trivyCacheVolume" 2>$null)
-        if ($LASTEXITCODE -ne 0 -or $matchingVolumes -contains $trivyCacheVolume) {
-            throw "Could not prove Trivy cache volume '$trivyCacheVolume' is absent or owned."
-        }
-        return
-    }
+    if (-not ($Report.PSObject.Properties.Name -contains 'Results')) { return @() }
+    if ($null -eq $Report.Results) { return @() }
 
-    $inspection = ($inspectionJson | ConvertFrom-Json)[0]
-    if ($inspection.Labels.'com.concertable.search.release-candidate' -ne $releaseId) {
-        throw "Refusing to remove unowned Trivy cache volume '$trivyCacheVolume'."
+    $found = @()
+    foreach ($result in @($Report.Results)) {
+        if (-not ($result.PSObject.Properties.Name -contains $Property)) { continue }
+        if ($null -eq $result.$Property) { continue }
+        $found += @($result.$Property)
     }
-
-    & docker volume rm $trivyCacheVolume
-    if ($LASTEXITCODE -ne 0) {
-        throw "Could not remove Trivy cache volume '$trivyCacheVolume'."
-    }
+    return $found
 }
 
 function Remove-CandidateImage {
@@ -348,10 +355,10 @@ try {
     }
     $packageToken = $null
 
-    New-TrivyCacheVolume
-    $trivyCacheVolumeCreated = $true
-    Invoke-Trivy -Arguments @(
-        'filesystem', '--scanners', 'secret', '--exit-code', '1', '--format', 'json', '--timeout', '30m',
+    Initialize-TrivyCache
+    # --timeout is a backstop against a pathological walk, not the fix; the persistent cache is.
+    $sourceReport = Invoke-Trivy -ReportName 'source-secrets.json' -Arguments @(
+        'filesystem', '--scanners', 'secret', '--format', 'json', '--timeout', '30m',
         '--output', '/evidence/source-secrets.json', '--no-progress',
         '--skip-dirs', '/work/.git',
         '--skip-dirs', '/work/.vs',
@@ -360,6 +367,10 @@ try {
         '--skip-dirs', '/work/**/obj',
         '/work'
     )
+    $sourceSecrets = Get-TrivyFindings -Report $sourceReport -Property 'Secrets'
+    if ($sourceSecrets.Count -gt 0) {
+        throw "Source secret scan found $($sourceSecrets.Count) secret(s); see source-secrets.json."
+    }
 
     $imageEvidence = @(
         [ordered]@{ Image = $webImage; Repository = 'ghcr.io/concertable/search-web'; File = 'search-web' },
@@ -378,18 +389,28 @@ try {
             throw "Could not save release-candidate image '$($item.Image)'."
         }
 
-        Invoke-Trivy -Arguments @(
-            'image', '--scanners', 'vuln', '--severity', 'CRITICAL', '--exit-code', '1', '--format', 'json', '--timeout', '30m',
+        $vulnReport = Invoke-Trivy -ReportName "$($item.File)-vulnerabilities.json" -Arguments @(
+            'image', '--scanners', 'vuln', '--severity', 'CRITICAL', '--format', 'json', '--timeout', '30m',
             '--output', "/evidence/$($item.File)-vulnerabilities.json", '--no-progress', '--input', "/images/$($item.File).tar"
         )
-        Invoke-Trivy -Arguments @(
-            'image', '--scanners', 'secret', '--exit-code', '1', '--format', 'json', '--timeout', '30m',
+        $criticals = Get-TrivyFindings -Report $vulnReport -Property 'Vulnerabilities'
+        if ($criticals.Count -gt 0) {
+            throw "Image '$($item.Image)' has $($criticals.Count) CRITICAL vulnerability(ies)."
+        }
+
+        $imageSecretReport = Invoke-Trivy -ReportName "$($item.File)-secrets.json" -Arguments @(
+            'image', '--scanners', 'secret', '--format', 'json', '--timeout', '30m',
             '--output', "/evidence/$($item.File)-secrets.json", '--no-progress', '--input', "/images/$($item.File).tar"
         )
-        Invoke-Trivy -Arguments @(
+        $imageSecrets = Get-TrivyFindings -Report $imageSecretReport -Property 'Secrets'
+        if ($imageSecrets.Count -gt 0) {
+            throw "Image '$($item.Image)' contains $($imageSecrets.Count) secret(s)."
+        }
+
+        Invoke-Trivy -ReportName "$($item.File).cdx.json" -Arguments @(
             'image', '--format', 'cyclonedx', '--timeout', '30m', '--output', "/evidence/$($item.File).cdx.json",
             '--no-progress', '--input', "/images/$($item.File).tar"
-        )
+        ) | Out-Null
 
         $sbom = Get-Content -Raw -LiteralPath $sbomPath | ConvertFrom-Json
         if ($sbom.bomFormat -ne 'CycloneDX' -or @($sbom.components).Count -eq 0) {
@@ -471,21 +492,17 @@ finally {
         }
     }
     finally {
-        try {
-            if ($trivyCacheVolumeCreated) {
-                Remove-TrivyCacheVolume
-            }
+        # The Trivy cache directory is deliberately NOT removed here. Deleting it is the bug: a cache
+        # recreated empty every run makes every scan cold, which is what made a scan that never ran
+        # look like a secret finding. Do not add a cleanup for it.
+        if ((Test-Path -LiteralPath $markerPath -PathType Leaf) -and (-not $KeepArtifacts -or -not $completed)) {
+            Assert-ReleaseRoot
+            Remove-Item -LiteralPath $releaseRoot -Recurse -Force
+            $releaseRootCreated = $false
         }
-        finally {
-            if ((Test-Path -LiteralPath $markerPath -PathType Leaf) -and (-not $KeepArtifacts -or -not $completed)) {
-                Assert-ReleaseRoot
-                Remove-Item -LiteralPath $releaseRoot -Recurse -Force
-                $releaseRootCreated = $false
-            }
-            elseif ($releaseRootCreated -and -not (Test-Path -LiteralPath $markerPath)) {
-                Remove-Item -LiteralPath $releaseRoot -Recurse -Force -ErrorAction SilentlyContinue
-                $releaseRootCreated = $false
-            }
+        elseif ($releaseRootCreated -and -not (Test-Path -LiteralPath $markerPath)) {
+            Remove-Item -LiteralPath $releaseRoot -Recurse -Force -ErrorAction SilentlyContinue
+            $releaseRootCreated = $false
         }
     }
 }
