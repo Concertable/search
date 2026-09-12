@@ -238,6 +238,9 @@ function Get-TrivyFindings {
 
     $found = @()
     foreach ($result in @($Report.Results)) {
+        # A JSON null ELEMENT survives the property-existence check and dies on member access:
+        # @($null) is a one-element array holding $null, and $null.PSObject throws under StrictMode.
+        if ($null -eq $result) { continue }
         if (-not ($result.PSObject.Properties.Name -contains $Property)) { continue }
         if ($null -eq $result.$Property) { continue }
         $found += @($result.$Property)
