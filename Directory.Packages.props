@@ -5,7 +5,6 @@
     <ConcertableDotNetPlatformVersion>0.2.0-alpha.0.5</ConcertableDotNetPlatformVersion>
     <ConcertableAuthVersion>0.1.0-alpha.0.1383</ConcertableAuthVersion>
     <ConcertableB2BContractsVersion>0.1.0-alpha.0.1381</ConcertableB2BContractsVersion>
-    <ConcertableSearchVersion>0.1.0-alpha.0.1381</ConcertableSearchVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -42,7 +41,6 @@
     <PackageVersion Include="Concertable.Auth.Contracts" Version="$(ConcertableAuthVersion)" />
     <PackageVersion Include="Concertable.Auth.Hosting" Version="$(ConcertableAuthVersion)" />
     <PackageVersion Include="Concertable.B2B.Hosting" Version="$(ConcertableB2BContractsVersion)" />
-    <PackageVersion Include="Concertable.Search.Hosting" Version="$(ConcertableSearchVersion)" />
     <PackageVersion Include="Concertable.B2B.Tenant.Contracts" Version="$(ConcertableB2BContractsVersion)" />
     <PackageVersion Include="Concertable.B2B.Artist.Contracts" Version="$(ConcertableB2BContractsVersion)" />
     <PackageVersion Include="Concertable.B2B.Venue.Contracts" Version="$(ConcertableB2BContractsVersion)" />
