@@ -1,4 +1,5 @@
-﻿using Concertable.Search.Domain.ReadModels;
+﻿using Concertable.DataAccess.Infrastructure.Extensions;
+using Concertable.Search.Domain.ReadModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -12,7 +13,7 @@ internal sealed class ConcertReadModelConfiguration : IEntityTypeConfiguration<C
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).ValueGeneratedNever();
         builder.Property(x => x.Name).IsRequired();
-        builder.Property(x => x.Location).HasColumnType("geography").IsRequired();
+        builder.Property(x => x.Location).HasGeographyColumn().IsRequired();
         builder.Property(x => x.Price).HasPrecision(18, 2);
 
         builder.HasMany(x => x.ConcertGenres)
