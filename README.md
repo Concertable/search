@@ -67,7 +67,8 @@ cutover workflow.
 The combined verifier proves that the Hosting package and all three images come from one clean
 Search revision and share one MinVer-derived version. It exercises the clean package consumer and image
 contracts, scans saved image archives, creates checksummed scan/SBOM evidence, and validates a complete release
-manifest before removing its owned temporary directory, images, and Docker cache volume:
+manifest before removing its owned temporary directory and images. The Trivy cache volume is
+reused across runs rather than removed — a cache destroyed each run is cold by construction:
 
 ```sh
 pwsh ./scripts/verify-search-release-candidate.ps1
