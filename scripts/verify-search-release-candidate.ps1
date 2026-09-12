@@ -232,6 +232,7 @@ function Invoke-Trivy {
 function Get-TrivyFindings {
     param([Parameter(Mandatory)] $Report, [Parameter(Mandatory)][string] $Property)
 
+    # Every `return @()` here unrolls to $null on the way out, which is why callers wrap in @().
     if (-not ($Report.PSObject.Properties.Name -contains 'Results')) { return @() }
     if ($null -eq $Report.Results) { return @() }
 
@@ -367,7 +368,7 @@ try {
         '--skip-dirs', '/work/**/obj',
         '/work'
     )
-    $sourceSecrets = Get-TrivyFindings -Report $sourceReport -Property 'Secrets'
+    $sourceSecrets = @(Get-TrivyFindings -Report $sourceReport -Property 'Secrets')
     if ($sourceSecrets.Count -gt 0) {
         throw "Source secret scan found $($sourceSecrets.Count) secret(s); see source-secrets.json."
     }
@@ -393,7 +394,7 @@ try {
             'image', '--scanners', 'vuln', '--severity', 'CRITICAL', '--format', 'json', '--timeout', '30m',
             '--output', "/evidence/$($item.File)-vulnerabilities.json", '--no-progress', '--input', "/images/$($item.File).tar"
         )
-        $criticals = Get-TrivyFindings -Report $vulnReport -Property 'Vulnerabilities'
+        $criticals = @(Get-TrivyFindings -Report $vulnReport -Property 'Vulnerabilities')
         if ($criticals.Count -gt 0) {
             throw "Image '$($item.Image)' has $($criticals.Count) CRITICAL vulnerability(ies)."
         }
@@ -402,7 +403,7 @@ try {
             'image', '--scanners', 'secret', '--format', 'json', '--timeout', '30m',
             '--output', "/evidence/$($item.File)-secrets.json", '--no-progress', '--input', "/images/$($item.File).tar"
         )
-        $imageSecrets = Get-TrivyFindings -Report $imageSecretReport -Property 'Secrets'
+        $imageSecrets = @(Get-TrivyFindings -Report $imageSecretReport -Property 'Secrets')
         if ($imageSecrets.Count -gt 0) {
             throw "Image '$($item.Image)' contains $($imageSecrets.Count) secret(s)."
         }
