@@ -208,8 +208,8 @@ try {
     }
 
     Assert-ImageMetadata -Image $WebImage -ExpectedAssembly 'Concertable.Search.Web.dll' -ExpectedRuntime 'Microsoft\.AspNetCore\.App 10\.'
-    Assert-ImageMetadata -Image $WorkersImage -ExpectedAssembly 'Concertable.Search.Workers.dll' -ExpectedRuntime 'Microsoft\.NETCore\.App 10\.'
-    Assert-ImageMetadata -Image $MigrationsImage -ExpectedAssembly 'Concertable.Search.Migrations.dll' -ExpectedRuntime 'Microsoft\.NETCore\.App 10\.'
+    Assert-ImageMetadata -Image $WorkersImage -ExpectedAssembly 'Concertable.Search.Workers.dll' -ExpectedRuntime 'Microsoft\.AspNetCore\.App 10\.'
+    Assert-ImageMetadata -Image $MigrationsImage -ExpectedAssembly 'Concertable.Search.Migrations.dll' -ExpectedRuntime 'Microsoft\.AspNetCore\.App 10\.'
     $packageToken = $null
 
     Write-Host "Verified Search images for revision ${revision}: $($images -join ', ')."
