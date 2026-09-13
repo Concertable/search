@@ -43,7 +43,7 @@ EXPOSE 8080
 USER $APP_UID
 ENTRYPOINT ["dotnet", "Concertable.Search.Web.dll"]
 
-FROM ${DOTNET_RUNTIME_IMAGE} AS search-workers
+FROM ${DOTNET_ASPNET_IMAGE} AS search-workers
 ARG VCS_REF
 ARG BUILD_VERSION
 LABEL org.opencontainers.image.source="https://github.com/Concertable/search" \
@@ -57,7 +57,7 @@ ENV DOTNET_EnableDiagnostics=0
 USER $APP_UID
 ENTRYPOINT ["dotnet", "Concertable.Search.Workers.dll"]
 
-FROM ${DOTNET_RUNTIME_IMAGE} AS search-migrations
+FROM ${DOTNET_ASPNET_IMAGE} AS search-migrations
 ARG VCS_REF
 ARG BUILD_VERSION
 LABEL org.opencontainers.image.source="https://github.com/Concertable/search" \
