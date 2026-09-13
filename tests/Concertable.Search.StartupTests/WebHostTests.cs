@@ -42,4 +42,18 @@ public sealed class WebHostTests
 
         Assert.True(jwtOptions.RequireHttpsMetadata);
     }
+
+    [Fact]
+    public void E2EEnvironment_AllowsHttpMetadata()
+    {
+        var arguments = CompositionTestArguments.Create();
+        arguments[0] = "--environment=E2E";
+        var builder = WebApplication.CreateBuilder(arguments);
+        builder.AddSearchWebHost();
+        using var app = builder.Build();
+        var jwtOptions = app.Services.GetRequiredService<IOptionsMonitor<JwtBearerOptions>>()
+            .Get(JwtBearerDefaults.AuthenticationScheme);
+
+        Assert.False(jwtOptions.RequireHttpsMetadata);
+    }
 }
