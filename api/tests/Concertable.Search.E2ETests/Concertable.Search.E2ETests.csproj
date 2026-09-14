@@ -17,9 +17,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Concertable.Search.AppHost\Concertable.Search.AppHost.csproj" />
-    <ProjectReference Include="..\..\src\Concertable.Search.Hosting\Concertable.Search.Hosting.csproj" />
-    <ProjectReference Include="..\..\src\Concertable.Search.TestKit\Concertable.Search.TestKit.csproj" />
+    <ProjectReference Include="..\..\..\local\AppHost\Concertable.Search.AppHost.csproj" />
+    <ProjectReference Include="..\..\..\api\src\Concertable.Search.Hosting\Concertable.Search.Hosting.csproj" />
+    <ProjectReference Include="..\..\..\api\src\Concertable.Search.TestKit\Concertable.Search.TestKit.csproj" />
   </ItemGroup>
 
   <ItemGroup>
