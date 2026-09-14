@@ -16,12 +16,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Concertable.Search.Web\Concertable.Search.Web.csproj" />
-    <ProjectReference Include="..\..\src\Concertable.Search.Infrastructure\Concertable.Search.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\api\src\Concertable.Search.Web\Concertable.Search.Web.csproj" />
+    <ProjectReference Include="..\..\..\api\src\Concertable.Search.Infrastructure\Concertable.Search.Infrastructure.csproj" />
     <PackageReference Include="Concertable.Testing" />
     <PackageReference Include="Concertable.Testing.Integration" />
     <PackageReference Include="Concertable.Seed.Shared" />
-    <ProjectReference Include="..\..\src\Seed\Concertable.Search.Seed.Infrastructure\Concertable.Search.Seed.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\api\src\Seed\Concertable.Search.Seed.Infrastructure\Concertable.Search.Seed.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
