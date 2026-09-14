@@ -25,8 +25,8 @@ them needs a GitHub [personal access token](https://github.com/settings/tokens) 
 export GITHUB_PACKAGES_TOKEN=<your read:packages PAT>
 dotnet restore Concertable.Search.slnx
 dotnet build Concertable.Search.slnx --configuration Release --no-restore
-dotnet publish src/Concertable.Search.Migrations/Concertable.Search.Migrations.csproj --configuration Release
-dotnet pack src/Concertable.Search.Hosting/Concertable.Search.Hosting.csproj --configuration Release --output artifacts/packages -p:MinVerVersionOverride=0.0.0-local
+dotnet publish api/src/Concertable.Search.Migrations/Concertable.Search.Migrations.csproj --configuration Release
+dotnet pack api/src/Concertable.Search.Hosting/Concertable.Search.Hosting.csproj --configuration Release --output artifacts/packages -p:MinVerVersionOverride=0.0.0-local
 pwsh ./scripts/verify-package-candidates.ps1 -PackageDirectory artifacts/packages
 dotnet test Concertable.Search.slnx --configuration Release --no-build --no-restore -m:1
 ```

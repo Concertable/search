@@ -113,10 +113,10 @@ jobs:
           }
 
       - name: Publish Search migration job
-        run: dotnet publish src/Concertable.Search.Migrations/Concertable.Search.Migrations.csproj --configuration Release --no-restore --output artifacts/migrations
+        run: dotnet publish api/src/Concertable.Search.Migrations/Concertable.Search.Migrations.csproj --configuration Release --no-restore --output artifacts/migrations
 
       - name: Pack Search Hosting
-        run: dotnet pack src/Concertable.Search.Hosting/Concertable.Search.Hosting.csproj --configuration Release --output artifacts/packages -p:MinVerVersionOverride=0.0.0-ci.${{ github.run_number }}
+        run: dotnet pack api/src/Concertable.Search.Hosting/Concertable.Search.Hosting.csproj --configuration Release --output artifacts/packages -p:MinVerVersionOverride=0.0.0-ci.${{ github.run_number }}
 
       - name: Verify package candidates from a clean consumer
         shell: pwsh

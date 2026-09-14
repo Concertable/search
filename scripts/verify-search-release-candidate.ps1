@@ -64,7 +64,7 @@ $migrationsImage = "concertable/search-migrations:release-candidate-$releaseId"
 $candidateImages = @($webImage, $workersImage, $migrationsImage)
 $expectedPackageIds = @('Concertable.Search.Hosting')
 $packageProjects = @(
-    (Join-Path $repositoryRoot 'src/Concertable.Search.Hosting/Concertable.Search.Hosting.csproj')
+    (Join-Path $repositoryRoot 'api/src/Concertable.Search.Hosting/Concertable.Search.Hosting.csproj')
 )
 $packageToken = $env:GITHUB_PACKAGES_TOKEN
 Remove-Item Env:GITHUB_PACKAGES_TOKEN -ErrorAction SilentlyContinue

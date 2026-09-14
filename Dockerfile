@@ -14,16 +14,16 @@ ARG BUILD_VERSION
 RUN --mount=type=secret,id=GITHUB_PACKAGES_TOKEN,required=true \
     GITHUB_PACKAGES_TOKEN="$(cat /run/secrets/GITHUB_PACKAGES_TOKEN)" && \
     export GITHUB_PACKAGES_TOKEN && \
-    dotnet restore src/Concertable.Search.Web/Concertable.Search.Web.csproj && \
-    dotnet restore src/Concertable.Search.Workers/Concertable.Search.Workers.csproj && \
-    dotnet restore src/Concertable.Search.Migrations/Concertable.Search.Migrations.csproj
-RUN dotnet publish src/Concertable.Search.Web/Concertable.Search.Web.csproj \
+    dotnet restore api/src/Concertable.Search.Web/Concertable.Search.Web.csproj && \
+    dotnet restore api/src/Concertable.Search.Workers/Concertable.Search.Workers.csproj && \
+    dotnet restore api/src/Concertable.Search.Migrations/Concertable.Search.Migrations.csproj
+RUN dotnet publish api/src/Concertable.Search.Web/Concertable.Search.Web.csproj \
         --configuration Release --no-restore --output /out/web \
         -p:MinVerVersionOverride=${BUILD_VERSION} && \
-    dotnet publish src/Concertable.Search.Workers/Concertable.Search.Workers.csproj \
+    dotnet publish api/src/Concertable.Search.Workers/Concertable.Search.Workers.csproj \
         --configuration Release --no-restore --output /out/workers \
         -p:MinVerVersionOverride=${BUILD_VERSION} && \
-    dotnet publish src/Concertable.Search.Migrations/Concertable.Search.Migrations.csproj \
+    dotnet publish api/src/Concertable.Search.Migrations/Concertable.Search.Migrations.csproj \
         --configuration Release --no-restore --output /out/migrations \
         -p:MinVerVersionOverride=${BUILD_VERSION}
 
