@@ -40,9 +40,4 @@
     <ContainerRegistry Condition="'$(ContainerRegistry)' == ''">ghcr.io</ContainerRegistry>
   </PropertyGroup>
 
-  <!-- Banned-API list for Microsoft.CodeAnalysis.BannedApiAnalyzers (shared across services). -->
-  <ItemGroup>
-    <AdditionalFiles Include="$(MSBuildThisFileDirectory)BannedSymbols.txt" Condition="Exists('$(MSBuildThisFileDirectory)BannedSymbols.txt')" />
-  </ItemGroup>
-
 </Project>
