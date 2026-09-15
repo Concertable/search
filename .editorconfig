@@ -1,0 +1,55 @@
+root = true
+
+[*.cs]
+csharp_style_namespace_declarations = file_scoped:error
+dotnet_diagnostic.IDE0130.severity = error
+
+dotnet_analyzer_diagnostic.severity = none
+
+# Sealing — public/internal classes that can be sealed must be (Meziantou MA0053).
+dotnet_diagnostic.MA0053.severity = error
+MA0053.public_class_should_be_sealed = true
+MA0053.class_with_virtual_member_should_be_sealed = false
+MA0053.exceptions_should_be_sealed = true
+
+# Logging — no inline logger.LogXxx templates; use the source-generated [LoggerMessage] methods
+# (the `logging` skill).
+dotnet_diagnostic.CA1848.severity = error
+
+# Banned APIs (Microsoft.CodeAnalysis.BannedApiAnalyzers) — the list is BannedSymbols.txt.
+dotnet_diagnostic.RS0030.severity = error
+
+# Private INSTANCE fields: camelCase, no underscore prefix (the `csharp-style` skill). Static and
+# const fields keep their own casing — the two severity=none rules below claim them first, so the
+# instance rule (first-match-wins) never touches them.
+dotnet_naming_rule.private_const_fields_unenforced.symbols = private_const_fields
+dotnet_naming_rule.private_const_fields_unenforced.style = pascal_case
+dotnet_naming_rule.private_const_fields_unenforced.severity = none
+dotnet_naming_rule.private_static_fields_unenforced.symbols = private_static_fields
+dotnet_naming_rule.private_static_fields_unenforced.style = pascal_case
+dotnet_naming_rule.private_static_fields_unenforced.severity = none
+dotnet_naming_rule.private_instance_fields_camel_case.symbols = private_instance_fields
+dotnet_naming_rule.private_instance_fields_camel_case.style = camel_case
+dotnet_naming_rule.private_instance_fields_camel_case.severity = error
+
+dotnet_naming_symbols.private_const_fields.applicable_kinds = field
+dotnet_naming_symbols.private_const_fields.applicable_accessibilities = private
+dotnet_naming_symbols.private_const_fields.required_modifiers = const
+dotnet_naming_symbols.private_static_fields.applicable_kinds = field
+dotnet_naming_symbols.private_static_fields.applicable_accessibilities = private
+dotnet_naming_symbols.private_static_fields.required_modifiers = static
+dotnet_naming_symbols.private_instance_fields.applicable_kinds = field
+dotnet_naming_symbols.private_instance_fields.applicable_accessibilities = private
+
+dotnet_naming_style.camel_case.capitalization = camel_case
+dotnet_naming_style.pascal_case.capitalization = pascal_case
+
+# Generated EF migrations are re-scaffolded by initial-migrations.ps1 — exempt from the analyzers
+# above (sealing/naming/banned-API/logging/namespaces), since any edit would be wiped on the next scaffold.
+[**/Migrations/**.cs]
+dotnet_diagnostic.MA0053.severity = none
+dotnet_diagnostic.CA1848.severity = none
+dotnet_diagnostic.RS0030.severity = none
+dotnet_diagnostic.IDE1006.severity = none
+dotnet_diagnostic.IDE0161.severity = none
+dotnet_diagnostic.IDE0130.severity = none
