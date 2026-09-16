@@ -12,75 +12,155 @@ public static class AppHostExtensions
         public IResourceBuilder<ServiceContainerResource> AddSearchMigrations(
             string image,
             string digest,
-            IResourceBuilder<SqlServerDatabaseResource> searchDb)
-        {
-            return builder.AddContainerImage(SearchConstants.MigrationsResource, image, digest)
-                          .WithReference(searchDb)
-                          .WaitFor(searchDb);
-        }
+            IResourceBuilder<SqlServerDatabaseResource> searchDb) =>
+            MigrationsImage(builder, image, digest, searchDb);
+
+        public IResourceBuilder<ServiceContainerResource> AddSearchMigrations(
+            string image,
+            string digest,
+            IResourceBuilder<PostgresDatabaseResource> searchDb) =>
+            MigrationsImage(builder, image, digest, searchDb);
 
         public IResourceBuilder<ProjectResource> AddSearchMigrations<TProject>(
             IResourceBuilder<SqlServerDatabaseResource> searchDb)
-            where TProject : IProjectMetadata, new()
-        {
-            return builder.AddProject<TProject>(SearchConstants.MigrationsResource)
-                          .WithReference(searchDb)
-                          .WaitFor(searchDb);
-        }
+            where TProject : IProjectMetadata, new() =>
+            MigrationsProject<TProject>(builder, searchDb);
+
+        public IResourceBuilder<ProjectResource> AddSearchMigrations<TProject>(
+            IResourceBuilder<PostgresDatabaseResource> searchDb)
+            where TProject : IProjectMetadata, new() =>
+            MigrationsProject<TProject>(builder, searchDb);
 
         public IResourceBuilder<ServiceContainerResource> AddSearchWeb(
             string image,
             string digest,
             IResourceBuilder<IResourceWithServiceDiscovery> auth,
-            IResourceBuilder<SqlServerDatabaseResource> searchDb)
-        {
-            return builder.AddContainerImage(SearchConstants.WebResource, image, digest)
-                          .WithHttpEndpoint(targetPort: SearchConstants.ContainerPort, name: "https")
-                          .WithReference(auth)
-                          .WaitFor(auth)
-                          .WithReference(searchDb)
-                          .WaitFor(searchDb)
-                          .WithEnvironment("Auth__Authority", auth.GetEndpoint("https"));
-        }
+            IResourceBuilder<SqlServerDatabaseResource> searchDb) =>
+            WebImage(builder, image, digest, auth, searchDb);
+
+        public IResourceBuilder<ServiceContainerResource> AddSearchWeb(
+            string image,
+            string digest,
+            IResourceBuilder<IResourceWithServiceDiscovery> auth,
+            IResourceBuilder<PostgresDatabaseResource> searchDb) =>
+            WebImage(builder, image, digest, auth, searchDb);
 
         public IResourceBuilder<ProjectResource> AddSearchWeb<TProject>(
             IResourceBuilder<IResourceWithServiceDiscovery> auth,
             IResourceBuilder<SqlServerDatabaseResource> searchDb)
-            where TProject : IProjectMetadata, new()
-        {
-            return builder.AddProject<TProject>(SearchConstants.WebResource)
-                          .WithReference(auth)
-                          .WaitFor(auth)
-                          .WithReference(searchDb)
-                          .WaitFor(searchDb)
-                          .WithEnvironment("Auth__Authority", auth.GetEndpoint("https"));
-        }
+            where TProject : IProjectMetadata, new() =>
+            WebProject<TProject>(builder, auth, searchDb);
+
+        public IResourceBuilder<ProjectResource> AddSearchWeb<TProject>(
+            IResourceBuilder<IResourceWithServiceDiscovery> auth,
+            IResourceBuilder<PostgresDatabaseResource> searchDb)
+            where TProject : IProjectMetadata, new() =>
+            WebProject<TProject>(builder, auth, searchDb);
 
         public IResourceBuilder<ProjectResource> AddSearchWorkers<TProject>(
             IResourceBuilder<SqlServerDatabaseResource> searchDb,
             IResourceBuilder<AzureServiceBusResource> asb)
-            where TProject : IProjectMetadata, new()
-        {
-            return builder.AddProject<TProject>(SearchConstants.WorkersResource)
-                          .WithReference(searchDb)
-                          .WaitFor(searchDb)
-                          .WithReference(asb)
-                          .WaitFor(asb)
-                          .WithEnvironment(AzureServiceBusOptions.ServiceNameEnvVar, SearchConstants.ServiceName);
-        }
+            where TProject : IProjectMetadata, new() =>
+            WorkersProject<TProject>(builder, searchDb, asb);
+
+        public IResourceBuilder<ProjectResource> AddSearchWorkers<TProject>(
+            IResourceBuilder<PostgresDatabaseResource> searchDb,
+            IResourceBuilder<AzureServiceBusResource> asb)
+            where TProject : IProjectMetadata, new() =>
+            WorkersProject<TProject>(builder, searchDb, asb);
 
         public IResourceBuilder<ServiceContainerResource> AddSearchWorkers(
             string image,
             string digest,
             IResourceBuilder<SqlServerDatabaseResource> searchDb,
-            IResourceBuilder<AzureServiceBusResource> asb)
-        {
-            return builder.AddContainerImage(SearchConstants.WorkersResource, image, digest)
-                          .WithReference(searchDb)
-                          .WaitFor(searchDb)
-                          .WithReference(asb)
-                          .WaitFor(asb)
-                          .WithEnvironment(AzureServiceBusOptions.ServiceNameEnvVar, SearchConstants.ServiceName);
-        }
+            IResourceBuilder<AzureServiceBusResource> asb) =>
+            WorkersImage(builder, image, digest, searchDb, asb);
+
+        public IResourceBuilder<ServiceContainerResource> AddSearchWorkers(
+            string image,
+            string digest,
+            IResourceBuilder<PostgresDatabaseResource> searchDb,
+            IResourceBuilder<AzureServiceBusResource> asb) =>
+            WorkersImage(builder, image, digest, searchDb, asb);
+    }
+
+    private static IResourceBuilder<ServiceContainerResource> MigrationsImage(
+        IDistributedApplicationBuilder builder,
+        string image,
+        string digest,
+        IResourceBuilder<IResourceWithConnectionString> searchDb)
+    {
+        return builder.AddContainerImage(SearchConstants.MigrationsResource, image, digest)
+                      .WithReference(searchDb)
+                      .WaitFor(searchDb);
+    }
+
+    private static IResourceBuilder<ProjectResource> MigrationsProject<TProject>(
+        IDistributedApplicationBuilder builder,
+        IResourceBuilder<IResourceWithConnectionString> searchDb)
+        where TProject : IProjectMetadata, new()
+    {
+        return builder.AddProject<TProject>(SearchConstants.MigrationsResource)
+                      .WithReference(searchDb)
+                      .WaitFor(searchDb);
+    }
+
+    private static IResourceBuilder<ServiceContainerResource> WebImage(
+        IDistributedApplicationBuilder builder,
+        string image,
+        string digest,
+        IResourceBuilder<IResourceWithServiceDiscovery> auth,
+        IResourceBuilder<IResourceWithConnectionString> searchDb)
+    {
+        return builder.AddContainerImage(SearchConstants.WebResource, image, digest)
+                      .WithHttpEndpoint(targetPort: SearchConstants.ContainerPort, name: "https")
+                      .WithReference(auth)
+                      .WaitFor(auth)
+                      .WithReference(searchDb)
+                      .WaitFor(searchDb)
+                      .WithEnvironment("Auth__Authority", auth.GetEndpoint("https"));
+    }
+
+    private static IResourceBuilder<ProjectResource> WebProject<TProject>(
+        IDistributedApplicationBuilder builder,
+        IResourceBuilder<IResourceWithServiceDiscovery> auth,
+        IResourceBuilder<IResourceWithConnectionString> searchDb)
+        where TProject : IProjectMetadata, new()
+    {
+        return builder.AddProject<TProject>(SearchConstants.WebResource)
+                      .WithReference(auth)
+                      .WaitFor(auth)
+                      .WithReference(searchDb)
+                      .WaitFor(searchDb)
+                      .WithEnvironment("Auth__Authority", auth.GetEndpoint("https"));
+    }
+
+    private static IResourceBuilder<ProjectResource> WorkersProject<TProject>(
+        IDistributedApplicationBuilder builder,
+        IResourceBuilder<IResourceWithConnectionString> searchDb,
+        IResourceBuilder<AzureServiceBusResource> asb)
+        where TProject : IProjectMetadata, new()
+    {
+        return builder.AddProject<TProject>(SearchConstants.WorkersResource)
+                      .WithReference(searchDb)
+                      .WaitFor(searchDb)
+                      .WithReference(asb)
+                      .WaitFor(asb)
+                      .WithEnvironment(AzureServiceBusOptions.ServiceNameEnvVar, SearchConstants.ServiceName);
+    }
+
+    private static IResourceBuilder<ServiceContainerResource> WorkersImage(
+        IDistributedApplicationBuilder builder,
+        string image,
+        string digest,
+        IResourceBuilder<IResourceWithConnectionString> searchDb,
+        IResourceBuilder<AzureServiceBusResource> asb)
+    {
+        return builder.AddContainerImage(SearchConstants.WorkersResource, image, digest)
+                      .WithReference(searchDb)
+                      .WaitFor(searchDb)
+                      .WithReference(asb)
+                      .WaitFor(asb)
+                      .WithEnvironment(AzureServiceBusOptions.ServiceNameEnvVar, SearchConstants.ServiceName);
     }
 }
