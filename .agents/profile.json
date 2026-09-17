@@ -1,0 +1,5 @@
+{
+  "lifecycle": "pre-launch",
+  "product": "concertable",
+  "stack": ["dotnet"]
+}
