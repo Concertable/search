@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.PostgreSQL" />
-    <PackageReference Include="Aspire.Hosting.SqlServer" />
     <PackageReference Include="Concertable.AppHost.Shared" />
     <PackageReference Include="Concertable.Auth.Hosting" />
     <PackageReference Include="Concertable.B2B.Hosting" />
