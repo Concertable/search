@@ -12,7 +12,7 @@ public static class AppHostExtensions
         public IResourceBuilder<ServiceContainerResource> AddSearchMigrations(
             string image,
             string digest,
-            IResourceBuilder<SqlServerDatabaseResource> searchDb)
+            IResourceBuilder<PostgresDatabaseResource> searchDb)
         {
             return builder.AddContainerImage(SearchConstants.MigrationsResource, image, digest)
                           .WithReference(searchDb)
@@ -20,7 +20,7 @@ public static class AppHostExtensions
         }
 
         public IResourceBuilder<ProjectResource> AddSearchMigrations<TProject>(
-            IResourceBuilder<SqlServerDatabaseResource> searchDb)
+            IResourceBuilder<PostgresDatabaseResource> searchDb)
             where TProject : IProjectMetadata, new()
         {
             return builder.AddProject<TProject>(SearchConstants.MigrationsResource)
@@ -32,7 +32,7 @@ public static class AppHostExtensions
             string image,
             string digest,
             IResourceBuilder<IResourceWithServiceDiscovery> auth,
-            IResourceBuilder<SqlServerDatabaseResource> searchDb)
+            IResourceBuilder<PostgresDatabaseResource> searchDb)
         {
             return builder.AddContainerImage(SearchConstants.WebResource, image, digest)
                           .WithHttpEndpoint(targetPort: SearchConstants.ContainerPort, name: "https")
@@ -45,7 +45,7 @@ public static class AppHostExtensions
 
         public IResourceBuilder<ProjectResource> AddSearchWeb<TProject>(
             IResourceBuilder<IResourceWithServiceDiscovery> auth,
-            IResourceBuilder<SqlServerDatabaseResource> searchDb)
+            IResourceBuilder<PostgresDatabaseResource> searchDb)
             where TProject : IProjectMetadata, new()
         {
             return builder.AddProject<TProject>(SearchConstants.WebResource)
@@ -57,7 +57,7 @@ public static class AppHostExtensions
         }
 
         public IResourceBuilder<ProjectResource> AddSearchWorkers<TProject>(
-            IResourceBuilder<SqlServerDatabaseResource> searchDb,
+            IResourceBuilder<PostgresDatabaseResource> searchDb,
             IResourceBuilder<AzureServiceBusResource> asb)
             where TProject : IProjectMetadata, new()
         {
@@ -72,7 +72,7 @@ public static class AppHostExtensions
         public IResourceBuilder<ServiceContainerResource> AddSearchWorkers(
             string image,
             string digest,
-            IResourceBuilder<SqlServerDatabaseResource> searchDb,
+            IResourceBuilder<PostgresDatabaseResource> searchDb,
             IResourceBuilder<AzureServiceBusResource> asb)
         {
             return builder.AddContainerImage(SearchConstants.WorkersResource, image, digest)

@@ -1,7 +1,10 @@
 using Concertable.B2B.Seed.Contracts;
 using Concertable.Contracts.Enums;
+using Concertable.Kernel.Geometry;
+using Concertable.Kernel.Services.Geometry;
 using Concertable.Search.Domain.ReadModels;
 using Concertable.Seed.Identity;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Concertable.Search.Seed.Infrastructure;
 
@@ -20,11 +23,13 @@ public sealed class SeedState
     public Genre GenreWithActiveConcerts { get; }
     public Genre GenreWithoutActiveConcerts { get; }
 
-    public SeedState(SeedCatalog catalog)
+    public SeedState(
+        SeedCatalog catalog,
+        [FromKeyedServices(GeometryProviderType.Geographic)] IGeometryProvider geometryProvider)
     {
-        Artists = catalog.Artists.Select(s => s.ToReadModel()).ToList();
-        Venues = catalog.Venues.Select(s => s.ToReadModel()).ToList();
-        Concerts = catalog.Concerts.Select(s => s.ToReadModel()).ToList();
+        Artists = catalog.Artists.Select(s => s.ToReadModel(geometryProvider)).ToList();
+        Venues = catalog.Venues.Select(s => s.ToReadModel(geometryProvider)).ToList();
+        Concerts = catalog.Concerts.Select(s => s.ToReadModel(geometryProvider)).ToList();
 
         Artist = Artists[0];
         Venue = Venues[0];

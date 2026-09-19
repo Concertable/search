@@ -31,6 +31,6 @@ internal sealed class GeometrySpecification<TEntity>
 
         var radiusMeters = (@params.RadiusKm ?? 10) * 1000;
 
-        return entity => entity.Location.Distance(center) <= radiusMeters;
+        return entity => entity.Location.IsWithinDistance(center, radiusMeters);
     }
 }

@@ -41,7 +41,8 @@ internal sealed class AllAutocompleteRepository : IAllAutocompleteRepository
                     .Apply(context.Concerts, searchParams)
                     .ToAutocompletes()
                     .Take(20))
-            .OrderBy(r => r.Name)
+            .OrderBy(r => EF.Functions.Collate(r.Name.ToLower(), "C"))
+            .ThenBy(r => EF.Functions.Collate(r.Name, "C"))
             .Take(10)
             .ToListAsync();
     }
