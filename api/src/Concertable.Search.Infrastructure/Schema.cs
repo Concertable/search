@@ -3,6 +3,9 @@ namespace Concertable.Search.Infrastructure;
 internal static class Schema
 {
     public const string Name = "search";
+    public const string Messaging = "messaging";
+
+    public static IReadOnlyList<string> Owned { get; } = [Name, Messaging];
 
     public static class Tables
     {

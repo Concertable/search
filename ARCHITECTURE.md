@@ -27,7 +27,7 @@ Search does **not** serve entity-details pages — those are the frozen public w
 | `Concertable.Search.Migrations` | Console job | Applies Search projection and pinned messaging inbox migrations to `SearchDb`, then exits. |
 | `Concertable.Search.AppHost` | Aspire AppHost | Local-dev orchestrator only. |
 
-**Database:** `SearchDb` (SQL Server), schema `search` — table names in `Infrastructure/Schema.cs`. The
+**Database:** `SearchDb` (PostgreSQL + PostGIS), schema `search` — table names in `Infrastructure/Schema.cs`. The
 idempotent migration job owns both `SearchDbContext` and the pinned messaging `InboxDbContext` migrations.
 The standalone AppHost invokes that job and waits for its successful completion before starting Web or Workers.
 Runtime hosts never apply schema changes themselves; deployment composition must enforce the same ordering.
@@ -81,7 +81,7 @@ Controllers (`Api/Controllers/`, mostly `[AllowAnonymous]`):
 
 ## Tech stack
 
-.NET 10 · EF Core + SQL Server (`SearchDbContext : DbContextBase`) · NetTopologySuite (`geography`) · Azure Service Bus (Workers) · `Concertable.Messaging` (Inbox/Transport) · Aspire (`Concertable.ServiceDefaults`) · JWT Bearer (audience `concertable.search.api`; most reads anonymous) · `Concertable.Shared.Api` · LinqKit (`.AsExpandable()` in header mappers) · FluentValidation.
+.NET 10 · EF Core + Npgsql/PostGIS (`SearchDbContext : DbContextBase`) · NetTopologySuite (`geography`) · Azure Service Bus (Workers) · `Concertable.Messaging` (Inbox/Transport) · Aspire (`Concertable.ServiceDefaults`) · JWT Bearer (audience `concertable.search.api`; most reads anonymous) · `Concertable.Shared.Api` · LinqKit (`.AsExpandable()` in header mappers) · FluentValidation.
 
 The standalone `Concertable.Search.AppHost` replays B2B catalog events via `Concertable.B2B.Seed.Simulator`; there is no Customer seed simulator, so a standalone run has catalog data but no seeded ratings — see [`TECH_DEBT.md`](./TECH_DEBT.md).
 

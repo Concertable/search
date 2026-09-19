@@ -29,8 +29,8 @@ public sealed class ResourceGraphTests
             resource.Name == SearchConstants.WorkersResource));
         AssertWaitsFor(validBuilder, SearchConstants.WebResource, SearchConstants.MigrationsResource, WaitType.WaitForCompletion);
         AssertWaitsFor(validBuilder, SearchConstants.WorkersResource, SearchConstants.MigrationsResource, WaitType.WaitForCompletion);
-        AssertWaitsFor(validBuilder, B2BConstants.SeedingSimulatorResource, SearchConstants.WorkersResource, WaitType.WaitUntilHealthy);
-        Assert.DoesNotContain(validBuilder.Resources, resource => resource.Name == B2BConstants.Database);
+        AssertWaitsFor(validBuilder, B2BSeedingSimulator.Name, SearchConstants.WorkersResource, WaitType.WaitUntilHealthy);
+        Assert.DoesNotContain(validBuilder.Resources, resource => resource.Name == B2BDatabase.Name);
         using var app = validBuilder.Build();
         var builder = AppHost.CreateBuilder([]);
         builder.Services.AddInvalidLifetimeGraph();

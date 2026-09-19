@@ -21,7 +21,8 @@ internal sealed class ArtistAutocompleteRepository : IArtistAutocompleteReposito
         await searchQuery
             .Apply(context.Artists, new SearchParams { SearchTerm = searchTerm })
             .ToAutocompletes()
-            .OrderBy(r => r.Name)
+            .OrderBy(r => EF.Functions.Collate(r.Name.ToLower(), "C"))
+            .ThenBy(r => EF.Functions.Collate(r.Name, "C"))
             .Take(10)
             .ToListAsync();
 }

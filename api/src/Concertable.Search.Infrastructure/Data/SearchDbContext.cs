@@ -1,11 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
+using Concertable.Messaging.Infrastructure.Outbox;
+using Microsoft.Extensions.Options;
+
 namespace Concertable.Search.Infrastructure.Data;
 
 internal sealed class SearchDbContext(
     DbContextOptions<SearchDbContext> options,
+    IOptions<OutboxOptions> outboxOptions,
     SearchConfigurationProvider provider)
-    : DbContextBase(options), ISearchDbContext
+    : DbContextBase(options, outboxOptions), ISearchDbContext
 {
     IQueryable<ArtistReadModel> ISearchDbContext.Artists => Set<ArtistReadModel>().AsNoTracking();
     IQueryable<VenueReadModel> ISearchDbContext.Venues => Set<VenueReadModel>().AsNoTracking();
@@ -17,6 +21,7 @@ internal sealed class SearchDbContext(
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        modelBuilder.HasPostgresExtension("postgis");
         provider.Configure(modelBuilder);
     }
 }

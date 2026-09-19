@@ -19,7 +19,7 @@ public sealed class ImageCompositionTests
     public void AddSearchWeb_ByImage_DeclaresTheEndpointConsumersResolve()
     {
         var builder = DistributedApplication.CreateBuilder();
-        var sql = builder.AddSqlServer("sql");
+        var postgres = builder.AddPostgres("postgres");
         var auth = builder.AddContainerImage(AuthConstants.Resource, "ghcr.io/concertable/auth", Digest)
                           .WithHttpEndpoint(targetPort: AuthConstants.ContainerPort, name: "https");
 
@@ -27,7 +27,7 @@ public sealed class ImageCompositionTests
             "ghcr.io/concertable/search-web",
             Digest,
             auth,
-            sql.AddDatabase(SearchConstants.Database));
+            postgres.AddDatabase(SearchConstants.Database));
 
         var endpoint = Assert.Single(
             web.Resource.Annotations.OfType<EndpointAnnotation>(),

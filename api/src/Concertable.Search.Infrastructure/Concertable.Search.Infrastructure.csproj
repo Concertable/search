@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
     <PackageReference Include="LinqKit.Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.NetTopologySuite" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,6 +20,8 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Concertable.Search.Migrations" />
+    <InternalsVisibleTo Include="Concertable.Search.IntegrationTests" />
+    <InternalsVisibleTo Include="Concertable.Search.IntegrationTests.Fixtures" />
   </ItemGroup>
 
   <!-- Never a ProjectReference: would break Search's standalone carve. -->
@@ -31,6 +34,7 @@
     <PackageReference Include="Concertable.Kernel" />
     <PackageReference Include="Concertable.Messaging.Contracts" />
     <PackageReference Include="Concertable.Messaging.Domain" />
+    <PackageReference Include="Concertable.Messaging.Infrastructure" />
     <PackageReference Include="Concertable.Seed.Shared" />
   </ItemGroup>
 

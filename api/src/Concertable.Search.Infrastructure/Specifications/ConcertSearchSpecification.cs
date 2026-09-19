@@ -21,7 +21,7 @@ internal sealed class ConcertSearchSpecification
 
     protected override Expression<Func<ConcertReadModel, bool>> Predicate(SearchParams @params)
     {
-        var now = this.timeProvider.GetUtcNow();
+        var now = this.timeProvider.GetUtcNow().UtcDateTime;
 
         return this.searchSpec
             .And(concert =>

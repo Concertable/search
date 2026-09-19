@@ -1,43 +1,45 @@
 using Concertable.Search.Migrations;
 using Concertable.Testing.Integration;
-using Microsoft.Data.SqlClient;
+using Npgsql;
 
 namespace Concertable.Search.IntegrationTests;
 
-public sealed class MigrationJobTests : IClassFixture<SqlFixture>
+public sealed class MigrationJobTests
 {
-    private readonly SqlFixture sql;
-
-    public MigrationJobTests(SqlFixture sql)
-    {
-        this.sql = sql;
-    }
-
     [Fact]
     public async Task RunAsync_CreatesOwnedAndInboxTables_AndCanRunAgain()
     {
-        await SearchMigrationJob.RunAsync(sql.ConnectionString).ConfigureAwait(true);
-        await SearchMigrationJob.RunAsync(sql.ConnectionString).ConfigureAwait(true);
-
-        var connection = new SqlConnection(sql.ConnectionString);
-        await using (connection.ConfigureAwait(true))
+        var postgres = new PostgresFixture();
+        await postgres.InitializeAsync();
+        try
         {
-            await connection.OpenAsync().ConfigureAwait(true);
-            var command = connection.CreateCommand();
-            await using (command.ConfigureAwait(true))
-            {
-                command.CommandText = """
-                    SELECT COUNT(*)
-                    FROM sys.tables AS tables
-                    INNER JOIN sys.schemas AS schemas ON schemas.schema_id = tables.schema_id
-                    WHERE (schemas.name = 'search' AND tables.name = 'Artists')
-                       OR (schemas.name = 'messaging' AND tables.name = 'Inbox');
-                    """;
+            await SearchMigrationJob.RunAsync(postgres.ConnectionString);
+            await SearchMigrationJob.RunAsync(postgres.ConnectionString);
 
-                Assert.Equal(
-                    2,
-                    (int)(await command.ExecuteScalarAsync().ConfigureAwait(true))!);
-            }
+            await using var connection = new NpgsqlConnection(postgres.ConnectionString);
+            await connection.OpenAsync();
+            await using var command = connection.CreateCommand();
+            command.CommandText = """
+                SELECT table_schema || '.' || table_name
+                FROM information_schema.tables
+                WHERE table_name LIKE '__EFMigrationsHistory%'
+                ORDER BY table_schema, table_name
+                """;
+            await using var reader = await command.ExecuteReaderAsync();
+            var histories = new List<string>();
+            while (await reader.ReadAsync())
+                histories.Add(reader.GetString(0));
+
+            Assert.Equal(
+            [
+                "messaging.__EFMigrationsHistory_Inbox",
+                "search.__EFMigrationsHistory",
+            ],
+            histories);
+        }
+        finally
+        {
+            await postgres.DisposeAsync();
         }
     }
 }

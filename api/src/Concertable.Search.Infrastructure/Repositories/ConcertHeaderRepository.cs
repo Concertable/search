@@ -39,30 +39,30 @@ internal sealed class ConcertHeaderRepository : IConcertHeaderRepository
     }
 
     public async Task<IReadOnlyList<ConcertHeader>> GetByAmountAsync(int amount) =>
-        await context.Concerts.Active(timeProvider.GetUtcNow().DateTime)
-            .OrderByDescending(c => c.DatePosted)
+        await context.Concerts.Active(timeProvider.GetUtcNow().UtcDateTime)
+            .OrderByDatePostedDescending()
             .ToHeaderDtos(context.Artists, context.Venues, context.ConcertRatingProjections)
             .Take(amount)
             .ToListAsync();
 
     public async Task<IReadOnlyList<ConcertHeader>> GetPopularAsync() =>
-        await context.Concerts.Active(timeProvider.GetUtcNow().DateTime)
+        await context.Concerts.Active(timeProvider.GetUtcNow().UtcDateTime)
             .OrderByDescending(c => c.TotalTickets - c.AvailableTickets)
             .ToHeaderDtos(context.Artists, context.Venues, context.ConcertRatingProjections)
             .Take(10)
             .ToListAsync();
 
     public async Task<IReadOnlyList<ConcertHeader>> GetFreeAsync() =>
-        await context.Concerts.Active(timeProvider.GetUtcNow().DateTime)
+        await context.Concerts.Active(timeProvider.GetUtcNow().UtcDateTime)
             .Where(c => c.Price == 0)
-            .OrderByDescending(c => c.DatePosted)
+            .OrderByDatePostedDescending()
             .ToHeaderDtos(context.Artists, context.Venues, context.ConcertRatingProjections)
             .Take(10)
             .ToListAsync();
 
     public async Task<IReadOnlyList<ConcertHeader>> GetRecommendedAsync(ConcertParams concertParams)
     {
-        var query = context.Concerts.Active(timeProvider.GetUtcNow().DateTime);
+        var query = context.Concerts.Active(timeProvider.GetUtcNow().UtcDateTime);
 
         if (concertParams.Genres.Any())
             query = query.Where(c => c.ConcertGenres.Any(eg => concertParams.Genres.Contains(eg.Genre)));
@@ -70,7 +70,7 @@ internal sealed class ConcertHeaderRepository : IConcertHeaderRepository
         query = query.Where(this.geometrySpec.ToExpression(concertParams));
 
         query = concertParams.OrderByRecent
-            ? query.OrderByDescending(c => c.DatePosted)
+            ? query.OrderByDatePostedDescending()
             : query.OrderBy(c => c.StartDate);
 
         return await query
