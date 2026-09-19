@@ -1,13 +1,13 @@
 using Concertable.B2B.Seed.Contracts.Specs;
+using Concertable.Kernel.Geometry;
 using Concertable.Kernel.ValueObjects;
 using Concertable.Search.Domain.ReadModels;
-using NetTopologySuite.Geometries;
 
 namespace Concertable.Search.Seed.Infrastructure;
 
 public static class SeedSpecMappers
 {
-    public static ArtistReadModel ToReadModel(this ArtistSeedSpec spec)
+    public static ArtistReadModel ToReadModel(this ArtistSeedSpec spec, IGeometryProvider geometryProvider)
     {
         var artist = new ArtistReadModel
         {
@@ -15,7 +15,7 @@ public static class SeedSpecMappers
             UserId = spec.UserId,
             Name = spec.Name,
             Avatar = spec.Avatar,
-            Location = new Point(spec.Longitude, spec.Latitude) { SRID = 4326 },
+            Location = geometryProvider.CreatePoint(spec.Latitude, spec.Longitude),
             Address = new Address(spec.County, spec.Town)
         };
 
@@ -25,17 +25,17 @@ public static class SeedSpecMappers
         return artist;
     }
 
-    public static VenueReadModel ToReadModel(this VenueSeedSpec spec) => new()
+    public static VenueReadModel ToReadModel(this VenueSeedSpec spec, IGeometryProvider geometryProvider) => new()
     {
         Id = spec.VenueId,
         UserId = spec.UserId,
         Name = spec.Name,
         Avatar = spec.Avatar,
-        Location = new Point(spec.Longitude, spec.Latitude) { SRID = 4326 },
+        Location = geometryProvider.CreatePoint(spec.Latitude, spec.Longitude),
         Address = new Address(spec.County, spec.Town)
     };
 
-    public static ConcertReadModel ToReadModel(this ConcertSeedSpec spec)
+    public static ConcertReadModel ToReadModel(this ConcertSeedSpec spec, IGeometryProvider geometryProvider)
     {
         var concert = new ConcertReadModel
         {
@@ -50,7 +50,7 @@ public static class SeedSpecMappers
             StartDate = spec.Period.Start,
             EndDate = spec.Period.End,
             DatePosted = spec.DatePosted,
-            Location = new Point(spec.Longitude, spec.Latitude) { SRID = 4326 }
+            Location = geometryProvider.CreatePoint(spec.Latitude, spec.Longitude)
         };
 
         foreach (var genre in spec.Genres)

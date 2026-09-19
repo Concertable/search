@@ -100,7 +100,7 @@ public static class Consumer
     public static void AddContainerResources(
         IDistributedApplicationBuilder builder,
         IResourceBuilder<IResourceWithServiceDiscovery> auth,
-        IResourceBuilder<SqlServerDatabaseResource> searchDb,
+        IResourceBuilder<PostgresDatabaseResource> searchDb,
         IResourceBuilder<AzureServiceBusResource> serviceBus)
     {
         var migrations = builder.AddSearchMigrations(

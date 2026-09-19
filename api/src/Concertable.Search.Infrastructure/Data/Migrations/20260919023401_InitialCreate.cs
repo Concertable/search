@@ -15,14 +15,17 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
             migrationBuilder.EnsureSchema(
                 name: "search");
 
+            migrationBuilder.AlterDatabase()
+                .Annotation("Npgsql:PostgresExtension:postgis", ",,");
+
             migrationBuilder.CreateTable(
                 name: "ArtistRatingProjections",
                 schema: "search",
                 columns: table => new
                 {
-                    ArtistId = table.Column<int>(type: "int", nullable: false),
-                    AverageRating = table.Column<double>(type: "float", nullable: false),
-                    ReviewCount = table.Column<int>(type: "int", nullable: false)
+                    ArtistId = table.Column<int>(type: "integer", nullable: false),
+                    AverageRating = table.Column<double>(type: "double precision", nullable: false),
+                    ReviewCount = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -34,13 +37,13 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
                 schema: "search",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Avatar = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Location = table.Column<Point>(type: "geography", nullable: false),
-                    County = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Town = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Avatar = table.Column<string>(type: "text", nullable: false),
+                    Location = table.Column<Point>(type: "geography (point, 4326)", nullable: false),
+                    County = table.Column<string>(type: "text", nullable: false),
+                    Town = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -52,9 +55,9 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
                 schema: "search",
                 columns: table => new
                 {
-                    ConcertId = table.Column<int>(type: "int", nullable: false),
-                    AverageRating = table.Column<double>(type: "float", nullable: false),
-                    ReviewCount = table.Column<int>(type: "int", nullable: false)
+                    ConcertId = table.Column<int>(type: "integer", nullable: false),
+                    AverageRating = table.Column<double>(type: "double precision", nullable: false),
+                    ReviewCount = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -66,18 +69,18 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
                 schema: "search",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false),
-                    ArtistId = table.Column<int>(type: "int", nullable: false),
-                    VenueId = table.Column<int>(type: "int", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Avatar = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
-                    TotalTickets = table.Column<int>(type: "int", nullable: false),
-                    AvailableTickets = table.Column<int>(type: "int", nullable: false),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DatePosted = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Location = table.Column<Point>(type: "geography", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false),
+                    ArtistId = table.Column<int>(type: "integer", nullable: false),
+                    VenueId = table.Column<int>(type: "integer", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Avatar = table.Column<string>(type: "text", nullable: true),
+                    Price = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
+                    TotalTickets = table.Column<int>(type: "integer", nullable: false),
+                    AvailableTickets = table.Column<int>(type: "integer", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DatePosted = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    Location = table.Column<Point>(type: "geography (point, 4326)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -89,9 +92,9 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
                 schema: "search",
                 columns: table => new
                 {
-                    VenueId = table.Column<int>(type: "int", nullable: false),
-                    AverageRating = table.Column<double>(type: "float", nullable: false),
-                    ReviewCount = table.Column<int>(type: "int", nullable: false)
+                    VenueId = table.Column<int>(type: "integer", nullable: false),
+                    AverageRating = table.Column<double>(type: "double precision", nullable: false),
+                    ReviewCount = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -103,13 +106,13 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
                 schema: "search",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Avatar = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Location = table.Column<Point>(type: "geography", nullable: false),
-                    County = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Town = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Avatar = table.Column<string>(type: "text", nullable: false),
+                    Location = table.Column<Point>(type: "geography (point, 4326)", nullable: false),
+                    County = table.Column<string>(type: "text", nullable: false),
+                    Town = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -121,8 +124,8 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
                 schema: "search",
                 columns: table => new
                 {
-                    ArtistId = table.Column<int>(type: "int", nullable: false),
-                    Genre = table.Column<int>(type: "int", nullable: false)
+                    ArtistId = table.Column<int>(type: "integer", nullable: false),
+                    Genre = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -141,8 +144,8 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
                 schema: "search",
                 columns: table => new
                 {
-                    ConcertId = table.Column<int>(type: "int", nullable: false),
-                    Genre = table.Column<int>(type: "int", nullable: false)
+                    ConcertId = table.Column<int>(type: "integer", nullable: false),
+                    Genre = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -155,6 +158,27 @@ namespace Concertable.Search.Infrastructure.Data.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Artists_Location",
+                schema: "search",
+                table: "Artists",
+                column: "Location")
+                .Annotation("Npgsql:IndexMethod", "gist");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Concerts_Location",
+                schema: "search",
+                table: "Concerts",
+                column: "Location")
+                .Annotation("Npgsql:IndexMethod", "gist");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Venues_Location",
+                schema: "search",
+                table: "Venues",
+                column: "Location")
+                .Annotation("Npgsql:IndexMethod", "gist");
         }
 
         /// <inheritdoc />

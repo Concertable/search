@@ -28,10 +28,12 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddSearchModule(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddSharedInfrastructure(configuration);
         services.AddDbContext<SearchDbContext>(opt =>
-            opt.UseSqlServer(
+            opt.UseNpgsql(
                 configuration.GetConnectionString("SearchDb"),
-                sqlOpt => sqlOpt.UseNetTopologySuite()));
+                npgsql => npgsql.MigrationsHistoryTable("__EFMigrationsHistory", Schema.Name)
+                    .UseNetTopologySuite()));
         services.AddScoped<ISearchDbContext>(sp => sp.GetRequiredService<SearchDbContext>());
         services.AddSingleton<SearchConfigurationProvider>();
 

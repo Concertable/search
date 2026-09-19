@@ -21,7 +21,8 @@ internal sealed class ConcertAutocompleteRepository : IConcertAutocompleteReposi
         await searchQuery
             .Apply(context.Concerts, new SearchParams { SearchTerm = searchTerm })
             .ToAutocompletes()
-            .OrderBy(r => r.Name)
+            .OrderBy(r => EF.Functions.Collate(r.Name.ToLower(), "C"))
+            .ThenBy(r => EF.Functions.Collate(r.Name, "C"))
             .Take(10)
             .ToListAsync();
 }

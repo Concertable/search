@@ -38,7 +38,9 @@ public static class HostExtensions
                     .SubscribeTo<ArtistRatingUpdatedEvent>()
                     .SubscribeTo<VenueRatingUpdatedEvent>()
                     .SubscribeTo<ConcertRatingUpdatedEvent>());
-            builder.Services.AddInbox(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("SearchDb")));
+            builder.Services.AddInbox(opt => opt.UseNpgsql(
+                builder.Configuration.GetConnectionString("SearchDb"),
+                npgsql => npgsql.MigrationsHistoryTable("__EFMigrationsHistory_Inbox", "messaging")));
             return builder;
         }
     }

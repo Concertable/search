@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using Concertable.Kernel;
 using Concertable.Kernel.Specifications;
+using Microsoft.EntityFrameworkCore;
 
 namespace Concertable.Search.Infrastructure.Specifications;
 
@@ -13,6 +14,7 @@ internal sealed class SearchTermSpecification<TEntity>
         if (string.IsNullOrWhiteSpace(searchTerm))
             return _ => true;
 
-        return entity => entity.Name.Contains(searchTerm);
+        var normalized = searchTerm.ToLowerInvariant();
+        return entity => EF.Functions.Collate(entity.Name.ToLower(), "C").Contains(normalized);
     }
 }

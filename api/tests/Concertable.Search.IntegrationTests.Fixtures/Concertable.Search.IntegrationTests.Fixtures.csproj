@@ -10,14 +10,13 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
-    <PackageReference Include="Respawn" />
-    <PackageReference Include="Testcontainers.MsSql" />
     <PackageReference Include="xunit" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\api\src\Concertable.Search.Web\Concertable.Search.Web.csproj" />
     <ProjectReference Include="..\..\..\api\src\Concertable.Search.Infrastructure\Concertable.Search.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\api\src\Concertable.Search.Migrations\Concertable.Search.Migrations.csproj" Aliases="SearchMigrations" />
     <PackageReference Include="Concertable.Testing" />
     <PackageReference Include="Concertable.Testing.Integration" />
     <PackageReference Include="Concertable.Seed.Shared" />

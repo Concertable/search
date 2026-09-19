@@ -26,7 +26,7 @@ public sealed class SeedProjectionParityTests
         var diffs = new List<string>();
         foreach (var spec in Catalog.Venues)
         {
-            var seeded = spec.ToReadModel();
+            var seeded = spec.ToReadModel(Geo);
             var projected = spec.ToChangedEvent().ToReadModel(Geo);
             var at = $"venue {spec.VenueId}";
 
@@ -47,7 +47,7 @@ public sealed class SeedProjectionParityTests
         var diffs = new List<string>();
         foreach (var spec in Catalog.Artists)
         {
-            var seeded = spec.ToReadModel();
+            var seeded = spec.ToReadModel(Geo);
             var projected = spec.ToChangedEvent().ToReadModel(Geo);
             var at = $"artist {spec.ArtistId}";
 
@@ -69,7 +69,7 @@ public sealed class SeedProjectionParityTests
         var diffs = new List<string>();
         foreach (var spec in Catalog.Concerts)
         {
-            var seeded = spec.ToReadModel();
+            var seeded = spec.ToReadModel(Geo);
             var projected = spec.ToChangedEvent().ToReadModel(Geo);
             var at = $"concert {spec.ConcertId}";
 

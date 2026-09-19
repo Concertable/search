@@ -14,7 +14,8 @@ internal sealed class VenueReadModelConfiguration : IEntityTypeConfiguration<Ven
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).ValueGeneratedNever();
         builder.Property(x => x.Name).IsRequired();
-        builder.Property(x => x.Location).HasGeographyColumn().IsRequired();
+        builder.Property(x => x.Location).HasColumnType("geography (point, 4326)").IsRequired();
+        builder.HasIndex(x => x.Location).HasMethod("gist");
         builder.OwnsAddress(x => x.Address);
     }
 }
