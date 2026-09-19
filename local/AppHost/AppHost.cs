@@ -14,7 +14,7 @@ public static class AppHost
     public static IDistributedApplicationBuilder CreateBuilder(string[] args)
     {
         var builder = StrictDistributedApplication.CreateBuilder(args);
-        var sql = builder.AddSqlServer("sql").WithDataVolume("concertable-search-sql-data");
+        var sql = builder.AddSqlServerContainer("concertable-search-sql-data");
         var authDb = sql.AddDatabase(AuthConstants.Database);
         var postgres = builder.AddPostgresContainer("concertable-search-postgres-data").WithPostGis();
         var searchDb = postgres.AddDatabase(SearchConstants.Database);
