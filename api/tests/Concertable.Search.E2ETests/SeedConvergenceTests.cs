@@ -24,11 +24,11 @@ public sealed class SeedConvergenceTests
             SearchConstants.WebResource,
             startupTimeout.Token);
         await app.ResourceNotifications.WaitForResourceAsync(
-            B2BConstants.SeedingSimulatorResource,
+            B2BSeedingSimulator.Name,
             KnownResourceStates.Exited,
             startupTimeout.Token);
         Assert.True(app.ResourceNotifications.TryGetCurrentState(
-            B2BConstants.SeedingSimulatorResource,
+            B2BSeedingSimulator.Name,
             out var simulator));
         Assert.Equal(0, simulator.Snapshot.ExitCode);
 

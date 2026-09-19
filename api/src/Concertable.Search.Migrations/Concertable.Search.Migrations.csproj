@@ -13,12 +13,13 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Concertable.Search.IntegrationTests" />
+    <InternalsVisibleTo Include="Concertable.Search.IntegrationTests.Fixtures" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Concertable.Messaging.Infrastructure" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.NetTopologySuite" />
   </ItemGroup>
 
 </Project>

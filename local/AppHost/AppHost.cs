@@ -9,14 +9,15 @@ public static class AppHost
     private const string AuthImage = "ghcr.io/concertable/auth";
     private const string AuthDigest = "sha256:06a295ad6fa01a223000682b0f6efbfba2d5436a8fb2ffaa2d2399526ff3ae69";
     private const string B2BSeedingSimulatorImage = "ghcr.io/concertable/b2b-seeding-simulator";
-    private const string B2BSeedingSimulatorDigest = "sha256:a232e5f6a111e3c81479c53cc79d49c54a0bf18c4dcb75a2cbaa7bf3ec1a0957";
+    private const string B2BSeedingSimulatorDigest = "sha256:240d9569035152fd7e63695bcb0913ca5bad85fef902d9669c7e3bc288d2e244";
 
     public static IDistributedApplicationBuilder CreateBuilder(string[] args)
     {
         var builder = StrictDistributedApplication.CreateBuilder(args);
-        var sql = builder.AddSqlServerContainer("concertable-search-sql-data");
+        var sql = builder.AddSqlServer("sql").WithDataVolume("concertable-search-sql-data");
         var authDb = sql.AddDatabase(AuthConstants.Database);
-        var searchDb = sql.AddDatabase(SearchConstants.Database);
+        var postgres = builder.AddPostgresContainer("concertable-search-postgres-data").WithPostGis();
+        var searchDb = postgres.AddDatabase(SearchConstants.Database);
         var asb = builder.AddServiceBus();
         asb.Topology()
            .AddSearchTopology()
