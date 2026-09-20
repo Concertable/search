@@ -122,8 +122,13 @@ jobs:
         shell: pwsh
         run: ./scripts/verify-package-candidates.ps1 -PackageDirectory artifacts/packages
 
+      # The org packages token, not GITHUB_TOKEN: a dependency image published by another repository
+      # grants that repository's own Actions access, and nothing grants this one. GITHUB_TOKEN worked
+      # only for images old enough to predate the repository split.
       - name: Log in to GHCR for standalone dependency images
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io --username "${{ github.actor }}" --password-stdin
+        env:
+          TOKEN: ${{ secrets.CONCERTABLE_PACKAGES_READ }}
+        run: echo "$TOKEN" | docker login ghcr.io --username "${{ github.actor }}" --password-stdin
 
       - name: Upload package candidate
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

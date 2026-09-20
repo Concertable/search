@@ -31,6 +31,11 @@ public sealed class ResourceGraphTests
         AssertWaitsFor(validBuilder, SearchConstants.WorkersResource, SearchConstants.MigrationsResource, WaitType.WaitForCompletion);
         AssertWaitsFor(validBuilder, B2BSeedingSimulator.Name, SearchConstants.WorkersResource, WaitType.WaitUntilHealthy);
         Assert.DoesNotContain(validBuilder.Resources, resource => resource.Name == B2BDatabase.Name);
+        Assert.IsType<PostgresDatabaseResource>(validBuilder.Resources.Single(resource =>
+            resource.Name == AuthConstants.Database));
+        Assert.DoesNotContain(validBuilder.Resources, resource => resource is SqlServerServerResource);
+        AssertWaitsFor(validBuilder, AuthConstants.MigrationsResource, AuthConstants.Database, WaitType.WaitUntilHealthy);
+        AssertWaitsFor(validBuilder, AuthConstants.Resource, AuthConstants.MigrationsResource, WaitType.WaitForCompletion);
         using var app = validBuilder.Build();
         var builder = AppHost.CreateBuilder([]);
         builder.Services.AddInvalidLifetimeGraph();
