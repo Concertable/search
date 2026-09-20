@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <ConcertableDotNetPlatformVersion>0.2.0-alpha.0.13</ConcertableDotNetPlatformVersion>
-    <ConcertableAuthVersion>0.2.0-alpha.0.297</ConcertableAuthVersion>
+    <ConcertableDotNetPlatformVersion>0.2.0-alpha.0.14</ConcertableDotNetPlatformVersion>
+    <ConcertableAuthVersion>0.2.0-alpha.0.305</ConcertableAuthVersion>
     <ConcertableB2BContractsVersion>0.2.0-alpha.0.302</ConcertableB2BContractsVersion>
   </PropertyGroup>
 
