@@ -35,7 +35,10 @@ public sealed class SeedConvergenceTests
             out var simulator));
         Assert.Equal(0, simulator.Snapshot.ExitCode);
 
-        using var httpClient = app.CreateHttpClient(SearchConstants.WebResource);
+        // Named, not defaulted: launchSettings declares https before http, and the unnamed overload
+        // takes whichever endpoint comes first. CI trusts no development certificate, so resolving to
+        // https fails the TLS handshake rather than the assertion.
+        using var httpClient = app.CreateHttpClient(SearchConstants.WebResource, "http");
         var search = new SearchTestClient(httpClient);
         var seed = new SeedCatalog(TimeProvider.System);
         var observableConcert = seed.Concerts.First(concert =>
