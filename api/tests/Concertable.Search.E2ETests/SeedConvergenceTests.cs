@@ -1,3 +1,4 @@
+using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Testing;
 using Concertable.B2B.Hosting;
@@ -20,7 +21,9 @@ public sealed class SeedConvergenceTests
 
         await app.StartAsync(startupTimeout.Token);
 
-        await app.ResourceNotifications.WaitForResourceHealthyAsync(
+        await WaitForHealthyAsync(
+            app,
+            builder.Resources.Select(resource => resource.Name).ToArray(),
             SearchConstants.WebResource,
             startupTimeout.Token);
         await app.ResourceNotifications.WaitForResourceAsync(
@@ -56,6 +59,33 @@ public sealed class SeedConvergenceTests
             observableConcert.ConcertId,
             observableConcert.Name,
             startupTimeout.Token);
+    }
+
+    // Aspire reports only the resource that was waited on, so a dependency that died takes the blame with
+    // it and the failure names search-web whatever actually broke. Re-throwing with every resource's state
+    // is the difference between reading the cause and guessing at it.
+    private static async Task WaitForHealthyAsync(
+        DistributedApplication app,
+        IReadOnlyCollection<string> resourceNames,
+        string resourceName,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await app.ResourceNotifications.WaitForResourceHealthyAsync(resourceName, cancellationToken);
+        }
+        catch (Exception exception)
+        {
+            var states = resourceNames.Select(name =>
+                app.ResourceNotifications.TryGetCurrentState(name, out var current)
+                    ? $"{name}={current.Snapshot.State?.Text ?? "unknown"}"
+                        + (current.Snapshot.ExitCode is { } exitCode ? $"(exit {exitCode})" : string.Empty)
+                    : $"{name}=unreported");
+
+            throw new InvalidOperationException(
+                $"'{resourceName}' never became healthy. Resource states: {string.Join(", ", states)}.",
+                exception);
+        }
     }
 
     private static async Task AssertProjectionAsync(
