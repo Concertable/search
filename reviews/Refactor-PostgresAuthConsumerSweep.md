@@ -5,7 +5,7 @@
 > irreversible or ambiguous finding: record its durable disposition, take the safe path, and keep going.
 
 **Review status:** `complete`
-**Reviewed up to commit:** `HEAD`  `(2026-09-20)`
+**Reviewed up to commit:** `849f05c32704459b8c50af87827a456f6e952196`  `(2026-09-20)`
 **Judgment:** `approved`
 
 ## Review pass — 2026-09-20 — composition
@@ -60,8 +60,27 @@ establishes, mirroring what it already pins for Search's own migrations: `AuthDb
 completion, and **no `SqlServerServerResource` exists in the graph at all**. That last assertion is what
 stops the container coming back.
 
+## Second pass — 2026-09-20 — CI (`849f05c3`)
+
+The first push went red in CI and stayed green locally, twice each on the same commit. It failed at 1m13s
+against a five-minute budget, so nothing timed out — a resource died, and Aspire names only the resource
+that was waited on, so `search-web` wore the blame for a dependency it waits on.
+
+Cause: `auth-migrations` is a package created 2026-09-20 linked to `Concertable/auth`. A private package
+grants its own repository's Actions access and nothing grants another's, so this repository's
+`GITHUB_TOKEN` cannot pull it — while the `auth` image beside it predates the repository split and is
+still readable, which is why the old composition worked. Fixed by logging in to GHCR with the org packages
+token this job already holds for the NuGet feed, which is what `system/qualify.yml` does for the same
+reason. Confirmed: CI green at `849f05c3`.
+
+The second half of that commit is the diagnostic — re-throwing with every resource's state and exit code.
+Aspire's own message cannot name the resource that actually died, and without this the only way to tell a
+pull failure from a migration failure is to guess. It is in this PR rather than a follow-up because this
+slice is what put a run-to-completion resource on the critical path.
+
 ### Gates
 
 Release build 0 warnings / 0 errors. Startup 8/8, architecture 7/7, unit 17/17, integration 47/47, E2E
 1/1 — the E2E run boots the real composition, so it is direct proof that the published `auth` and
-`auth-migrations` images create and migrate `AuthDb` on PostgreSQL with no SQL Server present.
+`auth-migrations` images create and migrate `AuthDb` on PostgreSQL with no SQL Server present. Remote CI
+green at `849f05c3`.
