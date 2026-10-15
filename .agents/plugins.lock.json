@@ -1,0 +1,20 @@
+{
+  "schema_version": 3,
+  "marketplaces": {
+    "agents": {
+      "repository": "Concertable/agents",
+      "revision": "b4475851891d33a54a319f0245d725dbde04c0e3"
+    },
+    "tj-agents": {
+      "repository": "tj-agents/marketplace",
+      "revision": "v1.1.0"
+    }
+  },
+  "plugins": [
+    "base@tj-agents",
+    "concertable@agents",
+    "dotnet@tj-agents",
+    "engineering@tj-agents",
+    "machine@tj-agents"
+  ]
+}
