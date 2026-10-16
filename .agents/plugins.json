@@ -1,13 +1,11 @@
 {
-  "schema_version": 3,
+  "schema_version": 1,
   "marketplaces": {
     "agents": {
-      "repository": "Concertable/agents",
-      "revision": "b4475851891d33a54a319f0245d725dbde04c0e3"
+      "repository": "Concertable/agents"
     },
     "tj-agents": {
-      "repository": "tj-agents/marketplace",
-      "revision": "v1.1.0"
+      "repository": "tj-agents/marketplace"
     }
   },
   "plugins": [
