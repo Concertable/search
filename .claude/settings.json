@@ -3,18 +3,16 @@
     "agents": {
       "source": {
         "source": "github",
-        "repo": "Concertable/agents",
-        "ref": "b4475851891d33a54a319f0245d725dbde04c0e3"
+        "repo": "Concertable/agents"
       },
-      "autoUpdate": false
+      "autoUpdate": true
     },
     "tj-agents": {
       "source": {
         "source": "github",
-        "repo": "tj-agents/marketplace",
-        "ref": "v1.1.0"
+        "repo": "tj-agents/marketplace"
       },
-      "autoUpdate": false
+      "autoUpdate": true
     }
   },
   "enabledPlugins": {
