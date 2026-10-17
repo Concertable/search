@@ -1,0 +1,5 @@
+{
+  "standing_authorization": "auto",
+  "instruction": "Tommy, 2026-10-15 (PluginScoping plan): extend the standing auto-merge instruction to every repository in this migration when reviews and required checks pass; repository stop rules and hold labels still apply.",
+  "hold_label": "human-gate"
+}

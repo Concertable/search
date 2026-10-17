@@ -1,23 +1,28 @@
 {
   "extraKnownMarketplaces": {
-    "agent-standards": {
+    "agents": {
       "source": {
         "source": "github",
-        "repo": "Concertable/agent-standards"
+        "repo": "Concertable/agents"
       },
       "autoUpdate": true
     },
-    "dotagents": {
+    "tj-agents": {
       "source": {
         "source": "github",
-        "repo": "tomjseery/dotagents"
+        "repo": "tj-agents/marketplace"
       },
       "autoUpdate": true
     }
   },
   "enabledPlugins": {
-    "concertable@agent-standards": true,
-    "dotnet@agent-standards": true,
-    "dotnet-standards@dotagents": true
+    "base@tj-agents": true,
+    "concertable@agents": true,
+    "dotnet@tj-agents": true,
+    "engineering@tj-agents": true,
+    "machine@tj-agents": true
+  },
+  "permissions": {
+    "allow": []
   }
 }
