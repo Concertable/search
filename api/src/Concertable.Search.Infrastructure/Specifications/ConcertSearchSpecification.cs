@@ -1,35 +1,26 @@
 using System.Linq.Expressions;
 using Concertable.Kernel.Specifications;
-using Concertable.Search.Application.Params;
 using Concertable.Search.Domain.ReadModels;
 
 namespace Concertable.Search.Infrastructure.Specifications;
 
-internal sealed class ConcertSearchSpecification
-    : PredicateSpecification<ConcertReadModel, SearchParams>, IConcertSearchSpecification
+internal sealed class ConcertSearchSpecification : PredicateSpecification<ConcertReadModel>
 {
-    private readonly ISearchSpecification<ConcertReadModel> searchSpec;
-    private readonly TimeProvider timeProvider;
-
     public ConcertSearchSpecification(
-        ISearchSpecification<ConcertReadModel> searchSpec,
-        TimeProvider timeProvider)
+        IPredicateSpecification<ConcertReadModel> search,
+        DateTime now,
+        DateOnly? from,
+        bool? showHistory,
+        bool? showSold)
     {
-        this.searchSpec = searchSpec;
-        this.timeProvider = timeProvider;
+        Predicate = search.And(concert =>
+            concert.DatePosted != null
+            && concert.EndDate > now
+            && (from == null || DateOnly.FromDateTime(concert.StartDate) >= from)
+            && (showHistory != false || concert.StartDate >= now)
+            && (showSold != false || concert.AvailableTickets > 0))
+            .ToExpression();
     }
 
-    protected override Expression<Func<ConcertReadModel, bool>> Predicate(SearchParams @params)
-    {
-        var now = this.timeProvider.GetUtcNow().UtcDateTime;
-
-        return this.searchSpec
-            .And(concert =>
-                concert.DatePosted != null
-                && concert.EndDate > now
-                && (@params.From == null || DateOnly.FromDateTime(concert.StartDate) >= @params.From)
-                && (@params.ShowHistory != false || concert.StartDate >= now)
-                && (@params.ShowSold != false || concert.AvailableTickets > 0))
-            .ToExpression(@params);
-    }
+    protected override Expression<Func<ConcertReadModel, bool>> Predicate { get; }
 }

@@ -75,7 +75,21 @@ Controllers (`Api/Controllers/`, mostly `[AllowAnonymous]`):
 - `ConcertHeaderController` — `popular`, `free` (anon), `recommended` (`[Authorize]`).
 - `AutocompleteController` — `GET api/Autocomplete?headerType={enum?}&searchTerm=`; a null `headerType` selects the all-types service.
 
-`HeaderType` (`Application/HeaderType.cs`, values `Artist`/`Venue`/`Concert`) keys the read side via the codebase's keyed-strategy-resolver pattern: `AddKeyedScoped<IHeaderService, …>(HeaderType.X)` + `HeaderServiceFactory`/`HeaderDispatcher` resolve the per-type service; `IHeader` DTOs are `[JsonDerivedType]`-polymorphic on the same key. Geo/radius uses **NetTopologySuite** (`GeometrySpecification`: WGS84 `Point.Distance(center) <= radiusMeters`, default 10 km); read models are `IHasLocation` with `geography` columns.
+`HeaderType` (`Application/HeaderType.cs`, values `Artist`/`Venue`/`Concert`) keys the read side via the codebase's keyed-strategy-resolver pattern: `AddKeyedScoped<IHeaderService, …>(HeaderType.X)` + `HeaderServiceFactory`/`HeaderDispatcher` resolve the per-type service; `IHeader` DTOs are `[JsonDerivedType]`-polymorphic on the same key. Geo/radius uses **NetTopologySuite** (`GeometrySpecification`: WGS84 `Point.IsWithinDistance(center, radiusMeters)`, translated to PostGIS `ST_DWithin`, default 10 km); read models are `IHasLocation` with `geography` columns.
+
+---
+
+## Search specifications and query building
+
+Infrastructure owns injected `IArtistSearchQueryBuilder`, `IVenueSearchQueryBuilder` and
+`IConcertSearchQueryBuilder` composers. Each `Build(source, parameters)` creates fresh predicate and
+ordering specifications from the request values, using the shared Kernel contracts and DataAccess
+ordering API. Specifications are passed as parameters and never registered in DI.
+Builders resolve the geographic center and UTC instant before constructing specifications and copy
+genre selections. They retain no request, query or context state; their singleton lifetime requires
+singleton-safe geometry and time dependencies. Repositories project, page and execute the query.
+Recommended concerts construct the same geographic specification from resolved values in their
+repository. Generic conventions belong to `efcore:specification` and `efcore:query-building`.
 
 ---
 
