@@ -17,6 +17,9 @@ enabled = true
 [plugins."dotnet@tj-agents"]
 enabled = true
 
+[plugins."efcore@tj-agents"]
+enabled = true
+
 [plugins."engineering@tj-agents"]
 enabled = true
 
