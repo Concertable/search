@@ -90,6 +90,27 @@ public sealed class PostgresProviderTests(ApiFixture fixture) : IAsyncLifetime
     }
 
     [Fact]
+    public async Task Build_NameSortWithDuplicateNames_PagesByIdentifier()
+    {
+        await InsertArtistAsync(900041, "tied-name-artist");
+        await InsertArtistAsync(900040, "tied-name-artist");
+        await using var scope = fixture.Services.CreateAsyncScope();
+        var context = scope.ServiceProvider.GetRequiredService<SearchDbContext>();
+        var builder = scope.ServiceProvider.GetRequiredService<IArtistSearchQueryBuilder>();
+        var query = builder.Build(context.Set<ArtistReadModel>(), new SearchParams
+        {
+            SearchTerm = "tied-name-artist",
+            Sort = new Sort(SortField.Name),
+        });
+
+        var firstPage = await query.Take(1).Select(artist => artist.Id).ToArrayAsync();
+        var secondPage = await query.Skip(1).Take(1).Select(artist => artist.Id).ToArrayAsync();
+
+        firstPage.ShouldBe(new[] { 900040 });
+        secondPage.ShouldBe(new[] { 900041 });
+    }
+
+    [Fact]
     public async Task RadiusQuery_UsesPostgisTranslationAndSpatialIndex()
     {
         await using (var scope = fixture.Services.CreateAsyncScope())
