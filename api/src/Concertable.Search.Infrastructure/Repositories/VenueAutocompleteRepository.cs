@@ -7,19 +7,19 @@ namespace Concertable.Search.Infrastructure.Repositories;
 internal sealed class VenueAutocompleteRepository : IVenueAutocompleteRepository
 {
     private readonly ISearchDbContext context;
-    private readonly IVenueSearchQuery searchQuery;
+    private readonly IVenueSearchQueryBuilder queryBuilder;
 
     public VenueAutocompleteRepository(
         ISearchDbContext context,
-        IVenueSearchQuery searchQuery)
+        IVenueSearchQueryBuilder queryBuilder)
     {
         this.context = context;
-        this.searchQuery = searchQuery;
+        this.queryBuilder = queryBuilder;
     }
 
     public async Task<IReadOnlyList<Autocomplete>> GetAsync(string? searchTerm) =>
-        await searchQuery
-            .Apply(context.Venues, new SearchParams { SearchTerm = searchTerm })
+        await queryBuilder
+            .Build(context.Venues, new SearchParams { SearchTerm = searchTerm })
             .ToAutocompletes()
             .OrderBy(r => EF.Functions.Collate(r.Name.ToLower(), "C"))
             .ThenBy(r => EF.Functions.Collate(r.Name, "C"))

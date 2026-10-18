@@ -8,10 +8,11 @@ using Concertable.Search.Application.Params;
 using Concertable.Search.Domain.ReadModels;
 using Concertable.Search.Infrastructure.Data;
 using Concertable.Search.Infrastructure.Extensions;
-using Concertable.Search.Infrastructure.Specifications;
+using Concertable.Search.Infrastructure.QueryBuilders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
+using Shouldly;
 
 namespace Concertable.Search.IntegrationTests;
 
@@ -69,19 +70,38 @@ public sealed class PostgresProviderTests(ApiFixture fixture) : IAsyncLifetime
     }
 
     [Fact]
+    public async Task Build_ChangedParametersAndAnotherRequest_PreservesTheFirstQuery()
+    {
+        await InsertArtistAsync(900030, "first-request-artist");
+        await InsertArtistAsync(900031, "second-request-artist");
+        await using var scope = fixture.Services.CreateAsyncScope();
+        var context = scope.ServiceProvider.GetRequiredService<SearchDbContext>();
+        var builder = scope.ServiceProvider.GetRequiredService<IArtistSearchQueryBuilder>();
+        var parameters = new SearchParams { SearchTerm = "first-request-artist" };
+        var firstQuery = builder.Build(context.Set<ArtistReadModel>(), parameters);
+
+        parameters.SearchTerm = "second-request-artist";
+        var secondQuery = builder.Build(context.Set<ArtistReadModel>(), parameters);
+        var secondIds = await secondQuery.Select(artist => artist.Id).ToArrayAsync();
+        var firstIds = await firstQuery.Select(artist => artist.Id).ToArrayAsync();
+
+        firstIds.ShouldBe(new[] { 900030 });
+        secondIds.ShouldBe(new[] { 900031 });
+    }
+
+    [Fact]
     public async Task RadiusQuery_UsesPostgisTranslationAndSpatialIndex()
     {
         await using (var scope = fixture.Services.CreateAsyncScope())
         {
             var context = scope.ServiceProvider.GetRequiredService<SearchDbContext>();
-            var geometry = scope.ServiceProvider.GetRequiredService<IGeometrySpecification<ConcertReadModel>>();
-            var radiusSql = context.Set<ConcertReadModel>()
-                .Where(geometry.ToExpression(new ConcertParams
+            var builder = scope.ServiceProvider.GetRequiredService<IConcertSearchQueryBuilder>();
+            var radiusSql = builder.Build(context.Set<ConcertReadModel>(), new SearchParams
                 {
                     Latitude = 51.5074,
                     Longitude = -0.1278,
                     RadiusKm = 1,
-                }))
+                })
                 .ToQueryString();
             var recentSql = context.Set<ConcertReadModel>()
                 .OrderByDatePostedDescending()

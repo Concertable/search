@@ -5,11 +5,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Concertable.Search.Infrastructure.Specifications;
 
-internal sealed class SortSpecification<TEntity> : ISortSpecification<TEntity>
+internal sealed class SortSpecification<TEntity> : Specification<TEntity>, IOrderedSpecification<TEntity>
     where TEntity : class, IIdEntity, IHasName
 {
-    public IReadOnlyList<SpecificationOrder<TEntity>> ToOrders(Sort? @params) =>
-        @params switch
+    public SortSpecification(Sort? sort)
+    {
+        Orders = sort switch
         {
             { Field: SortField.Name, Direction: SortDirection.Asc } =>
             [
@@ -23,4 +24,7 @@ internal sealed class SortSpecification<TEntity> : ISortSpecification<TEntity>
             ],
             _ => [SpecificationOrder<TEntity>.Create(entity => entity.Id, SpecificationOrderDirection.Ascending)]
         };
+    }
+
+    public IReadOnlyList<SpecificationOrder<TEntity>> Orders { get; }
 }
