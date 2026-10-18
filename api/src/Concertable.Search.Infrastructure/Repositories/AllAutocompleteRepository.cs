@@ -7,38 +7,38 @@ namespace Concertable.Search.Infrastructure.Repositories;
 internal sealed class AllAutocompleteRepository : IAllAutocompleteRepository
 {
     private readonly ISearchDbContext context;
-    private readonly IArtistSearchQuery artistQuery;
-    private readonly IVenueSearchQuery venueQuery;
-    private readonly IConcertSearchQuery concertQuery;
+    private readonly IArtistSearchQueryBuilder artistQueryBuilder;
+    private readonly IVenueSearchQueryBuilder venueQueryBuilder;
+    private readonly IConcertSearchQueryBuilder concertQueryBuilder;
 
     public AllAutocompleteRepository(
         ISearchDbContext context,
-        IArtistSearchQuery artistQuery,
-        IVenueSearchQuery venueQuery,
-        IConcertSearchQuery concertQuery)
+        IArtistSearchQueryBuilder artistQueryBuilder,
+        IVenueSearchQueryBuilder venueQueryBuilder,
+        IConcertSearchQueryBuilder concertQueryBuilder)
     {
         this.context = context;
-        this.artistQuery = artistQuery;
-        this.venueQuery = venueQuery;
-        this.concertQuery = concertQuery;
+        this.artistQueryBuilder = artistQueryBuilder;
+        this.venueQueryBuilder = venueQueryBuilder;
+        this.concertQueryBuilder = concertQueryBuilder;
     }
 
     public async Task<IReadOnlyList<Autocomplete>> GetAsync(string? searchTerm)
     {
         var searchParams = new SearchParams { SearchTerm = searchTerm };
 
-        return await artistQuery
-            .Apply(context.Artists, searchParams)
+        return await artistQueryBuilder
+            .Build(context.Artists, searchParams)
             .ToAutocompletes()
             .Take(20)
             .Concat(
-                venueQuery
-                    .Apply(context.Venues, searchParams)
+                venueQueryBuilder
+                    .Build(context.Venues, searchParams)
                     .ToAutocompletes()
                     .Take(20))
             .Concat(
-                concertQuery
-                    .Apply(context.Concerts, searchParams)
+                concertQueryBuilder
+                    .Build(context.Concerts, searchParams)
                     .ToAutocompletes()
                     .Take(20))
             .OrderBy(r => EF.Functions.Collate(r.Name.ToLower(), "C"))

@@ -1,36 +1,20 @@
 using System.Linq.Expressions;
 using Concertable.Kernel;
-using Concertable.Kernel.Geometry;
-using Concertable.Kernel.Services.Geometry;
 using Concertable.Kernel.Specifications;
-using Concertable.Search.Application.Params;
-using Microsoft.Extensions.DependencyInjection;
+using NetTopologySuite.Geometries;
 
 namespace Concertable.Search.Infrastructure.Specifications;
 
-internal sealed class GeometrySpecification<TEntity>
-    : PredicateSpecification<TEntity, IGeoParams>, IGeometrySpecification<TEntity>
-    where TEntity : class, IIdEntity, IHasLocation
+internal sealed class GeometrySpecification<TEntity> : PredicateSpecification<TEntity>
+    where TEntity : class, IHasLocation
 {
-    private readonly IGeometryProvider geometryProvider;
-
-    public GeometrySpecification(
-        [FromKeyedServices(GeometryProviderType.Geographic)] IGeometryProvider geometryProvider)
+    public GeometrySpecification(Point? center, double radiusMeters)
     {
-        this.geometryProvider = geometryProvider;
+        var origin = (Point?)center?.Copy();
+        Predicate = origin is null
+            ? _ => true
+            : entity => entity.Location.IsWithinDistance(origin, radiusMeters);
     }
 
-    protected override Expression<Func<TEntity, bool>> Predicate(IGeoParams @params)
-    {
-        if (!@params.HasValidCoordinates())
-            return _ => true;
-
-        var center = this.geometryProvider.CreatePoint(@params.Latitude, @params.Longitude);
-        if (center is null)
-            return _ => true;
-
-        var radiusMeters = (@params.RadiusKm ?? 10) * 1000;
-
-        return entity => entity.Location.IsWithinDistance(center, radiusMeters);
-    }
+    protected override Expression<Func<TEntity, bool>> Predicate { get; }
 }

@@ -5,16 +5,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Concertable.Search.Infrastructure.Specifications;
 
-internal sealed class SearchTermSpecification<TEntity>
-    : PredicateSpecification<TEntity, string?>, INameSpecification<TEntity>
+internal sealed class SearchTermSpecification<TEntity> : PredicateSpecification<TEntity>
     where TEntity : class, IHasName
 {
-    protected override Expression<Func<TEntity, bool>> Predicate(string? searchTerm)
+    public SearchTermSpecification(string? searchTerm)
     {
         if (string.IsNullOrWhiteSpace(searchTerm))
-            return _ => true;
+        {
+            Predicate = _ => true;
+            return;
+        }
 
         var normalized = searchTerm.ToLowerInvariant();
-        return entity => EF.Functions.Collate(entity.Name.ToLower(), "C").Contains(normalized);
+        Predicate = entity => EF.Functions.Collate(entity.Name.ToLower(), "C").Contains(normalized);
     }
+
+    protected override Expression<Func<TEntity, bool>> Predicate { get; }
 }

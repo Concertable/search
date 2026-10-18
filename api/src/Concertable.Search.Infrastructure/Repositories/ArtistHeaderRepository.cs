@@ -11,20 +11,20 @@ namespace Concertable.Search.Infrastructure.Repositories;
 internal sealed class ArtistHeaderRepository : IArtistHeaderRepository
 {
     private readonly ISearchDbContext context;
-    private readonly IArtistSearchQuery searchQuery;
+    private readonly IArtistSearchQueryBuilder queryBuilder;
 
     public ArtistHeaderRepository(
         ISearchDbContext context,
-        IArtistSearchQuery searchQuery)
+        IArtistSearchQueryBuilder queryBuilder)
     {
         this.context = context;
-        this.searchQuery = searchQuery;
+        this.queryBuilder = queryBuilder;
     }
 
     public async Task<IPagination<ArtistHeader>> SearchAsync(SearchParams searchParams)
     {
-        return await this.searchQuery
-            .Apply(this.context.Artists.AsNoTracking(), searchParams)
+        return await this.queryBuilder
+            .Build(this.context.Artists.AsNoTracking(), searchParams)
             .ToHeaderDtos(context.ArtistRatingProjections.AsNoTracking())
             .ToPaginationAsync(searchParams);
     }

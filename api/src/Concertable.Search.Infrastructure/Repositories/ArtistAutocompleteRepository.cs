@@ -7,19 +7,19 @@ namespace Concertable.Search.Infrastructure.Repositories;
 internal sealed class ArtistAutocompleteRepository : IArtistAutocompleteRepository
 {
     private readonly ISearchDbContext context;
-    private readonly IArtistSearchQuery searchQuery;
+    private readonly IArtistSearchQueryBuilder queryBuilder;
 
     public ArtistAutocompleteRepository(
         ISearchDbContext context,
-        IArtistSearchQuery searchQuery)
+        IArtistSearchQueryBuilder queryBuilder)
     {
         this.context = context;
-        this.searchQuery = searchQuery;
+        this.queryBuilder = queryBuilder;
     }
 
     public async Task<IReadOnlyList<Autocomplete>> GetAsync(string? searchTerm) =>
-        await searchQuery
-            .Apply(context.Artists, new SearchParams { SearchTerm = searchTerm })
+        await queryBuilder
+            .Build(context.Artists, new SearchParams { SearchTerm = searchTerm })
             .ToAutocompletes()
             .OrderBy(r => EF.Functions.Collate(r.Name.ToLower(), "C"))
             .ThenBy(r => EF.Functions.Collate(r.Name, "C"))
