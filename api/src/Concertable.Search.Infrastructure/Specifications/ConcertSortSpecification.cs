@@ -25,6 +25,8 @@ internal sealed class ConcertSortSpecification : Specification<ConcertReadModel>
             { Field: SortField.Date, Direction: SortDirection.Desc } => [SpecificationOrder<ConcertReadModel>.Create(concert => concert.StartDate, SpecificationOrderDirection.Descending)],
             _ => [SpecificationOrder<ConcertReadModel>.Create(concert => concert.StartDate, SpecificationOrderDirection.Ascending)]
         };
+
+        Orders = [.. Orders, SpecificationOrder<ConcertReadModel>.Create(entity => entity.Id, SpecificationOrderDirection.Ascending)];
     }
 
     public IReadOnlyList<SpecificationOrder<ConcertReadModel>> Orders { get; }

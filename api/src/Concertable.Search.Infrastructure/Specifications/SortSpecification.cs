@@ -24,6 +24,9 @@ internal sealed class SortSpecification<TEntity> : Specification<TEntity>, IOrde
             ],
             _ => [SpecificationOrder<TEntity>.Create(entity => entity.Id, SpecificationOrderDirection.Ascending)]
         };
+
+        if (sort is { Field: SortField.Name })
+            Orders = [.. Orders, SpecificationOrder<TEntity>.Create(entity => entity.Id, SpecificationOrderDirection.Ascending)];
     }
 
     public IReadOnlyList<SpecificationOrder<TEntity>> Orders { get; }
