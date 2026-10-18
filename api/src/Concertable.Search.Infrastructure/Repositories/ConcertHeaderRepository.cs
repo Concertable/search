@@ -1,4 +1,7 @@
-﻿using Concertable.Contracts;
+using Concertable.Kernel.Geometry;
+using Concertable.Kernel.Services.Geometry;
+using Microsoft.Extensions.DependencyInjection;
+using Concertable.Contracts;
 using Concertable.DataAccess;
 using Concertable.Search.Application.DTOs;
 using Concertable.Search.Application.Params;
@@ -14,26 +17,26 @@ namespace Concertable.Search.Infrastructure.Repositories;
 internal sealed class ConcertHeaderRepository : IConcertHeaderRepository
 {
     private readonly ISearchDbContext context;
-    private readonly IConcertSearchQuery searchQuery;
-    private readonly IGeometrySpecification<ConcertReadModel> geometrySpec;
+    private readonly IConcertSearchQueryBuilder queryBuilder;
+    private readonly IGeometryProvider geometryProvider;
     private readonly TimeProvider timeProvider;
 
     public ConcertHeaderRepository(
         ISearchDbContext context,
-        IConcertSearchQuery searchQuery,
-        IGeometrySpecification<ConcertReadModel> geometrySpec,
+        IConcertSearchQueryBuilder queryBuilder,
+        [FromKeyedServices(GeometryProviderType.Geographic)] IGeometryProvider geometryProvider,
         TimeProvider timeProvider)
     {
         this.context = context;
-        this.searchQuery = searchQuery;
-        this.geometrySpec = geometrySpec;
+        this.queryBuilder = queryBuilder;
+        this.geometryProvider = geometryProvider;
         this.timeProvider = timeProvider;
     }
 
     public async Task<IPagination<ConcertHeader>> SearchAsync(SearchParams searchParams)
     {
-        return await this.searchQuery
-            .Apply(this.context.Concerts, searchParams)
+        return await this.queryBuilder
+            .Build(this.context.Concerts, searchParams)
             .ToHeaderDtos(context.Artists, context.Venues, context.ConcertRatingProjections)
             .ToPaginationAsync(searchParams);
     }
@@ -67,7 +70,11 @@ internal sealed class ConcertHeaderRepository : IConcertHeaderRepository
         if (concertParams.Genres.Any())
             query = query.Where(c => c.ConcertGenres.Any(eg => concertParams.Genres.Contains(eg.Genre)));
 
-        query = query.Where(this.geometrySpec.ToExpression(concertParams));
+        var center = concertParams.HasValidCoordinates()
+            ? geometryProvider.CreatePoint(concertParams.Latitude, concertParams.Longitude)
+            : null;
+        var geometry = new GeometrySpecification<ConcertReadModel>(center, (concertParams.RadiusKm ?? 10) * 1000);
+        query = query.Where(geometry.ToExpression());
 
         query = concertParams.OrderByRecent
             ? query.OrderByDatePostedDescending()

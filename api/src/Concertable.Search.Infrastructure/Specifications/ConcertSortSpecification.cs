@@ -5,10 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Concertable.Search.Infrastructure.Specifications;
 
-internal sealed class ConcertSortSpecification : ISortSpecification<ConcertReadModel>
+internal sealed class ConcertSortSpecification : Specification<ConcertReadModel>, IOrderedSpecification<ConcertReadModel>
 {
-    public IReadOnlyList<SpecificationOrder<ConcertReadModel>> ToOrders(Sort? @params) =>
-        @params switch
+    public ConcertSortSpecification(Sort? sort)
+    {
+        Orders = sort switch
         {
             { Field: SortField.Name, Direction: SortDirection.Asc } =>
             [
@@ -24,4 +25,7 @@ internal sealed class ConcertSortSpecification : ISortSpecification<ConcertReadM
             { Field: SortField.Date, Direction: SortDirection.Desc } => [SpecificationOrder<ConcertReadModel>.Create(concert => concert.StartDate, SpecificationOrderDirection.Descending)],
             _ => [SpecificationOrder<ConcertReadModel>.Create(concert => concert.StartDate, SpecificationOrderDirection.Ascending)]
         };
+    }
+
+    public IReadOnlyList<SpecificationOrder<ConcertReadModel>> Orders { get; }
 }
