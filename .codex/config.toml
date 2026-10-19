@@ -26,4 +26,7 @@ enabled = true
 [plugins."machine@tj-agents"]
 enabled = true
 
+[plugins."personal@tj-agents"]
+enabled = true
+
 # END repo-declared agent capabilities
