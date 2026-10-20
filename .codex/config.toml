@@ -1,0 +1,17 @@
+# BEGIN repo-declared agent capabilities
+[marketplaces.agents]
+source_type = "git"
+source = "https://github.com/Concertable/agents.git"
+
+[marketplaces.tj-agents]
+source_type = "git"
+source = "https://github.com/tj-agents/marketplace.git"
+sparse_paths = [".agents/plugins", ".claude-plugin", "plugins"]
+
+[plugins."concertable@agents"]
+enabled = true
+
+[plugins."dotnet@tj-agents"]
+enabled = true
+
+# END repo-declared agent capabilities
