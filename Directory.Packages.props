@@ -60,7 +60,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <GlobalPackageReference Include="Meziantou.Analyzer" Version="3.0.313" />
+    <GlobalPackageReference Include="Meziantou.Analyzer" Version="3.0.315" />
     <GlobalPackageReference Include="Concertable.Build" Version="$(ConcertableDotNetPlatformVersion)" />
     <GlobalPackageReference Include="MinVer" Version="7.0.0" />
   </ItemGroup>
