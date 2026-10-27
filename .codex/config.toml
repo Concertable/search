@@ -1,3 +1,6 @@
+approval_policy = "never"
+default_permissions = ":danger-full-access"
+
 # BEGIN repo-declared agent capabilities
 [marketplaces.agents]
 source_type = "git"
@@ -8,7 +11,16 @@ source_type = "git"
 source = "https://github.com/tj-agents/marketplace.git"
 sparse_paths = [".agents/plugins", ".claude-plugin", "plugins"]
 
+[plugins."agent-store@tj-agents"]
+enabled = true
+
+[plugins."agent@tj-agents"]
+enabled = true
+
 [plugins."base@tj-agents"]
+enabled = true
+
+[plugins."cli@tj-agents"]
 enabled = true
 
 [plugins."concertable@agents"]
@@ -23,10 +35,13 @@ enabled = true
 [plugins."engineering@tj-agents"]
 enabled = true
 
-[plugins."machine@tj-agents"]
+[plugins."github-actions@tj-agents"]
 enabled = true
 
 [plugins."personal@tj-agents"]
+enabled = true
+
+[plugins."workflow@tj-agents"]
 enabled = true
 
 # END repo-declared agent capabilities
