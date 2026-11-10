@@ -48,7 +48,7 @@ jobs:
       - name: Build and verify the release candidate
         shell: pwsh
         env:
-          GITHUB_PACKAGES_TOKEN: ${{ secrets.CONCERTABLE_PACKAGES_READ }}
+          GITHUB_PACKAGES_TOKEN: ${{ github.token }}
         run: >-
           ./scripts/verify-search-release-candidate.ps1
           -Configuration Release

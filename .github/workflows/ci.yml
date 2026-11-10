@@ -11,9 +11,6 @@ permissions:
   contents: read
   packages: read
 
-env:
-  GITHUB_PACKAGES_TOKEN: ${{ secrets.CONCERTABLE_PACKAGES_READ }}
-
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -46,12 +43,16 @@ jobs:
           dotnet-version: 10.x
 
       - name: Restore Search solution
+        env:
+          GITHUB_PACKAGES_TOKEN: ${{ github.token }}
         run: dotnet restore Concertable.Search.slnx
 
       - name: Build Search solution
         run: dotnet build Concertable.Search.slnx --configuration Release --no-restore
 
       - name: Build and inspect Search images without publishing
+        env:
+          GITHUB_PACKAGES_TOKEN: ${{ github.token }}
         shell: pwsh
         run: >-
           ./scripts/verify-search-images.ps1
@@ -116,9 +117,13 @@ jobs:
         run: dotnet publish api/src/Concertable.Search.Migrations/Concertable.Search.Migrations.csproj --configuration Release --no-restore --output artifacts/migrations
 
       - name: Pack Search Hosting
+        env:
+          GITHUB_PACKAGES_TOKEN: ${{ github.token }}
         run: dotnet pack api/src/Concertable.Search.Hosting/Concertable.Search.Hosting.csproj --configuration Release --output artifacts/packages -p:MinVerVersionOverride=0.0.0-ci.${{ github.run_number }}
 
       - name: Verify package candidates from a clean consumer
+        env:
+          GITHUB_PACKAGES_TOKEN: ${{ github.token }}
         shell: pwsh
         run: ./scripts/verify-package-candidates.ps1 -PackageDirectory artifacts/packages
 
@@ -147,6 +152,8 @@ jobs:
           retention-days: 7
 
       - name: Verify combined Search release candidate without publishing
+        env:
+          GITHUB_PACKAGES_TOKEN: ${{ github.token }}
         shell: pwsh
         run: >-
           ./scripts/verify-search-release-candidate.ps1
