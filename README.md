@@ -52,6 +52,19 @@ three secret parameters of at least 32 characters, then supplies them to Auth as
 service client secrets. `concertable-auth` remains the Auth client ID; no SPA clients are enabled, and the
 developer-certificate bridge remains part of the Auth resource.
 
+Run the AppHost directly with `aspire run`. For an existing local setup, before the first run with this
+change, copy each effective `ServiceAuth` user-secret value to its parameter key. Do not print, log, or
+silently rotate these secrets during the migration.
+
+| Obsolete key | Parameter key |
+| --- | --- |
+| `ServiceAuth:B2BClientSecret` | `Parameters:auth-b2b-client-secret` |
+| `ServiceAuth:CustomerClientSecret` | `Parameters:auth-customer-client-secret` |
+| `ServiceAuth:AuthClientSecret` | `Parameters:auth-service-client-secret` |
+
+After migrating the values, remove the obsolete keys. Actual reconciliation with retained Auth state remains
+a runtime acceptance gate.
+
 Keep the generated defaults. If an authorised rotation is needed, set the relevant AppHost user-secret key
 to a new value of at least 32 characters; the keys are:
 
