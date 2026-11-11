@@ -14,6 +14,139 @@ promotion preparation is developed through pull requests here. The monorepo rema
 the ordered cutover gates are complete and the final rename, publication, and source removal are
 explicitly authorized.
 
+## Run Search locally
+
+This is a local-development composition, not a cloud deployment or product publication. It runs Search
+from source with a shared PostgreSQL/PostGIS server (`SearchDb` and `AuthDb`), the Azure Service Bus
+emulator, digest-pinned Auth and Auth-migrations images, and the digest-pinned B2B seed simulator. It
+does not start a B2B database or B2B runtime.
+
+### Prerequisites
+
+- .NET SDK 10 and an Aspire CLI compatible with the AppHost SDK (the composition is currently built with
+  Aspire 13.6.2). Install the CLI normally and make `aspire` available on `PATH`; confirm the version with
+  `aspire --version`.
+- A running Docker Engine configured for **Linux containers**. The emulator, PostgreSQL/PostGIS, Auth, and
+  the B2B simulator are containers.
+- A trusted HTTPS development certificate for the Auth image bridge:
+
+  ```powershell
+  dotnet dev-certs https --trust
+  ```
+
+- GitHub Packages access for restore: a GitHub PAT with `read:packages`, supplied without printing it as
+  `GITHUB_PACKAGES_TOKEN`. The repository's `nuget.config` uses that variable for `Concertable.*` packages.
+- GHCR pull access for the private Auth and B2B images. Sign in interactively before the first run:
+
+  ```powershell
+  docker login ghcr.io
+  ```
+
+  Use a GitHub account/PAT authorised to read the organisation's packages; do not put the token in a
+  command line, source file, or checked-in settings.
+
+### AppHost secrets
+
+The AppHost has `UserSecretsId` `search-apphost-dev-secrets`. On a normal run it generates and persists
+three secret parameters of at least 32 characters, then supplies them to Auth as its B2B, Customer, and
+service client secrets. `concertable-auth` remains the Auth client ID; no SPA clients are enabled, and the
+developer-certificate bridge remains part of the Auth resource.
+
+Keep the generated defaults. If an authorised rotation is needed, set the relevant AppHost user-secret key
+to a new value of at least 32 characters; the keys are:
+
+```powershell
+dotnet user-secrets set "Parameters:auth-b2b-client-secret" "<new 32+ character secret>" --project ./local/AppHost/Concertable.Search.AppHost.csproj
+dotnet user-secrets set "Parameters:auth-customer-client-secret" "<new 32+ character secret>" --project ./local/AppHost/Concertable.Search.AppHost.csproj
+dotnet user-secrets set "Parameters:auth-service-client-secret" "<new 32+ character secret>" --project ./local/AppHost/Concertable.Search.AppHost.csproj
+```
+
+### Start, observe, and stop
+
+From the repository root, start the one supported local runtime in the foreground:
+
+```powershell
+aspire run --apphost ./local/AppHost/Concertable.Search.AppHost.csproj
+```
+
+Use `Ctrl+C` to end that foreground run. The AppHost orders Auth migrations before Auth, and Search
+migrations before both Search Web and Workers. The B2B simulator waits for the workers, then publishes its
+catalog events and exits.
+
+For a detached run that you have identified as this AppHost, stop only that AppHost:
+
+```powershell
+aspire stop --apphost ./local/AppHost/Concertable.Search.AppHost.csproj
+```
+
+The following Aspire 13.6.1 CLI diagnostics are useful while the app is running:
+
+```powershell
+aspire describe --apphost ./local/AppHost/Concertable.Search.AppHost.csproj
+aspire describe search-web --apphost ./local/AppHost/Concertable.Search.AppHost.csproj
+aspire logs search-migrations --apphost ./local/AppHost/Concertable.Search.AppHost.csproj --tail 200
+aspire logs search-workers --apphost ./local/AppHost/Concertable.Search.AppHost.csproj --tail 200
+```
+
+Check the resource state before interpreting a request: `search-migrations` must complete successfully;
+Auth must have completed its migration and be discoverable; and `search-web` and `search-workers` must be
+healthy. If a dependency blocks the Web resource, use `aspire describe` for all resources first, then the
+logs of the first non-healthy dependency rather than guessing from the Web symptom.
+
+The connected path to observe is: B2B seed simulator event -> Service Bus emulator -> Search Workers
+upsert/inbox -> `SearchDb` -> Search Web autocomplete. Obtain Search Web's **HTTP** endpoint from
+`aspire describe search-web`, then query an expected B2B fixture through the actual optional
+`headerType` and `searchTerm` parameters:
+
+Pinned fixture — B2B `0.2.0-alpha.0.302`, source commit
+`a1baf9a77daec9b7cb23ac69dcf6840d21fc503c`: artist ID `1`, `The Rockers`.
+
+```powershell
+$searchWebHttpUrl = '<HTTP endpoint shown for search-web>'.TrimEnd('/')
+$expectedArtistId = 1
+$expectedArtistName = 'The Rockers'
+$searchTerm = [uri]::EscapeDataString($expectedArtistName)
+$results = Invoke-RestMethod -Uri "$searchWebHttpUrl/api/Autocomplete?headerType=Artist&searchTerm=$searchTerm"
+$match = $results | Where-Object {
+  $_.PSObject.Properties['$type'].Value -eq 'artist' -and
+  $_.id -eq $expectedArtistId -and
+  $_.name -eq $expectedArtistName
+}
+if ($null -eq $match) { throw 'Pinned artist projection was not returned by autocomplete.' }
+$match
+```
+
+The response contract is an array of objects with `$type`, `id`, and `name`; the Search contract declares
+`$type` as the `HeaderType` enum and the TestClient reads it as the camel-case string `artist`, `venue`, or
+`concert`. The E2E fixture derives its values dynamically from the same pinned `SeedCatalog` and requires
+exact type, ID, and name matches for the first artist, first venue, and an observable posted future concert.
+No successful local response has been observed for this documentation change.
+
+### Current local constraints and data safety
+
+- Qualification awaits a published platform pin containing the PostGIS mount fix. The current
+  `0.2.0-alpha.0.14` pin is broken; the repair exists only in unpublished platform commit `2dda7db`. There
+  is no local mount workaround and this setup makes no retained-store persistence claim.
+- The native generated PostgreSQL password is designed to persist with AppHost user secrets. The effective
+  password of an older retained store is unverified, so keep credentials and that store together as runtime
+  evidence; do not recreate a database to make them appear to match.
+- The Postgres volume name is derived from `AppContext.BaseDirectory`. A different checkout or build
+  configuration can select a different store. Treat an anonymous retained database as a lesson artifact:
+  never delete or recreate it. An authorised transition requires a backup, a verified restore, and explicit
+  approval. Retention verification requires a non-seeded sentinel surviving container recreation and an
+  observed database identity; simulator rows alone are replayable evidence, not persistence evidence.
+- Simulator replay uses fresh envelope IDs and projection upserts. The emulator's broker data is not
+  durable. Re-run the simulator to rebuild projections; do not mistake replay for stored state.
+- The current B2B image and packages are the coherent `0.2.0-alpha.0.302` set. The known extra `Awaiting
+  Show` concert 6 remains until a corrected simulator and `Seed.Contracts` package are published and the
+  projection is reconciled; do not use that row as a success criterion.
+- Standalone Search receives catalog events but no seeded Customer-origin rating events, so seeded ratings
+  are absent. This is recorded in [`TECH_DEBT.md`](./TECH_DEBT.md).
+- The on-demand infrastructure exercise belongs to the [Infra repository](https://github.com/Concertable/infra).
+  Its unpublished `Feature/LocalAzureLearning` branch at `f331b58` contains the separate
+  `labs/azure-local/verify.ps1` exercise and ARM records for only a resource group, VNet, and subnet. It
+  does not provide cloud parity.
+
 ## Building the independent closure
 
 The deployable closure consumes Concertable's shared platform and cross-service contracts as NuGet
