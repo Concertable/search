@@ -42,6 +42,44 @@ public sealed class ResourceGraphTests
         Assert.ThrowsAny<Exception>(() => builder.Build());
     }
 
+    [Fact]
+    public async Task AuthClientSecrets_GeneratedDefaults_AreSecretAndReachAuth()
+    {
+        var builder = AppHost.CreateBuilder(["--AppHost:Operation=publish"]);
+
+        await AssertGeneratedSecretAsync(builder, "auth-b2b-client-secret");
+        await AssertGeneratedSecretAsync(builder, "auth-customer-client-secret");
+        await AssertGeneratedSecretAsync(builder, "auth-service-client-secret");
+
+        var environment = await GetAuthEnvironmentAsync(builder);
+
+        Assert.Equal("{auth-b2b-client-secret.value}", environment["ServiceAuth__B2BClientSecret"]);
+        Assert.Equal("{auth-customer-client-secret.value}", environment["ServiceAuth__CustomerClientSecret"]);
+        Assert.Equal("{auth-service-client-secret.value}", environment["ServiceAuth__AuthClientSecret"]);
+    }
+
+    [Fact]
+    public async Task AuthClientSecrets_ParametersAreExplicitlyConfigured_UsesParameterValues()
+    {
+        var builder = AppHost.CreateBuilder(
+        [
+            "--AppHost:Operation=publish",
+            "--Parameters:auth-b2b-client-secret=synthetic-b2b-client-secret",
+            "--Parameters:auth-customer-client-secret=synthetic-customer-client-secret",
+            "--Parameters:auth-service-client-secret=synthetic-service-client-secret"
+        ]);
+
+        Assert.Equal("synthetic-b2b-client-secret", await GetParameter(builder, "auth-b2b-client-secret").GetValueAsync(CancellationToken.None));
+        Assert.Equal("synthetic-customer-client-secret", await GetParameter(builder, "auth-customer-client-secret").GetValueAsync(CancellationToken.None));
+        Assert.Equal("synthetic-service-client-secret", await GetParameter(builder, "auth-service-client-secret").GetValueAsync(CancellationToken.None));
+
+        var environment = await GetAuthEnvironmentAsync(builder);
+
+        Assert.Equal("{auth-b2b-client-secret.value}", environment["ServiceAuth__B2BClientSecret"]);
+        Assert.Equal("{auth-customer-client-secret.value}", environment["ServiceAuth__CustomerClientSecret"]);
+        Assert.Equal("{auth-service-client-secret.value}", environment["ServiceAuth__AuthClientSecret"]);
+    }
+
     private static void AssertWaitsFor(
         IDistributedApplicationBuilder builder,
         string resourceName,
@@ -62,15 +100,7 @@ public sealed class ResourceGraphTests
 
     private static async Task AssertNoSpaClientsAsync(IDistributedApplicationBuilder builder)
     {
-        var auth = Assert.IsAssignableFrom<IResourceWithEnvironment>(
-            builder.Resources.Single(resource => resource.Name == AuthConstants.Resource));
-        var configuration = await ExecutionConfigurationBuilder.Create(auth)
-            .WithEnvironmentVariablesConfig()
-            .BuildAsync(
-                new DistributedApplicationExecutionContext(DistributedApplicationOperation.Publish),
-                NullLogger.Instance,
-                CancellationToken.None);
-        var environment = configuration.EnvironmentVariables.ToDictionary();
+        var environment = await GetAuthEnvironmentAsync(builder);
 
         Assert.Equal("true", environment["Auth__SpaClients__RestrictToEnabledClients"]);
         Assert.DoesNotContain(
@@ -80,6 +110,36 @@ public sealed class ResourceGraphTests
             environment.Keys,
             key => key.StartsWith("Auth__SpaClients__", StringComparison.Ordinal)
                 && key != "Auth__SpaClients__RestrictToEnabledClients");
+    }
+
+    private static async Task AssertGeneratedSecretAsync(IDistributedApplicationBuilder builder, string parameterName)
+    {
+        var parameter = GetParameter(builder, parameterName);
+        var generatedDefault = Assert.IsType<GenerateParameterDefault>(parameter.Default);
+
+        Assert.True(parameter.Secret);
+        Assert.Equal(32, generatedDefault.MinLength);
+        Assert.True((await parameter.GetValueAsync(CancellationToken.None)).Length >= generatedDefault.MinLength);
+    }
+
+    private static ParameterResource GetParameter(IDistributedApplicationBuilder builder, string parameterName)
+    {
+        return Assert.IsType<ParameterResource>(
+            builder.Resources.Single(resource => resource.Name == parameterName));
+    }
+
+    private static async Task<Dictionary<string, string>> GetAuthEnvironmentAsync(IDistributedApplicationBuilder builder)
+    {
+        var auth = Assert.IsAssignableFrom<IResourceWithEnvironment>(
+            builder.Resources.Single(resource => resource.Name == AuthConstants.Resource));
+        var configuration = await ExecutionConfigurationBuilder.Create(auth)
+            .WithEnvironmentVariablesConfig()
+            .BuildAsync(
+                new DistributedApplicationExecutionContext(DistributedApplicationOperation.Publish),
+                NullLogger.Instance,
+                CancellationToken.None);
+
+        return configuration.EnvironmentVariables.ToDictionary();
     }
 
     private static void AssertContainerRuntimeArgs(
