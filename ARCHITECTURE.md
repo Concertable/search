@@ -56,7 +56,7 @@ Search subscribes to six B2B-owned events (Workers `Program.cs`); each handler (
 |---|---|---|
 | `ArtistChangedEvent` | `Concertable.B2B.Artist.Contracts.Events` | `ArtistProjectionHandler` → `Artists` |
 | `VenueChangedEvent` | `Concertable.B2B.Venue.Contracts.Events` | `VenueProjectionHandler` → `Venues` |
-| `ConcertChangedEvent` | `Concertable.B2B.Concert.Contracts.Events` | `ConcertProjectionHandler` → `Concerts` |
+| `ConcertChangedEvent` | `Concertable.B2B.Concert.Contracts.Events` | `ConcertChangedHandler` → `Concerts` |
 | `ArtistRatingUpdatedEvent` | `Concertable.B2B.Artist.Contracts.Events` | `ArtistRatingProjectionHandler` → `ArtistRatingProjections` |
 | `VenueRatingUpdatedEvent` | `Concertable.B2B.Venue.Contracts.Events` | `VenueRatingProjectionHandler` → `VenueRatingProjections` |
 | `ConcertRatingUpdatedEvent` | `Concertable.B2B.Concert.Contracts.Events` | `ConcertRatingProjectionHandler` → `ConcertRatingProjections` |
