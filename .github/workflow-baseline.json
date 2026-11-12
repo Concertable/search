@@ -1,0 +1,8 @@
+[
+  {
+    "path": ".github/workflows/ci.yml",
+    "rule": "naming",
+    "message": "job 'ci-complete' name 'ci-complete' must start with an uppercase letter",
+    "reason": "Preserves the existing required GitHub check context while aggregating Search and Windows setup validation."
+  }
+]

@@ -8,19 +8,48 @@ on:
   merge_group:
 
 permissions:
-  contents: read
-  packages: read
-
-env:
-  GITHUB_PACKAGES_TOKEN: ${{ secrets.CONCERTABLE_PACKAGES_READ }}
+  contents: read # Both validation jobs check out the candidate without write authority.
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  local-setup-tests:
+    name: Verify Windows local setup orchestration
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Exercise startup sequencing and failure isolation
+        shell: pwsh
+        run: pwsh -NoProfile -File ./scripts/tests/start-local.Tests.ps1
+
   ci-complete:
     name: ci-complete
+    if: always()
+    needs:
+      - build-and-test
+      - local-setup-tests
+    permissions: {}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every validation job
+        env:
+          BUILD_RESULT: ${{ needs.build-and-test.result }}
+          SETUP_RESULT: ${{ needs.local-setup-tests.result }}
+        run: |
+          set -euo pipefail
+          test "$BUILD_RESULT" = success
+          test "$SETUP_RESULT" = success
+
+  build-and-test:
+    name: Build and test Search
+    permissions:
+      contents: read # Checkout reads the candidate and its MinVer history.
+      packages: read # The Search closure restores packages from other Concertable repositories.
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
@@ -35,8 +64,8 @@ jobs:
       - name: Scan source for secrets
         run: >-
           docker run --rm
-          --volume '${{ github.workspace }}:/work:ro'
-          --volume '${{ runner.temp }}/trivy-cache:/root/.cache/trivy'
+          --volume "${GITHUB_WORKSPACE}:/work:ro"
+          --volume "${RUNNER_TEMP}/trivy-cache:/root/.cache/trivy"
           aquasec/trivy:0.74.0@sha256:62b1e65e8869bc4b4c6aa4fa2b21595256c7c2f6018a9d9ad61caf87187c1969
           filesystem --scanners secret --exit-code 1 --timeout 30m --no-progress /work
 
@@ -46,6 +75,8 @@ jobs:
           dotnet-version: 10.x
 
       - name: Restore Search solution
+        env:
+          GITHUB_PACKAGES_TOKEN: ${{ secrets.CONCERTABLE_PACKAGES_READ }}
         run: dotnet restore Concertable.Search.slnx
 
       - name: Build Search solution
@@ -53,21 +84,23 @@ jobs:
 
       - name: Build and inspect Search images without publishing
         shell: pwsh
+        env:
+          GITHUB_PACKAGES_TOKEN: ${{ secrets.CONCERTABLE_PACKAGES_READ }}
         run: >-
           ./scripts/verify-search-images.ps1
-          -WebImage 'concertable/search-web:verification-${{ github.sha }}'
-          -WorkersImage 'concertable/search-workers:verification-${{ github.sha }}'
-          -MigrationsImage 'concertable/search-migrations:verification-${{ github.sha }}'
-          -BuildVersion '0.0.0-ci.${{ github.run_number }}'
+          -WebImage "concertable/search-web:verification-$env:GITHUB_SHA"
+          -WorkersImage "concertable/search-workers:verification-$env:GITHUB_SHA"
+          -MigrationsImage "concertable/search-migrations:verification-$env:GITHUB_SHA"
+          -BuildVersion "0.0.0-ci.$env:GITHUB_RUN_NUMBER"
           -KeepImages
 
       - name: Scan Search image vulnerabilities and secrets
         shell: pwsh
         run: |
           foreach ($image in @(
-            'concertable/search-web:verification-${{ github.sha }}',
-            'concertable/search-workers:verification-${{ github.sha }}',
-            'concertable/search-migrations:verification-${{ github.sha }}'
+            "concertable/search-web:verification-$env:GITHUB_SHA",
+            "concertable/search-workers:verification-$env:GITHUB_SHA",
+            "concertable/search-migrations:verification-$env:GITHUB_SHA"
           )) {
             foreach ($scanner in @(
               @{ Name = 'vulnerabilities'; Arguments = @('--scanners', 'vuln', '--severity', 'CRITICAL') },
@@ -76,7 +109,7 @@ jobs:
               $arguments = @(
                 'run', '--rm',
                 '--volume', '/var/run/docker.sock:/var/run/docker.sock',
-                '--volume', '${{ runner.temp }}/trivy-cache:/root/.cache/trivy',
+                '--volume', "$env:RUNNER_TEMP/trivy-cache:/root/.cache/trivy",
                 'aquasec/trivy:0.74.0@sha256:62b1e65e8869bc4b4c6aa4fa2b21595256c7c2f6018a9d9ad61caf87187c1969',
                 'image'
               ) + $scanner.Arguments + @('--exit-code', '1', '--no-progress', $image)
@@ -90,12 +123,12 @@ jobs:
       - name: Generate and verify Search image SBOMs
         shell: pwsh
         run: |
-          $evidence = '${{ runner.temp }}/search-image-evidence'
+          $evidence = Join-Path $env:RUNNER_TEMP 'search-image-evidence'
           New-Item -ItemType Directory -Path $evidence | Out-Null
           foreach ($item in @(
-            @{ Image = 'concertable/search-web:verification-${{ github.sha }}'; File = 'search-web.cdx.json' },
-            @{ Image = 'concertable/search-workers:verification-${{ github.sha }}'; File = 'search-workers.cdx.json' },
-            @{ Image = 'concertable/search-migrations:verification-${{ github.sha }}'; File = 'search-migrations.cdx.json' }
+            @{ Image = "concertable/search-web:verification-$env:GITHUB_SHA"; File = 'search-web.cdx.json' },
+            @{ Image = "concertable/search-workers:verification-$env:GITHUB_SHA"; File = 'search-workers.cdx.json' },
+            @{ Image = "concertable/search-migrations:verification-$env:GITHUB_SHA"; File = 'search-migrations.cdx.json' }
           )) {
             docker run --rm `
               --volume /var/run/docker.sock:/var/run/docker.sock `
@@ -116,10 +149,14 @@ jobs:
         run: dotnet publish api/src/Concertable.Search.Migrations/Concertable.Search.Migrations.csproj --configuration Release --no-restore --output artifacts/migrations
 
       - name: Pack Search Hosting
-        run: dotnet pack api/src/Concertable.Search.Hosting/Concertable.Search.Hosting.csproj --configuration Release --output artifacts/packages -p:MinVerVersionOverride=0.0.0-ci.${{ github.run_number }}
+        env:
+          GITHUB_PACKAGES_TOKEN: ${{ secrets.CONCERTABLE_PACKAGES_READ }}
+        run: dotnet pack api/src/Concertable.Search.Hosting/Concertable.Search.Hosting.csproj --configuration Release --output artifacts/packages -p:MinVerVersionOverride=0.0.0-ci.$GITHUB_RUN_NUMBER
 
       - name: Verify package candidates from a clean consumer
         shell: pwsh
+        env:
+          GITHUB_PACKAGES_TOKEN: ${{ secrets.CONCERTABLE_PACKAGES_READ }}
         run: ./scripts/verify-package-candidates.ps1 -PackageDirectory artifacts/packages
 
       # The org packages token, not GITHUB_TOKEN: a dependency image published by another repository
@@ -128,7 +165,8 @@ jobs:
       - name: Log in to GHCR for standalone dependency images
         env:
           TOKEN: ${{ secrets.CONCERTABLE_PACKAGES_READ }}
-        run: echo "$TOKEN" | docker login ghcr.io --username "${{ github.actor }}" --password-stdin
+          GHCR_USERNAME: ${{ github.actor }}
+        run: printf '%s' "$TOKEN" | docker login ghcr.io --username "$GHCR_USERNAME" --password-stdin
 
       - name: Upload package candidate
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -148,10 +186,21 @@ jobs:
 
       - name: Verify combined Search release candidate without publishing
         shell: pwsh
+        env:
+          GITHUB_PACKAGES_TOKEN: ${{ secrets.CONCERTABLE_PACKAGES_READ }}
         run: >-
           ./scripts/verify-search-release-candidate.ps1
           -Configuration Release
-          -OutputPath '${{ runner.temp }}/search-release-candidate'
+          -OutputPath "$env:RUNNER_TEMP/search-release-candidate"
+
+      - name: Trust HTTPS for the isolated Search runtime
+        run: |
+          set -euo pipefail
+          export DOTNET_DEV_CERTS_OPENSSL_CERTIFICATE_DIRECTORY="$RUNNER_TEMP/search-dev-certs"
+          export SSL_CERT_DIR="$DOTNET_DEV_CERTS_OPENSSL_CERTIFICATE_DIRECTORY:/usr/lib/ssl/certs"
+          dotnet dev-certs https --trust
+          dotnet dev-certs https --check --trust
+          printf '%s\n' "DOTNET_DEV_CERTS_OPENSSL_CERTIFICATE_DIRECTORY=$DOTNET_DEV_CERTS_OPENSSL_CERTIFICATE_DIRECTORY" "SSL_CERT_DIR=$SSL_CERT_DIR" >> "$GITHUB_ENV"
 
       - name: Test Search solution
         run: dotnet test Concertable.Search.slnx --configuration Release --no-build --no-restore -m:1
@@ -161,14 +210,14 @@ jobs:
         shell: pwsh
         run: |
           foreach ($image in @(
-            'concertable/search-web:verification-${{ github.sha }}',
-            'concertable/search-workers:verification-${{ github.sha }}',
-            'concertable/search-migrations:verification-${{ github.sha }}'
+            "concertable/search-web:verification-$env:GITHUB_SHA",
+            "concertable/search-workers:verification-$env:GITHUB_SHA",
+            "concertable/search-migrations:verification-$env:GITHUB_SHA"
           )) {
             $inspection = docker image inspect $image 2>$null | ConvertFrom-Json
             if ($LASTEXITCODE -eq 0) {
               if ($inspection[0].Config.Labels.'org.opencontainers.image.source' -ne 'https://github.com/Concertable/search' -or
-                  $inspection[0].Config.Labels.'org.opencontainers.image.revision' -ne '${{ github.sha }}') {
+                  $inspection[0].Config.Labels.'org.opencontainers.image.revision' -ne $env:GITHUB_SHA) {
                 throw "Refusing to remove image '$image' because it is not owned by this Search revision."
               }
               docker image rm --force $image
@@ -177,4 +226,9 @@ jobs:
               }
             }
           }
-          Remove-Item -LiteralPath '${{ runner.temp }}/search-image-evidence' -Recurse -Force -ErrorAction SilentlyContinue
+          $temporaryRoot = [IO.Path]::GetFullPath($env:RUNNER_TEMP)
+          $evidencePath = [IO.Path]::GetFullPath((Join-Path $temporaryRoot 'search-image-evidence'))
+          if ([IO.Path]::GetRelativePath($temporaryRoot, $evidencePath) -ne 'search-image-evidence') {
+            throw 'Refusing to remove evidence outside the runner temporary directory.'
+          }
+          Remove-Item -LiteralPath $evidencePath -Recurse -Force -ErrorAction SilentlyContinue
