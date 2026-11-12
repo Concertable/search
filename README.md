@@ -52,9 +52,8 @@ three secret parameters of at least 32 characters, then supplies them to Auth as
 service client secrets. `concertable-auth` remains the Auth client ID; no SPA clients are enabled, and the
 developer-certificate bridge remains part of the Auth resource.
 
-Run the AppHost directly with `aspire run`. For an existing local setup, before the first run with this
-change, copy each effective `ServiceAuth` user-secret value to its parameter key. Do not print, log, or
-silently rotate these secrets during the migration.
+Before the first wrapper run with this change, copy each effective `ServiceAuth` user-secret value to its
+parameter key. Do not print, log, or silently rotate these secrets during the migration.
 
 | Obsolete key | Parameter key |
 | --- | --- |
@@ -76,15 +75,32 @@ dotnet user-secrets set "Parameters:auth-service-client-secret" "<new 32+ charac
 
 ### Start, observe, and stop
 
-From the repository root, start the one supported local runtime in the foreground:
+The supported entry point first runs the qualified local Infra lab, requires its fresh `passed` receipt, then
+starts Search in the foreground. `-InfraPath` is explicit: the required source revision
+`f331b58443cd4c701174039bad1ff10cc298b8b0` is not published on a remote branch, so a fresh clone cannot
+qualify it. Obtain the qualified local Infra checkout from its owner. The wrapper temporarily removes
+`ARM_*` and `AZURE_*` credential variables for the lab process and restores the caller environment before
+starting Search.
+
+From the repository root:
 
 ```powershell
-aspire run --apphost ./local/AppHost/Concertable.Search.AppHost.csproj
+pwsh ./scripts/start-local.ps1 -InfraPath '<absolute path to the qualified Infra checkout>'
 ```
 
-Use `Ctrl+C` to end that foreground run. The AppHost orders Auth migrations before Auth, and Search
+If the native Aspire CLI is not on `PATH`, supply its qualified command path with `-AspireCommand`. The
+wrapper refuses an unexpected Infra repository, a lab changed from the pinned revision, an existing lab
+container/network, an existing Search AppHost, failed lab execution, or a stale/non-passing receipt. It does
+not stop a workload to clear any of those conditions.
+
+Starting from a different Search worktree can select a different derived Postgres volume. This entry point
+does not migrate or reuse historical lesson data: named and anonymous retained volumes stay preserved, and
+an authorised backup-and-verified-restore transition remains the gate before changing them.
+
+Use `Ctrl+C` to end the foreground Search run. The AppHost orders Auth migrations before Auth, and Search
 migrations before both Search Web and Workers. The B2B simulator waits for the workers, then publishes its
-catalog events and exits.
+catalog events and exits. Launch alone is not a completed setup: check the resources and autocomplete path
+below.
 
 For a detached run that you have identified as this AppHost, stop only that AppHost:
 

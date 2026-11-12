@@ -11,6 +11,8 @@ namespace Concertable.Search.StartupTests;
 
 public sealed class ResourceGraphTests
 {
+    private const string PostgresDataDirectory = "/var/lib/postgresql/data";
+
     [Fact]
     public async Task ProductionGraphAndStrictValidation_AreValid()
     {
@@ -33,13 +35,30 @@ public sealed class ResourceGraphTests
         Assert.DoesNotContain(validBuilder.Resources, resource => resource.Name == B2BDatabase.Name);
         Assert.IsType<PostgresDatabaseResource>(validBuilder.Resources.Single(resource =>
             resource.Name == AuthConstants.Database));
-        Assert.DoesNotContain(validBuilder.Resources, resource => resource is SqlServerServerResource);
+        Assert.DoesNotContain(validBuilder.Resources, resource => resource.GetType().Name == "SqlServerServerResource");
         AssertWaitsFor(validBuilder, AuthConstants.MigrationsResource, AuthConstants.Database, WaitType.WaitUntilHealthy);
         AssertWaitsFor(validBuilder, AuthConstants.Resource, AuthConstants.MigrationsResource, WaitType.WaitForCompletion);
         using var app = validBuilder.Build();
         var builder = AppHost.CreateBuilder([]);
         builder.Services.AddInvalidLifetimeGraph();
         Assert.ThrowsAny<Exception>(() => builder.Build());
+    }
+
+    [Fact]
+    public void PostgresDataVolume_IsWritableAndMountedAtTheDirectDataDirectory()
+    {
+        var builder = AppHost.CreateBuilder([]);
+        var postgres = Assert.Single(builder.Resources.OfType<PostgresServerResource>());
+        var mount = Assert.Single(
+            postgres.Annotations.OfType<ContainerMountAnnotation>(),
+            candidate => candidate.Target == PostgresDataDirectory);
+
+        Assert.Equal(ContainerMountType.Volume, mount.Type);
+        Assert.False(mount.IsReadOnly);
+        Assert.False(string.IsNullOrWhiteSpace(mount.Source));
+        Assert.DoesNotContain(
+            postgres.Annotations.OfType<ContainerMountAnnotation>(),
+            candidate => candidate.Target == "/var/lib/postgresql");
     }
 
     [Fact]
