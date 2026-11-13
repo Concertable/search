@@ -26,6 +26,7 @@ does not start a B2B database or B2B runtime.
 - .NET SDK 10 and an Aspire CLI compatible with the AppHost SDK (the composition is currently built with
   Aspire 13.6.2). Install the CLI normally and make `aspire` available on `PATH`; confirm the version with
   `aspire --version`.
+- PowerShell 7 and Git for the local orchestration entry point.
 - A running Docker Engine configured for **Linux containers**. The emulator, PostgreSQL/PostGIS, Auth, and
   the B2B simulator are containers.
 - A trusted HTTPS development certificate for the Auth image bridge:
@@ -52,8 +53,8 @@ three secret parameters of at least 32 characters, then supplies them to Auth as
 service client secrets. `concertable-auth` remains the Auth client ID; no SPA clients are enabled, and the
 developer-certificate bridge remains part of the Auth resource.
 
-For an existing setup, before the first wrapper run with this change, copy each effective `ServiceAuth` user-secret value to its
-parameter key. Do not print, log, or silently rotate these secrets during the migration.
+For an existing setup, before the first wrapper run with this change, copy each effective `ServiceAuth`
+user-secret value to its parameter key. Do not print, log, or silently rotate these secrets during migration.
 
 | Obsolete key | Parameter key |
 | --- | --- |
@@ -91,7 +92,8 @@ pwsh ./scripts/start-local.ps1 -InfraPath '<absolute path to the qualified Infra
 If the native Aspire CLI is not on `PATH`, supply its qualified command path with `-AspireCommand`. The
 wrapper refuses an unexpected Infra repository, a lab changed from the pinned revision, an existing lab
 container/network, an existing Search AppHost, failed lab execution, or a stale/non-passing receipt. It does
-not stop a workload to clear any of those conditions.
+not stop a workload to clear any of those conditions. After the receipt, it verifies that the lab container
+and network are gone before starting Search.
 
 Starting from a different Search worktree can select a different derived Postgres volume. This entry point
 does not migrate or reuse historical lesson data: named and anonymous retained volumes stay preserved, and
@@ -153,9 +155,15 @@ No successful local response has been observed for this documentation change.
 
 ### Current local constraints and data safety
 
-- Qualification awaits a published platform pin containing the PostGIS mount fix. The current
-  `0.2.0-alpha.0.14` pin is broken; the repair exists only in unpublished platform commit `2dda7db`. There
-  is no local mount workaround and this setup makes no retained-store persistence claim.
+- The platform pin is `0.2.0-alpha.0.88`, published from
+  [platform PR #97](https://github.com/Concertable/platform-dotnet/pull/97), merge
+  `7be8b4e5b288591d1d23f40868bea14b8d079632`. Fresh startup tests verify its direct writable PostGIS mount
+  at `/var/lib/postgresql/data`. This consumes the shared repair; it does not migrate a retained store.
+- The complete wrapper and Docker E2E path remain unqualified while the local Docker/WSL host is
+  unavailable. The E2E test builds, but neither its runtime behavior nor combined startup/stop and memory
+  use has been observed. It checks Auth HTTPS discovery, migrations, readiness, autocomplete, configured
+  database identity and non-seeded SearchDb/AuthDb sentinels across two distinct Postgres containers using
+  one test-owned disposable volume. That test never selects the historical lesson volumes.
 - The native generated PostgreSQL password is designed to persist with AppHost user secrets. The effective
   password of an older retained store is unverified, so keep credentials and that store together as runtime
   evidence; do not recreate a database to make them appear to match.
@@ -193,13 +201,13 @@ pwsh ./scripts/verify-package-candidates.ps1 -PackageDirectory artifacts/package
 dotnet test Concertable.Search.slnx --configuration Release --no-build --no-restore -m:1
 ```
 
-The integration suite requires Docker. The repository CI supplies its `GITHUB_TOKEN` through
+The integration suite requires Docker. The repository CI supplies its `CONCERTABLE_PACKAGES_READ` secret through
 `GITHUB_PACKAGES_TOKEN`, runs these repository gates, packs the unpublished Hosting candidate,
 verifies it through one clean installed-package consumer, builds the standalone AppHost, runs its
 architecture coverage, and retains preparation artifacts for seven days. The standalone host runs Search
 from source, consumes Auth and the B2B seed simulator as digest-pinned images, and does not provision a
 foreign data-service database. It runs the Search migration job to successful completion before starting Web
-or Workers; those runtime hosts never modify schema. CI logs into GHCR with its ephemeral repository token,
+or Workers; those runtime hosts never modify schema. CI logs into GHCR with the package-read credential,
 then the Search-owned standalone test proves that B2B simulator events rebuild artist, venue, and concert
 projections observable through Search's public autocomplete API. The inherited full-stack E2E helper remains
 system-owned and excluded.
