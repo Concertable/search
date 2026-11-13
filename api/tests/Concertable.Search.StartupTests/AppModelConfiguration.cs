@@ -17,10 +17,6 @@ internal static class AppModelConfiguration
     /// topology or wiring key added here would hide exactly the defect this tier exists to catch.</summary>
     public static string[] Secrets { get; } =
     [
-        "--ServiceAuth:AuthClientSecret=startup-auth-secret",
-        "--ServiceAuth:B2BClientSecret=startup-b2b-secret",
-        "--ServiceAuth:CustomerClientSecret=startup-customer-secret",
-        "--ServiceAuth:ClientSecret=startup-client-secret",
         "--Stripe:SecretKey=sk_test_startup",
         "--Stripe:WebhookSecret=whsec_startup",
         "--ExternalServices:UseRealStripe=false"

@@ -8,12 +8,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Concertable.Search.Infrastructure.Handlers;
 
-internal sealed class ConcertProjectionHandler : IIntegrationEventHandler<ConcertChangedEvent>
+internal sealed class ConcertChangedHandler : IIntegrationEventHandler<ConcertChangedEvent>
 {
+    private const string InboxHandlerName = "ConcertProjectionHandler";
+
     private readonly IGeometryProvider geometryProvider;
     private readonly SearchDbContext context;
 
-    public ConcertProjectionHandler(
+    public ConcertChangedHandler(
         [FromKeyedServices(GeometryProviderType.Geographic)] IGeometryProvider geometryProvider,
         SearchDbContext context)
     {
@@ -23,10 +25,10 @@ internal sealed class ConcertProjectionHandler : IIntegrationEventHandler<Concer
 
     public async Task HandleAsync(ConcertChangedEvent e, MessageEnvelope envelope, CancellationToken ct = default)
     {
-        if (await context.IsInboxMessageProcessedAsync(envelope.MessageId, nameof(ConcertProjectionHandler), ct))
+        if (await context.IsInboxMessageProcessedAsync(envelope.MessageId, InboxHandlerName, ct))
             return;
 
-        context.AddInboxMessage(envelope, nameof(ConcertProjectionHandler));
+        context.AddInboxMessage(envelope, InboxHandlerName);
 
         var concert = await context.Set<ConcertReadModel>()
             .Include(c => c.ConcertGenres)

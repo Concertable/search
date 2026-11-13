@@ -16,6 +16,21 @@ public static class AppHost
     public static IDistributedApplicationBuilder CreateBuilder(string[] args)
     {
         var builder = StrictDistributedApplication.CreateBuilder(args);
+        var b2BClientSecret = builder.AddParameter(
+            "auth-b2b-client-secret",
+            new GenerateParameterDefault { MinLength = 32 },
+            secret: true,
+            persist: true);
+        var customerClientSecret = builder.AddParameter(
+            "auth-customer-client-secret",
+            new GenerateParameterDefault { MinLength = 32 },
+            secret: true,
+            persist: true);
+        var serviceClientSecret = builder.AddParameter(
+            "auth-service-client-secret",
+            new GenerateParameterDefault { MinLength = 32 },
+            secret: true,
+            persist: true);
         var postgres = builder.AddPostgresContainer("concertable-search-postgres-data").WithPostGis();
         var searchDb = postgres.AddDatabase(SearchConstants.Database);
         var authDb = postgres.AddDatabase(AuthConstants.Database);
@@ -31,6 +46,9 @@ public static class AppHost
                           .WithHttpsEndpoint(targetPort: AuthConstants.ContainerPort, name: "https");
         auth.WithSpaClients([]);
         auth.WithEnvironment("ServiceAuth__AuthClientId", "concertable-auth");
+        auth.WithEnvironment("ServiceAuth__B2BClientSecret", b2BClientSecret);
+        auth.WithEnvironment("ServiceAuth__CustomerClientSecret", customerClientSecret);
+        auth.WithEnvironment("ServiceAuth__AuthClientSecret", serviceClientSecret);
         var migrations = builder.AddSearchMigrations<Projects.Concertable_Search_Migrations>(searchDb);
         builder.AddSearchWeb<Projects.Concertable_Search_Web>(auth, searchDb)
                .WaitForCompletion(migrations);
