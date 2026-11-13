@@ -214,8 +214,15 @@ jobs:
             "concertable/search-workers:verification-$env:GITHUB_SHA",
             "concertable/search-migrations:verification-$env:GITHUB_SHA"
           )) {
-            $inspection = docker image inspect $image 2>$null | ConvertFrom-Json
-            if ($LASTEXITCODE -eq 0) {
+            $imageIds = @(docker image ls --quiet $image)
+            if ($LASTEXITCODE -ne 0) {
+              throw "Could not query verification image '$image'."
+            }
+            if ($imageIds.Count -gt 0) {
+              $inspection = docker image inspect $image | ConvertFrom-Json
+              if ($LASTEXITCODE -ne 0) {
+                throw "Could not inspect verification image '$image'."
+              }
               if ($inspection[0].Config.Labels.'org.opencontainers.image.source' -ne 'https://github.com/Concertable/search' -or
                   $inspection[0].Config.Labels.'org.opencontainers.image.revision' -ne $env:GITHUB_SHA) {
                 throw "Refusing to remove image '$image' because it is not owned by this Search revision."
