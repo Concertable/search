@@ -24,7 +24,24 @@ function Assert-Throws([scriptblock] $Action, [string] $Message) {
 }
 
 function global:docker {
-    Write-Output 'Error: No such object'
+    if ($env:START_LOCAL_TEST_DOCKER_MODE -eq 'unavailable') {
+        Write-Output 'error during connect: the Docker daemon is unavailable'
+        $global:LASTEXITCODE = 1
+        return
+    }
+    if ($env:START_LOCAL_TEST_DOCKER_MODE -eq "leftover-$($args[0])" -and
+        (Test-Path -LiteralPath $env:START_LOCAL_TEST_LOG) -and
+        ((Get-Content -LiteralPath $env:START_LOCAL_TEST_LOG) -contains 'lab')) {
+        Write-Output '[{}]'
+        $global:LASTEXITCODE = 0
+        return
+    }
+    if ($args[0] -eq 'network') {
+        Write-Output "Error response from daemon: network $($args[2]) not found"
+    }
+    else {
+        Write-Output 'Error: No such object'
+    }
     $global:LASTEXITCODE = 1
 }
 
@@ -114,8 +131,10 @@ $previousAzure = $env:AZURE_TEST_CREDENTIAL
 $previousMode = $env:START_LOCAL_TEST_LAB_MODE
 $previousLog = $env:START_LOCAL_TEST_LOG
 $previousAppHostStatus = $env:START_LOCAL_TEST_APPHOST_STATUS
+$previousDockerMode = $env:START_LOCAL_TEST_DOCKER_MODE
 
 try {
+    $env:START_LOCAL_TEST_DOCKER_MODE = ''
     Invoke-Case 'runs the lab before Aspire and restores credentials' {
         $fixture = New-Fixture (Join-Path $root 'success')
         $log = Join-Path $root 'success.log'
@@ -133,6 +152,42 @@ try {
         $labIndex = [Array]::IndexOf($lines, 'lab')
         $runIndex = [Array]::FindIndex($lines, [Predicate[string]] { param($line) $line -like 'run *' })
         Assert-True ($labIndex -ge 0 -and $runIndex -gt $labIndex) 'Aspire started before the lab.'
+    }
+
+    Invoke-Case 'stops before the lab when Docker is unavailable' {
+        $fixture = New-Fixture (Join-Path $root 'docker-unavailable')
+        $log = Join-Path $root 'docker-unavailable.log'
+        $env:START_LOCAL_TEST_LOG = $log
+        $env:START_LOCAL_TEST_LAB_MODE = 'success'
+        $env:START_LOCAL_TEST_APPHOST_STATUS = ''
+        $env:START_LOCAL_TEST_DOCKER_MODE = 'unavailable'
+        try {
+            Assert-Throws { Invoke-StartLocal $fixture.Infra $fixture.Aspire $fixture.Dependency } 'An unavailable Docker daemon must stop orchestration.'
+            Assert-True (-not ((Get-Content -LiteralPath $log) -match '^lab$|^run ')) 'The lab or Aspire ran with Docker unavailable.'
+        }
+        finally {
+            $env:START_LOCAL_TEST_DOCKER_MODE = ''
+        }
+    }
+
+    foreach ($kind in @('container', 'network')) {
+        Invoke-Case "does not start Aspire when the lab leaves its $kind" {
+            $fixture = New-Fixture (Join-Path $root "leftover-$kind")
+            $log = Join-Path $root "leftover-$kind.log"
+            $env:START_LOCAL_TEST_LOG = $log
+            $env:START_LOCAL_TEST_LAB_MODE = 'success'
+            $env:START_LOCAL_TEST_APPHOST_STATUS = ''
+            $env:START_LOCAL_TEST_DOCKER_MODE = "leftover-$kind"
+            try {
+                Assert-Throws { Invoke-StartLocal $fixture.Infra $fixture.Aspire $fixture.Dependency } "A remaining lab $kind must stop orchestration."
+                $lines = @(Get-Content -LiteralPath $log)
+                Assert-True ($lines -contains 'lab') 'The lab never ran, so its cleanup was not checked.'
+                Assert-True (-not ($lines -match '^run ')) "Aspire ran while the lab $kind remained."
+            }
+            finally {
+                $env:START_LOCAL_TEST_DOCKER_MODE = ''
+            }
+        }
     }
 
     Invoke-Case 'does not start Aspire when the lab fails' {
@@ -240,6 +295,7 @@ finally {
     $env:START_LOCAL_TEST_LAB_MODE = $previousMode
     $env:START_LOCAL_TEST_LOG = $previousLog
     $env:START_LOCAL_TEST_APPHOST_STATUS = $previousAppHostStatus
+    $env:START_LOCAL_TEST_DOCKER_MODE = $previousDockerMode
     if (Test-Path -LiteralPath $root) {
         $resolvedRoot = (Resolve-Path -LiteralPath $root).Path
         $expectedRoot = Join-Path $temporaryParent $rootName

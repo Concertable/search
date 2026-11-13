@@ -146,7 +146,12 @@ function Assert-NoLabCollision([hashtable] $Dependency) {
         if ($exitCode -eq 0) {
             throw "The Infra lab $($resource.Kind) '$($resource.Name)' already exists."
         }
-        if ($exitCode -ne 1 -or ($output -join [Environment]::NewLine) -notmatch '(?i)no such (object|container|network)') {
+        $diagnostic = $output -join [Environment]::NewLine
+        $missingResource = $diagnostic -match '(?i)no such (object|container|network)'
+        if ($resource.Kind -eq 'network') {
+            $missingResource = $missingResource -or $diagnostic -match "(?i)network $([regex]::Escape($resource.Name)) not found(?:\r?\n|$)"
+        }
+        if ($exitCode -ne 1 -or -not $missingResource) {
             throw "Could not determine whether the Infra lab $($resource.Kind) '$($resource.Name)' exists: $($output -join [Environment]::NewLine)"
         }
     }
@@ -218,6 +223,7 @@ function Invoke-StartLocal([string] $RequestedInfraPath, [string] $ExplicitAspir
     Invoke-LabWithoutAzureCredentials $infra.LabScript
     Assert-FreshPassedReceipt $infra.ReceiptPath $startedAt
 
+    Assert-NoLabCollision $Dependency
     Assert-NoExistingAppHost $aspire $appHost
     & $aspire 'run' '--apphost' $appHost
     $exitCode = $LASTEXITCODE
