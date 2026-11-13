@@ -52,7 +52,7 @@ three secret parameters of at least 32 characters, then supplies them to Auth as
 service client secrets. `concertable-auth` remains the Auth client ID; no SPA clients are enabled, and the
 developer-certificate bridge remains part of the Auth resource.
 
-Before the first wrapper run with this change, copy each effective `ServiceAuth` user-secret value to its
+For an existing setup, before the first wrapper run with this change, copy each effective `ServiceAuth` user-secret value to its
 parameter key. Do not print, log, or silently rotate these secrets during the migration.
 
 | Obsolete key | Parameter key |
