@@ -196,8 +196,8 @@ function Assert-FreshPassedReceipt([string] $ReceiptPath, [DateTimeOffset] $Invo
 
     try {
         $receipt = Get-Content -LiteralPath $ReceiptPath -Raw | ConvertFrom-Json
-        $startedAt = [DateTimeOffset]::Parse([string] $receipt.started_at_utc)
-        $finishedAt = [DateTimeOffset]::Parse([string] $receipt.finished_at_utc)
+        $startedAt = [DateTimeOffset] $receipt.started_at_utc
+        $finishedAt = [DateTimeOffset] $receipt.finished_at_utc
     }
     catch {
         throw "Infra lab verification receipt at '$ReceiptPath' is invalid."
