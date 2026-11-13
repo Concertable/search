@@ -135,6 +135,24 @@ $previousDockerMode = $env:START_LOCAL_TEST_DOCKER_MODE
 
 try {
     $env:START_LOCAL_TEST_DOCKER_MODE = ''
+    Invoke-Case 'preserves fractional seconds in receipt timestamps' {
+        $invocation = [DateTimeOffset]::FromUnixTimeSeconds([DateTimeOffset]::UtcNow.ToUnixTimeSeconds() - 60).AddMilliseconds(500)
+        $receiptPath = Join-Path $root 'fractional-receipt.json'
+        @{ result = 'passed'; started_at_utc = $invocation.AddMilliseconds(100).ToString('o'); finished_at_utc = $invocation.AddMilliseconds(200).ToString('o') } |
+            ConvertTo-Json | Set-Content -LiteralPath $receiptPath
+
+        Assert-FreshPassedReceipt $receiptPath $invocation
+    }
+
+    Invoke-Case 'rejects old receipt contents with a fresh file timestamp' {
+        $invocation = [DateTimeOffset]::UtcNow.AddMinutes(-1)
+        $receiptPath = Join-Path $root 'old-receipt-contents.json'
+        @{ result = 'passed'; started_at_utc = $invocation.AddMinutes(-1).ToString('o'); finished_at_utc = $invocation.AddMinutes(-1).ToString('o') } |
+            ConvertTo-Json | Set-Content -LiteralPath $receiptPath
+
+        Assert-Throws { Assert-FreshPassedReceipt $receiptPath $invocation } 'Fresh file metadata must not admit old receipt contents.'
+    }
+
     Invoke-Case 'runs the lab before Aspire and restores credentials' {
         $fixture = New-Fixture (Join-Path $root 'success')
         $log = Join-Path $root 'success.log'
