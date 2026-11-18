@@ -15,9 +15,17 @@ public sealed class ResourceGraphTests
     public async Task ProductionGraphAndStrictValidation_AreValid()
     {
         var validBuilder = AppHost.CreateBuilder([]);
-        AssertImageEndpoint(validBuilder, AuthConstants.Resource, "https", scheme: "https");
+        // The endpoint is named "https" because consumers resolve Auth through GetEndpoint("https"), but
+        // the image binds plaintext on it: its Dockerfile sets ASPNETCORE_HTTP_PORTS=8080.
+        AssertImageEndpoint(validBuilder, AuthConstants.Resource, "https", scheme: "http");
         AssertContainerRuntimeArgs(validBuilder, AuthConstants.Resource, "--user", "root");
         AssertUsesDeveloperCertificate(validBuilder, AuthConstants.Resource);
+        Assert.IsType<PostgresDatabaseResource>(validBuilder.Resources.Single(resource =>
+            resource.Name == AuthConstants.Database));
+        AssertWaitsFor(validBuilder, AuthConstants.MigrationsResource, AuthConstants.Database, WaitType.WaitUntilHealthy);
+        // AddAuth wires this itself rather than leaving it to the call site, so nothing here would catch an
+        // Auth.Hosting publish that dropped it and left Auth racing its own schema creation.
+        AssertWaitsFor(validBuilder, AuthConstants.Resource, AuthConstants.MigrationsResource, WaitType.WaitForCompletion);
         await AssertNoSpaClientsAsync(validBuilder);
         var migrations = Assert.IsType<ProjectResource>(validBuilder.Resources.Single(resource =>
             resource.Name == SearchConstants.MigrationsResource));
