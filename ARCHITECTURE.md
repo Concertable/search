@@ -25,7 +25,7 @@ Search does **not** serve entity-details pages — those are the frozen public w
 | `Concertable.Search.Domain` | Shared csproj | Read-model + rating-projection entities. Depends only on `Concertable.Kernel`. |
 | `Concertable.Search.Infrastructure` | Shared csproj | `SearchDbContext`, EF configs, migrations, event handlers, repositories, geo specs. |
 | `Concertable.Search.Migrations` | Console job | Applies Search projection and pinned messaging inbox migrations to `SearchDb`, then exits. |
-| `Concertable.Search.AppHost` | Aspire AppHost | Local-dev orchestrator only. |
+| `Concertable.Search.AppHost` | Aspire AppHost | Local-development entry point; orchestrates source Search, Postgres/PostGIS (`SearchDb` and `AuthDb`), the ASB emulator, digest-pinned Auth/Auth migrations, and the B2B seed simulator. |
 
 **Database:** `SearchDb` (PostgreSQL + PostGIS), schema `search` — table names in `Infrastructure/Schema.cs`. The
 idempotent migration job owns both `SearchDbContext` and the pinned messaging `InboxDbContext` migrations.
@@ -56,7 +56,7 @@ Search subscribes to six B2B-owned events (Workers `Program.cs`); each handler (
 |---|---|---|
 | `ArtistChangedEvent` | `Concertable.B2B.Artist.Contracts.Events` | `ArtistProjectionHandler` → `Artists` |
 | `VenueChangedEvent` | `Concertable.B2B.Venue.Contracts.Events` | `VenueProjectionHandler` → `Venues` |
-| `ConcertChangedEvent` | `Concertable.B2B.Concert.Contracts.Events` | `ConcertProjectionHandler` → `Concerts` |
+| `ConcertChangedEvent` | `Concertable.B2B.Concert.Contracts.Events` | `ConcertChangedHandler` → `Concerts` |
 | `ArtistRatingUpdatedEvent` | `Concertable.B2B.Artist.Contracts.Events` | `ArtistRatingProjectionHandler` → `ArtistRatingProjections` |
 | `VenueRatingUpdatedEvent` | `Concertable.B2B.Venue.Contracts.Events` | `VenueRatingProjectionHandler` → `VenueRatingProjections` |
 | `ConcertRatingUpdatedEvent` | `Concertable.B2B.Concert.Contracts.Events` | `ConcertRatingProjectionHandler` → `ConcertRatingProjections` |
@@ -97,7 +97,9 @@ repository. Generic conventions belong to `efcore:specification` and `efcore:que
 
 .NET 10 · EF Core + Npgsql/PostGIS (`SearchDbContext : DbContextBase`) · NetTopologySuite (`geography`) · Azure Service Bus (Workers) · `Concertable.Messaging` (Inbox/Transport) · Aspire (`Concertable.ServiceDefaults`) · JWT Bearer (audience `concertable.search.api`; most reads anonymous) · `Concertable.Shared.Api` · LinqKit (`.AsExpandable()` in header mappers) · FluentValidation.
 
-The standalone `Concertable.Search.AppHost` replays B2B catalog events via `Concertable.B2B.Seed.Simulator`; there is no Customer seed simulator, so a standalone run has catalog data but no seeded ratings — see [`TECH_DEBT.md`](./TECH_DEBT.md).
+The standalone `Concertable.Search.AppHost` replays B2B catalog events via `Concertable.B2B.Seed.Simulator`.
+Its operational setup, current limitations, and data-safety rules live in [the local-run guide](./README.md#run-search-locally);
+the missing Customer seed simulator is tracked in [`TECH_DEBT.md`](./TECH_DEBT.md).
 
 ---
 
