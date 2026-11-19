@@ -1,18 +1,15 @@
 # Concertable.Search
 
-The **Search** service of [Concertable](https://github.com/Concertable/concertable) — the search
+The **Search** service of Concertable — the search
 *data service*: it maintains read-optimised projections of concerts, venues, artists, and ratings,
 built purely from B2B-owned `*.Contracts` integration events. Customer reviews feed rating
 aggregation upstream in B2B; Search consumes the resulting B2B-owned rating events. It never
 depends on another data service's runtime. When a standalone host lacks B2B events at seed time,
 the B2B-owned seed simulator replays them.
 
-## Promotion staging
+## Repository ownership
 
-This private repository is the writable Search extraction and promotion-staging repository. Search
-promotion preparation is developed through pull requests here. The monorepo remains canonical until
-the ordered cutover gates are complete and the final rename, publication, and source removal are
-explicitly authorized.
+This repository owns Search source changes, releases and deployment.
 
 ## Building the independent closure
 
