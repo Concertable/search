@@ -11,4 +11,4 @@ permissions:
 
 jobs:
   policy:
-    uses: tj-agents/personal/.github/workflows/personal-policy.yml@main
+    uses: tj-agents/personal/.github/workflows/personal-policy.yml@18919f8400cf7fc206b62523738be3ce55042811 # main
