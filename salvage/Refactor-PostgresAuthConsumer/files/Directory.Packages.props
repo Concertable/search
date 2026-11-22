@@ -1,0 +1,67 @@
+﻿<Project>
+
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <ConcertableDotNetPlatformVersion>0.2.0-alpha.0.14</ConcertableDotNetPlatformVersion>
+    <ConcertableAuthVersion>0.2.0-alpha.0.305</ConcertableAuthVersion>
+    <ConcertableB2BContractsVersion>0.2.0-alpha.0.302</ConcertableB2BContractsVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageVersion Include="Concertable.Testing" Version="$(ConcertableDotNetPlatformVersion)" />
+    <PackageVersion Include="Concertable.Testing.Architecture" Version="$(ConcertableDotNetPlatformVersion)" />
+    <PackageVersion Include="Concertable.Testing.Integration" Version="$(ConcertableDotNetPlatformVersion)" />
+    <PackageVersion Include="Aspire.Hosting.Azure.ServiceBus" Version="13.3.2" />
+    <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="13.3.2" />
+    <PackageVersion Include="Aspire.Hosting.Testing" Version="13.3.2" />
+    <PackageVersion Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="13.1.2" />
+    <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
+    <PackageVersion Include="LinqKit.Microsoft.EntityFrameworkCore" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.10.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.4" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.4" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.4" />
+    <PackageVersion Include="Npgsql" Version="10.0.3" />
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL.NetTopologySuite" Version="10.0.3" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageVersion Include="Moq" Version="4.20.72" />
+    <PackageVersion Include="Respawn" Version="7.0.0" />
+    <PackageVersion Include="Testcontainers.PostgreSql" Version="4.1.0" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.0" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.0.2" />
+  </ItemGroup>
+
+  <!-- Shared platform + cross-service contracts from the org feed. Each train moves on its own
+       cadence, so they carry separate variables rather than one lockstep pin. Bump only to a version
+       already published to the feed, else restore fails NU1101. -->
+  <ItemGroup>
+    <PackageVersion Include="Concertable.AppHost.Shared" Version="$(ConcertableDotNetPlatformVersion)" />
+    <PackageVersion Include="Concertable.Auth.Contracts" Version="$(ConcertableAuthVersion)" />
+    <PackageVersion Include="Concertable.Auth.Hosting" Version="$(ConcertableAuthVersion)" />
+    <PackageVersion Include="Concertable.B2B.Hosting" Version="$(ConcertableB2BContractsVersion)" />
+    <PackageVersion Include="Concertable.B2B.Tenant.Contracts" Version="$(ConcertableB2BContractsVersion)" />
+    <PackageVersion Include="Concertable.B2B.Artist.Contracts" Version="$(ConcertableB2BContractsVersion)" />
+    <PackageVersion Include="Concertable.B2B.Venue.Contracts" Version="$(ConcertableB2BContractsVersion)" />
+    <PackageVersion Include="Concertable.B2B.Concert.Contracts" Version="$(ConcertableB2BContractsVersion)" />
+    <PackageVersion Include="Concertable.B2B.Seed.Contracts" Version="$(ConcertableB2BContractsVersion)" />
+    <PackageVersion Include="Concertable.Kernel" Version="$(ConcertableDotNetPlatformVersion)" />
+    <PackageVersion Include="Concertable.DataAccess.Infrastructure" Version="$(ConcertableDotNetPlatformVersion)" />
+    <PackageVersion Include="Concertable.Messaging.Contracts" Version="$(ConcertableDotNetPlatformVersion)" />
+    <PackageVersion Include="Concertable.Messaging.Domain" Version="$(ConcertableDotNetPlatformVersion)" />
+    <PackageVersion Include="Concertable.Messaging.Infrastructure" Version="$(ConcertableDotNetPlatformVersion)" />
+    <PackageVersion Include="Concertable.Messaging.AzureServiceBus" Version="$(ConcertableDotNetPlatformVersion)" />
+    <PackageVersion Include="Concertable.ServiceDefaults" Version="$(ConcertableDotNetPlatformVersion)" />
+    <PackageVersion Include="Concertable.Shared.Api" Version="$(ConcertableDotNetPlatformVersion)" />
+    <PackageVersion Include="Concertable.Seed.Shared" Version="$(ConcertableDotNetPlatformVersion)" />
+    <PackageVersion Include="Concertable.Seed.Identity" Version="$(ConcertableDotNetPlatformVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <GlobalPackageReference Include="Meziantou.Analyzer" Version="3.0.98" />
+    <GlobalPackageReference Include="Concertable.Build" Version="$(ConcertableDotNetPlatformVersion)" />
+    <GlobalPackageReference Include="MinVer" Version="7.0.0" />
+  </ItemGroup>
+
+</Project>

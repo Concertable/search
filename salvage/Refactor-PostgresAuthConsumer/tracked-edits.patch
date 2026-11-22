@@ -1,0 +1,82 @@
+diff --git a/Directory.Packages.props b/Directory.Packages.props
+index c347700..b2a9c79 100644
+--- a/Directory.Packages.props
++++ b/Directory.Packages.props
+@@ -1,9 +1,9 @@
+-<Project>
++﻿<Project>
+ 
+   <PropertyGroup>
+     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+-    <ConcertableDotNetPlatformVersion>0.2.0-alpha.0.13</ConcertableDotNetPlatformVersion>
+-    <ConcertableAuthVersion>0.2.0-alpha.0.297</ConcertableAuthVersion>
++    <ConcertableDotNetPlatformVersion>0.2.0-alpha.0.14</ConcertableDotNetPlatformVersion>
++    <ConcertableAuthVersion>0.2.0-alpha.0.305</ConcertableAuthVersion>
+     <ConcertableB2BContractsVersion>0.2.0-alpha.0.302</ConcertableB2BContractsVersion>
+   </PropertyGroup>
+ 
+diff --git a/api/tests/Concertable.Search.StartupTests/ResourceGraphTests.cs b/api/tests/Concertable.Search.StartupTests/ResourceGraphTests.cs
+index 49418fc..aaf5f2c 100644
+--- a/api/tests/Concertable.Search.StartupTests/ResourceGraphTests.cs
++++ b/api/tests/Concertable.Search.StartupTests/ResourceGraphTests.cs
+@@ -15,9 +15,17 @@ public sealed class ResourceGraphTests
+     public async Task ProductionGraphAndStrictValidation_AreValid()
+     {
+         var validBuilder = AppHost.CreateBuilder([]);
+-        AssertImageEndpoint(validBuilder, AuthConstants.Resource, "https", scheme: "https");
++        // The endpoint is named "https" because consumers resolve Auth through GetEndpoint("https"), but
++        // the image binds plaintext on it: its Dockerfile sets ASPNETCORE_HTTP_PORTS=8080.
++        AssertImageEndpoint(validBuilder, AuthConstants.Resource, "https", scheme: "http");
+         AssertContainerRuntimeArgs(validBuilder, AuthConstants.Resource, "--user", "root");
+         AssertUsesDeveloperCertificate(validBuilder, AuthConstants.Resource);
++        Assert.IsType<PostgresDatabaseResource>(validBuilder.Resources.Single(resource =>
++            resource.Name == AuthConstants.Database));
++        AssertWaitsFor(validBuilder, AuthConstants.MigrationsResource, AuthConstants.Database, WaitType.WaitUntilHealthy);
++        // AddAuth wires this itself rather than leaving it to the call site, so nothing here would catch an
++        // Auth.Hosting publish that dropped it and left Auth racing its own schema creation.
++        AssertWaitsFor(validBuilder, AuthConstants.Resource, AuthConstants.MigrationsResource, WaitType.WaitForCompletion);
+         await AssertNoSpaClientsAsync(validBuilder);
+         var migrations = Assert.IsType<ProjectResource>(validBuilder.Resources.Single(resource =>
+             resource.Name == SearchConstants.MigrationsResource));
+diff --git a/local/AppHost/AppHost.cs b/local/AppHost/AppHost.cs
+index fe9abec..f5f0e31 100644
+--- a/local/AppHost/AppHost.cs
++++ b/local/AppHost/AppHost.cs
+@@ -7,26 +7,32 @@ using Concertable.Search.Hosting;
+ public static class AppHost
+ {
+     private const string AuthImage = "ghcr.io/concertable/auth";
+-    private const string AuthDigest = "sha256:06a295ad6fa01a223000682b0f6efbfba2d5436a8fb2ffaa2d2399526ff3ae69";
++    private const string AuthDigest = "sha256:cbd7c429da9d9dd2cc674177760690c53d1414e8057e368eefc3631dfcb62be6";
++    private const string AuthMigrationsImage = "ghcr.io/concertable/auth-migrations";
++    private const string AuthMigrationsDigest = "sha256:090b1bb80dc7b708508a03883cdfb8e8805b36918589e6d14f2f350cc61c5dcb";
+     private const string B2BSeedingSimulatorImage = "ghcr.io/concertable/b2b-seeding-simulator";
+     private const string B2BSeedingSimulatorDigest = "sha256:240d9569035152fd7e63695bcb0913ca5bad85fef902d9669c7e3bc288d2e244";
+ 
+     public static IDistributedApplicationBuilder CreateBuilder(string[] args)
+     {
+         var builder = StrictDistributedApplication.CreateBuilder(args);
+-        var sql = builder.AddSqlServerContainer("concertable-search-sql-data");
+-        var authDb = sql.AddDatabase(AuthConstants.Database);
+         var postgres = builder.AddPostgresContainer("concertable-search-postgres-data").WithPostGis();
+         var searchDb = postgres.AddDatabase(SearchConstants.Database);
++        var authDb = postgres.AddDatabase(AuthConstants.Database);
+         var asb = builder.AddServiceBus();
+         asb.Topology()
+            .AddSearchTopology()
+            .AddAuthTopology()
+            .Publish<PayoutOwnerRegisteredEvent>()
+            .RunAsEmulator();
+-        var auth = builder.AddAuth(AuthImage, AuthDigest, authDb, asb)
++        var authMigrations = builder.AddAuthMigrations(AuthMigrationsImage, AuthMigrationsDigest, authDb);
++        // The image binds plaintext on its container port (ASPNETCORE_HTTP_PORTS=8080), but consumers
++        // resolve it through GetEndpoint("https"), so the endpoint carrying that traffic is named "https"
++        // while staying HTTP. WithHttpsEndpoint instead leaves DCP unable to apply the container's
++        // configuration and the resource never starts, reporting no reason.
++        var auth = builder.AddAuth(AuthImage, AuthDigest, authDb, authMigrations, asb)
+                           .WithContainerRuntimeArgs("--user", "root")
+-                          .WithHttpsEndpoint(targetPort: AuthConstants.ContainerPort, name: "https");
++                          .WithHttpEndpoint(targetPort: AuthConstants.ContainerPort, name: "https");
+         auth.WithSpaClients([]);
+         auth.WithEnvironment("ServiceAuth__AuthClientId", "concertable-auth");
+         var migrations = builder.AddSearchMigrations<Projects.Concertable_Search_Migrations>(searchDb);
